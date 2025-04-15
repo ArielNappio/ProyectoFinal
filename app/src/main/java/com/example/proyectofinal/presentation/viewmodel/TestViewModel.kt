@@ -11,7 +11,8 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 class TestViewModel(
-    private val repository: RemoteRepository): ViewModel() {
+    private val repository: RemoteRepository
+): ViewModel() {
 
         private val _getData = MutableStateFlow<NetworkResponse<List<Item>>?>(null)
         val getData = _getData.asStateFlow()
