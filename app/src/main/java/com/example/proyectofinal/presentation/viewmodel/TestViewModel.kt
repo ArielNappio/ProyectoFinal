@@ -22,6 +22,7 @@ class TestViewModel(
         viewModelScope.launch {
             repository.getItem().collect { res ->
                 _getData.update {
+                    println(res)
                     res }
             }
         }
