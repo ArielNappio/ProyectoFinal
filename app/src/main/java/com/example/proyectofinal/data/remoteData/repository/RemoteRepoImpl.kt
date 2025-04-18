@@ -23,7 +23,7 @@ class RemoteRepoImpl (
         try{
             emit(NetworkResponse.Loading())
 
-            val response = ktorClient.post("https://tu-api.com/api/Auth/login") {
+            val response = ktorClient.post(ApiUrls.LOGIN) {
                 contentType(io.ktor.http.ContentType.Application.Json)
                 setBody(loginRequest)
             }

@@ -23,6 +23,7 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.example.proyectofinal.presentation.view.LoginScreen
 import com.example.proyectofinal.presentation.view.TestScreen
 import com.example.proyectofinal.presentation.view.MainCameraScreen
 import com.example.proyectofinal.ui.theme.ProyectoFinalTheme
@@ -37,7 +38,8 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    NavigationApp()
+                    LoginScreen()
+                    //NavigationApp()
                 }
             }
         }

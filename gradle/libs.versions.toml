@@ -14,6 +14,8 @@ koin = "4.0.3"
 cameraX = "1.4.2"
 accompanistPermissions = "0.37.2"
 navigationCompose = "2.8.9"
+navigationRuntimeKtx = "2.8.9"
+navigationRuntimeAndroid = "2.9.0-beta01"
 datastore = "1.1.4"
 
 [libraries]
@@ -64,6 +66,9 @@ accompanist-permissions = { module = "com.google.accompanist:accompanist-permiss
 
 #Navigation
 androidx-navigation-compose = { group = "androidx.navigation", name = "navigation-compose", version.ref = "navigationCompose" }
+androidx-navigation-runtime-ktx = { group = "androidx.navigation", name = "navigation-runtime-ktx", version.ref = "navigationRuntimeKtx" }
+androidx-navigation-runtime-android = { group = "androidx.navigation", name = "navigation-runtime-android", version.ref = "navigationRuntimeAndroid" }
+
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
