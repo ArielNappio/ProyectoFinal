@@ -72,6 +72,9 @@ dependencies {
     implementation(libs.androidx.camera.core)
     implementation(libs.androidx.camera.extensions)
 
+    //datastore
+    implementation(libs.datastore.preferences)
+
     implementation(libs.accompanist.permissions)
 
     implementation(libs.androidx.navigation.compose)

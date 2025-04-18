@@ -1,23 +1,39 @@
 package com.example.proyectofinal.data.remoteData.repository
 
 import com.example.proyectofinal.data.remoteData.model.Item
+import com.example.proyectofinal.data.remoteData.model.LoginRequest
 import com.example.proyectofinal.util.NetworkResponse
 import io.ktor.client.HttpClient
-import io.ktor.client.call.body
-import io.ktor.client.request.get
 import io.ktor.client.request.prepareGet
 import io.ktor.client.statement.bodyAsText
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.serialization.json.Json
-import okhttp3.internal.connection.Exchange
+import com.example.proyectofinal.data.remoteData.model.LoginResponse
+import io.ktor.client.call.body
+import io.ktor.client.request.post
+import io.ktor.client.request.setBody
+import io.ktor.http.contentType
+
 
 class RemoteRepoImpl (
     private val ktorClient: HttpClient
 ): RemoteRepository{
-    override fun postItem(): Any? {
-        TODO("Not yet implemented")
+    override fun postLogin(loginRequest: LoginRequest): Flow<NetworkResponse<LoginResponse>> = flow {
+        try{
+            emit(NetworkResponse.Loading())
+
+            val response = ktorClient.post("https://tu-api.com/api/Auth/login") {
+                contentType(io.ktor.http.ContentType.Application.Json)
+                setBody(loginRequest)
+            }
+
+            val responseBody = response.body<LoginResponse>()
+            emit(NetworkResponse.Success(data = responseBody))
+        }
+        catch(e: Exception){
+            emit(NetworkResponse.Failure(error = e.toString()))
+        }
     }
 
     override fun getItem(): Flow<NetworkResponse<List<Item>>> = flow{
