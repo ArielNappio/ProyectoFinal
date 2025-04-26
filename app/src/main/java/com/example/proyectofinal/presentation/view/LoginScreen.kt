@@ -14,6 +14,7 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -23,13 +24,23 @@ import androidx.compose.ui.unit.dp
 import com.example.proyectofinal.presentation.viewmodel.LoginViewModel
 import org.koin.androidx.compose.koinViewModel
 import androidx.compose.runtime.getValue
+import androidx.navigation.NavController
+import com.example.proyectofinal.util.NetworkResponse
 
 @Composable
-fun LoginScreen() {
+fun LoginScreen(
+    navController: NavController
+) {
     val viewmodel = koinViewModel<LoginViewModel>()
     val email by viewmodel.email.collectAsState()
     val password by viewmodel.password.collectAsState()
     val loginState by viewmodel.loginState.collectAsState()
+
+    LaunchedEffect(loginState) {
+        if(loginState is NetworkResponse.Success){
+            navController.navigate("main")
+        }
+    }
 
     Column(
         modifier = Modifier
@@ -57,7 +68,7 @@ fun LoginScreen() {
         OutlinedTextField(
             value = password,
             onValueChange = { viewmodel.onPasswordChange(it) },
-            label = { Text("Contraseña") },
+            label = { Text("Contraseña8") },
             modifier = Modifier.fillMaxWidth(),
             visualTransformation = PasswordVisualTransformation(),
             keyboardOptions = KeyboardOptions.Default.copy(
@@ -68,7 +79,7 @@ fun LoginScreen() {
         Spacer(modifier = Modifier.height(24.dp))
 
         Button(
-            onClick = {viewmodel.onLoginClick()},
+            onClick = { viewmodel.onLoginClick() },
             modifier = Modifier.fillMaxWidth()
         ) {
             Text("Iniciar sesión")

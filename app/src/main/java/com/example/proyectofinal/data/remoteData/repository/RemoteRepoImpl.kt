@@ -13,6 +13,7 @@ import com.example.proyectofinal.data.remoteData.model.LoginResponse
 import io.ktor.client.call.body
 import io.ktor.client.request.post
 import io.ktor.client.request.setBody
+import io.ktor.http.HttpStatusCode
 import io.ktor.http.contentType
 
 
@@ -20,7 +21,7 @@ class RemoteRepoImpl (
     private val ktorClient: HttpClient
 ): RemoteRepository{
     override fun postLogin(loginRequest: LoginRequest): Flow<NetworkResponse<LoginResponse>> = flow {
-        try{
+        try {
             emit(NetworkResponse.Loading())
 
             val response = ktorClient.post(ApiUrls.LOGIN) {
@@ -28,11 +29,14 @@ class RemoteRepoImpl (
                 setBody(loginRequest)
             }
 
-            val responseBody = response.body<LoginResponse>()
-            emit(NetworkResponse.Success(data = responseBody))
-        }
-        catch(e: Exception){
-            emit(NetworkResponse.Failure(error = e.toString()))
+            if (response.status == HttpStatusCode.OK) {
+                val responseBody = response.body<LoginResponse>()
+                emit(NetworkResponse.Success(data = responseBody))
+            } else {
+                emit(NetworkResponse.Failure(error = "Error: ${response.status}"))
+            }
+        } catch (e: Exception) {
+            emit(NetworkResponse.Failure(error = e.localizedMessage ?: "Unknown error"))
         }
     }
 

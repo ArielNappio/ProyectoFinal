@@ -38,8 +38,7 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    LoginScreen()
-                    //NavigationApp()
+                    NavigationApp()
                 }
             }
         }
@@ -49,7 +48,8 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun NavigationApp() {
     val navController = rememberNavController()
-    NavHost(navController = navController, startDestination = "main") {
+    NavHost(navController = navController, startDestination = "login") {
+        composable("login") { LoginScreen(navController = navController) }
         composable("main") { MainScreen(navController = navController) }
         composable("camera") { MainCameraScreen() }
         composable("api") { TestScreen() }
