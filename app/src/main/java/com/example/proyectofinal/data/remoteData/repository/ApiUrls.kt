@@ -6,4 +6,6 @@ object ApiUrls {
     const val TEST = "${BASE_URL}WeatherForecast"
     const val LOGIN = "${BASE_URL}api/Auth/login"
     const val REGISTER = "${BASE_URL}api/Auth/register"
+    const val ORDERS = "${BASE_URL}api/Order"
+    const val ORDER = "${BASE_URL}api/Order/{id}"
 }
