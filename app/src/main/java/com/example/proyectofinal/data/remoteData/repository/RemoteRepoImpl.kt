@@ -88,7 +88,7 @@ class RemoteRepoImpl(
         }
     }
 
-    override fun createOrder(order: Order): Flow<NetworkResponse<Unit>> = flow{
+    override fun createOrder(order: Order): Flow<NetworkResponse<Order>> = flow {
         try {
             emit(NetworkResponse.Loading())
             val response = ktorClient.post(ApiUrls.ORDERS) {
@@ -96,17 +96,17 @@ class RemoteRepoImpl(
                 setBody(order)
             }
             if (response.status == HttpStatusCode.Created) {
-                emit(NetworkResponse.Success(data = Unit))
+                emit(NetworkResponse.Success(data = order))
             }
         } catch (e: Exception) {
             emit(NetworkResponse.Failure(error = e.toString()))
         }
     }
 
-    override fun updateOrder(id: Int, order: Order): Flow<NetworkResponse<Unit>> = flow {
+    override fun updateOrder(order: Order): Flow<NetworkResponse<Unit>> = flow {
         try {
             emit(NetworkResponse.Loading())
-            val response = ktorClient.put("${ApiUrls.ORDER}/$id"){
+            val response = ktorClient.put("${ApiUrls.ORDER}/${order.id}"){
                 contentType(ContentType.Application.Json)
                 setBody(order)
             }

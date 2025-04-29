@@ -14,8 +14,8 @@ interface RemoteRepository{
     //orders
     fun getOrders(): Flow<NetworkResponse<List<Order>>>
     fun getOrderById(id: Int): Flow<NetworkResponse<Order>>
-    fun createOrder(order: Order): Flow<NetworkResponse<Unit>>
-    fun updateOrder(id: Int, order: Order): Flow<NetworkResponse<Unit>>
+    fun createOrder(order: Order): Flow<NetworkResponse<Order>>
+    fun updateOrder(order: Order): Flow<NetworkResponse<Unit>>
     fun deleteOrder(id: Int): Flow<NetworkResponse<Unit>>
 
 }
