@@ -26,6 +26,7 @@ import androidx.navigation.compose.rememberNavController
 import com.example.proyectofinal.presentation.view.LoginScreen
 import com.example.proyectofinal.presentation.view.TestScreen
 import com.example.proyectofinal.presentation.view.MainCameraScreen
+import com.example.proyectofinal.presentation.view.MainScreen
 import com.example.proyectofinal.ui.theme.ProyectoFinalTheme
 
 class MainActivity : ComponentActivity() {
@@ -56,21 +57,3 @@ fun NavigationApp() {
     }
 }
 
-@Composable
-fun MainScreen(navController: NavController) {
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(16.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
-    ) {
-        Button(onClick = { navController.navigate("camera") }, modifier = Modifier.fillMaxWidth()) {
-            Text("Go to camera screen")
-        }
-        Spacer(modifier = Modifier.height(16.dp))
-        Button(onClick = { navController.navigate("api") }, modifier = Modifier.fillMaxWidth()) {
-            Text("Go to API consumption screen")
-        }
-    }
-}
