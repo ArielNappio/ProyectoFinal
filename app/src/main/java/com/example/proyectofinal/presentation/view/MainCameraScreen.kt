@@ -2,8 +2,6 @@ package com.example.proyectofinal.presentation.view
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.tooling.preview.Preview
-import com.example.proyectofinal.presentation.view.features.CameraScreen
-import com.example.proyectofinal.presentation.view.features.NoCameraPermissionScreen
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.PermissionState
 import com.google.accompanist.permissions.isGranted

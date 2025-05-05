@@ -1,4 +1,4 @@
-package com.example.proyectofinal.data.usecases
+package com.example.proyectofinal.domain.usecase
 
 import android.content.ContentResolver
 import android.content.ContentValues
@@ -21,7 +21,10 @@ class SavePhotoToGalleryUseCase(
         val resolver: ContentResolver = context.applicationContext.contentResolver
 
         val imageCollection: Uri = when {
-            Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q -> MediaStore.Images.Media.getContentUri(MediaStore.VOLUME_EXTERNAL_PRIMARY)
+            Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q -> MediaStore.Images.Media.getContentUri(
+                MediaStore.VOLUME_EXTERNAL_PRIMARY
+            )
+
             else -> MediaStore.Images.Media.EXTERNAL_CONTENT_URI
         }
 
@@ -34,7 +37,10 @@ class SavePhotoToGalleryUseCase(
 
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
                 put(MediaStore.MediaColumns.DATE_TAKEN, nowTimestamp)
-                put(MediaStore.MediaColumns.RELATIVE_PATH, Environment.DIRECTORY_DCIM + "/YourAppNameOrAnyOtherSubFolderName")
+                put(
+                    MediaStore.MediaColumns.RELATIVE_PATH,
+                    Environment.DIRECTORY_DCIM + "/YourAppNameOrAnyOtherSubFolderName"
+                )
                 put(MediaStore.MediaColumns.IS_PENDING, 1)
             }
 
@@ -51,7 +57,7 @@ class SavePhotoToGalleryUseCase(
 
         // Write the image data to the new Uri.
         val result: Result<Unit> = imageMediaStoreUri?.let { uri ->
-            kotlin.runCatching {
+            runCatching {
                 resolver.openOutputStream(uri).use { outputStream: OutputStream? ->
                     checkNotNull(outputStream) { "Couldn't create file for gallery, MediaStore output stream is null" }
                     capturePhotoBitmap.compress(Bitmap.CompressFormat.JPEG, 100, outputStream)

@@ -1,7 +1,7 @@
 package com.example.proyectofinal.di
 
 import com.example.proyectofinal.presentation.viewmodel.TestViewModel
-import com.example.proyectofinal.presentation.view.features.CameraViewModel
+import com.example.proyectofinal.presentation.viewmodel.CameraViewModel
 import com.example.proyectofinal.presentation.viewmodel.LoginViewModel
 import com.example.proyectofinal.presentation.viewmodel.MainViewModel
 import org.koin.core.module.dsl.viewModel

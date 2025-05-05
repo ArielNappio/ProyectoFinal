@@ -1,4 +1,4 @@
-package com.example.proyectofinal.presentation.view.features
+package com.example.proyectofinal.presentation.view
 
 import android.content.Context
 import android.graphics.Bitmap
@@ -33,6 +33,7 @@ import androidx.compose.ui.Alignment.Companion.BottomStart
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.compose.ui.tooling.preview.Preview
@@ -41,6 +42,8 @@ import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.example.proyectofinal.presentation.state.CameraState
+import com.example.proyectofinal.presentation.viewmodel.CameraViewModel
 import com.example.proyectofinal.util.rotateBitmap
 import org.koin.androidx.compose.koinViewModel
 import java.util.concurrent.Executor
@@ -147,7 +150,7 @@ private fun LastPhotoPreview(
         Image(
             bitmap = capturedPhoto,
             contentDescription = "Last captured photo",
-            contentScale = androidx.compose.ui.layout.ContentScale.Crop
+            contentScale = ContentScale.Crop
         )
     }
 }

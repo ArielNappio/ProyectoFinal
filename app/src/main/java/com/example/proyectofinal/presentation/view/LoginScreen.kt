@@ -68,7 +68,7 @@ fun LoginScreen(
         OutlinedTextField(
             value = password,
             onValueChange = { viewmodel.onPasswordChange(it) },
-            label = { Text("Contraseña8") },
+            label = { Text("Contraseña") },
             modifier = Modifier.fillMaxWidth(),
             visualTransformation = PasswordVisualTransformation(),
             keyboardOptions = KeyboardOptions.Default.copy(

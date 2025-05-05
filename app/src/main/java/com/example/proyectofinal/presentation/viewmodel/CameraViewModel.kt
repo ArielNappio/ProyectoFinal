@@ -1,9 +1,10 @@
-package com.example.proyectofinal.presentation.view.features
+package com.example.proyectofinal.presentation.viewmodel
 
 import android.graphics.Bitmap
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.proyectofinal.data.usecases.SavePhotoToGalleryUseCase
+import com.example.proyectofinal.domain.usecase.SavePhotoToGalleryUseCase
+import com.example.proyectofinal.presentation.state.CameraState
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
