@@ -1,9 +1,9 @@
 package com.example.proyectofinal
 
-import com.example.proyectofinal.data.remoteData.model.Order
-import com.example.proyectofinal.data.remoteData.repository.RemoteRepository
-import com.example.proyectofinal.domain.usecase.GetOrdersUseCase
-import com.example.proyectofinal.util.NetworkResponse
+import com.example.proyectofinal.order.data.model.Order
+import com.example.proyectofinal.auth.data.remoteData.repository.AuthRemoteRepository
+import com.example.proyectofinal.order.domain.usecase.GetOrdersUseCase
+import com.example.proyectofinal.core.network.NetworkResponse
 import io.mockk.coEvery
 import io.mockk.mockk
 import junit.framework.TestCase.assertEquals
@@ -22,7 +22,7 @@ import org.junit.Test
 @OptIn(ExperimentalCoroutinesApi::class)
 class GetOrdersUseCaseTest {
 
-    private lateinit var repository: RemoteRepository
+    private lateinit var repository: AuthRemoteRepository
     private lateinit var getOrdersUseCase: GetOrdersUseCase
 
     private val testDispatcher = StandardTestDispatcher()

@@ -1,8 +1,8 @@
 package com.example.proyectofinal
 
-import com.example.proyectofinal.data.remoteData.repository.RemoteRepository
-import com.example.proyectofinal.domain.usecase.DeleteOrderUseCase
-import com.example.proyectofinal.util.NetworkResponse
+import com.example.proyectofinal.auth.data.remoteData.repository.AuthRemoteRepository
+import com.example.proyectofinal.order.domain.usecase.DeleteOrderUseCase
+import com.example.proyectofinal.core.network.NetworkResponse
 import io.mockk.coEvery
 import io.mockk.mockk
 import kotlinx.coroutines.Dispatchers
@@ -20,7 +20,7 @@ import org.junit.Test
 @OptIn(ExperimentalCoroutinesApi::class)
 class DeleteOrderUseCaseTest {
 
-    private lateinit var repository: RemoteRepository
+    private lateinit var repository: AuthRemoteRepository
     private lateinit var deleteOrderUseCase: DeleteOrderUseCase
 
     private val testDispatcher = StandardTestDispatcher()
