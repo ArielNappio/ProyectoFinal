@@ -2,6 +2,7 @@ package com.example.proyectofinal.auth.data.local
 
 
 import android.content.Context
+import android.util.Log
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
@@ -13,9 +14,11 @@ private val Context.dataStore by preferencesDataStore("auth")
 class TokenManager(private val context: Context) {
     private val TOKEN_KEY = stringPreferencesKey("jwt_token")
 
-    val token: Flow<String?> = context.dataStore.data.map {
-        it[TOKEN_KEY]
-    }
+    val token: Flow<String?> = context.dataStore.data
+        .map {
+            Log.d("TokenManager", "Token leído: ${it[TOKEN_KEY]}")
+            it[TOKEN_KEY]
+        }
 
     suspend fun saveToken(token: String) {
         context.dataStore.edit {

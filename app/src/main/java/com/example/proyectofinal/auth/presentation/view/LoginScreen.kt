@@ -1,5 +1,6 @@
 package com.example.proyectofinal.auth.presentation.view
 
+import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -9,6 +10,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
@@ -26,6 +28,7 @@ import org.koin.androidx.compose.koinViewModel
 import androidx.compose.runtime.getValue
 import androidx.navigation.NavController
 import com.example.proyectofinal.core.network.NetworkResponse
+import com.example.proyectofinal.core.util.UiState
 
 @Composable
 fun LoginScreen(
@@ -35,67 +38,84 @@ fun LoginScreen(
     val email by viewmodel.email.collectAsState()
     val password by viewmodel.password.collectAsState()
     val loginState by viewmodel.loginState.collectAsState()
+    val navigateToMain by viewmodel.navigateToMain.collectAsState()
+    val isLoading by viewmodel.isLoading.collectAsState()
+
+    LaunchedEffect(navigateToMain) {
+        if (navigateToMain) {
+            navController.navigate("main") {
+                popUpTo("login") { inclusive = true }
+            }
+        }
+    }
 
     LaunchedEffect(loginState) {
-        if(loginState is NetworkResponse.Success){
-            navController.navigate("main")
+        if (loginState is UiState.Success) {
+            navController.navigate("main") {
+                popUpTo("login") { inclusive = true }
+            }
         }
     }
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(24.dp),
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Text(text = "BiblioAccess", style = MaterialTheme.typography.headlineMedium)
-
-        Spacer(modifier = Modifier.height(24.dp))
-
-        OutlinedTextField(
-            value = email,
-            onValueChange = { viewmodel.onEmailChange(it) },
-            label = { Text("Email") },
-            modifier = Modifier.fillMaxWidth(),
-            keyboardOptions = KeyboardOptions.Default.copy(
-                keyboardType = KeyboardType.Email
-            )
-        )
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        OutlinedTextField(
-            value = password,
-            onValueChange = { viewmodel.onPasswordChange(it) },
-            label = { Text("Contraseña") },
-            modifier = Modifier.fillMaxWidth(),
-            visualTransformation = PasswordVisualTransformation(),
-            keyboardOptions = KeyboardOptions.Default.copy(
-                keyboardType = KeyboardType.Password
-            )
-        )
-
-        Spacer(modifier = Modifier.height(24.dp))
-
-        Button(
-            onClick = { viewmodel.onLoginClick() },
-            modifier = Modifier.fillMaxWidth()
+    if(isLoading){
+        Column(
+            modifier = Modifier.fillMaxSize(),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
         ) {
-            Text("Iniciar sesión")
-        }
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        TextButton(onClick = { /*TODO onRegisterClick*/}) {
-            Text("¿Tienes cuenta? Regístrate")
+            Text("Cargando...")
+            CircularProgressIndicator()
         }
     }
+
+    else {
+
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(24.dp),
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Text(text = "BiblioAccess6", style = MaterialTheme.typography.headlineMedium)
+
+            Spacer(modifier = Modifier.height(24.dp))
+
+            OutlinedTextField(
+                value = email,
+                onValueChange = { viewmodel.onEmailChange(it) },
+                label = { Text("Email") },
+                modifier = Modifier.fillMaxWidth(),
+                keyboardOptions = KeyboardOptions.Default.copy(
+                    keyboardType = KeyboardType.Email
+                )
+            )
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            OutlinedTextField(
+                value = password,
+                onValueChange = { viewmodel.onPasswordChange(it) },
+                label = { Text("Contraseña") },
+                modifier = Modifier.fillMaxWidth(),
+                visualTransformation = PasswordVisualTransformation(),
+                keyboardOptions = KeyboardOptions.Default.copy(
+                    keyboardType = KeyboardType.Password
+                )
+            )
+
+            Spacer(modifier = Modifier.height(24.dp))
+
+            Button(
+                onClick = { viewmodel.onLoginClick() },
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text("Iniciar sesión")
+            }
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+        }
+    }
+
 }
-
-
-//@Preview(showBackground = true)
-//@Composable
-//fun LoginScreenPreview() {
-//    LoginScreen("", "", {}, {}, {}, {})
-//}

@@ -11,6 +11,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -20,7 +21,8 @@ import com.example.proyectofinal.navigation.presentation.viewmodel.MainViewModel
 import org.koin.androidx.compose.koinViewModel
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.graphics.Color
-import com.example.proyectofinal.navigation.presentation.viewmodel.UiState
+import com.example.proyectofinal.core.util.UiState
+import com.example.proyectofinal.navigation.presentation.viewmodel.MainScreenUiState
 
 @Composable
 fun MainScreen(
@@ -28,41 +30,61 @@ fun MainScreen(
 ) {
     val viewModel = koinViewModel<MainViewModel>()
     val userState by viewModel.userState.collectAsState()
+    val mainScreenUiState by viewModel.mainScreenUiState.collectAsState()
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(16.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Top
-    ) {
-
-        when (userState) {
-            is UiState.Loading -> {
-                CircularProgressIndicator(modifier = Modifier.align(Alignment.CenterHorizontally))
+    when (mainScreenUiState) {
+        is MainScreenUiState.Loading -> {
+            Column(
+                modifier = Modifier.fillMaxSize(),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center
+            ) {
+                Text("Cargando...")
+                CircularProgressIndicator()
             }
-            is UiState.Success -> {
-                val user = (userState as UiState.Success).data
-                user?.let {
-                    Text("Welcome, ${it.fullName}")
-                    Text("Email: ${it.email}")
+        }
+        is MainScreenUiState.Authenticated -> {
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(16.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Top
+            ) {
+                when (userState) {
+                    is UiState.Loading -> {
+                        Text("Cargando datos del usuario...")
+                    }
+                    is UiState.Success -> {
+                        val user = (userState as UiState.Success).data
+                        user?.let {
+                            Text("Username: ${it.userName}")
+                            Text("Welcome, ${it.fullName}")
+                            Text("Email: ${it.email}")
+                            Text("Rol: ${it.roles[0]}")
+                        }
+                        Spacer(modifier = Modifier.height(32.dp))
+                        Button(onClick = { navController.navigate("camera") }, modifier = Modifier.fillMaxWidth()) {
+                            Text("Go to camera screen")
+                        }
+                        Spacer(modifier = Modifier.height(16.dp))
+                        Button(onClick = { viewModel.logout() }, modifier = Modifier.fillMaxWidth()) {
+                            Text("logout")
+                        }
+                    }
+                    is UiState.Error -> {
+                        val errorMessage = (userState as UiState.Error).message
+                        Text("Error al cargar datos del usuario: $errorMessage", color = Color.Red)
+                    }
                 }
             }
-            is UiState.Error -> {
-                val errorMessage = (userState as UiState.Error).message
-                Text("Error: $errorMessage", color = Color.Red)
+        }
+        is MainScreenUiState.Unauthenticated -> {
+            navController.navigate("login") {
+                popUpTo("main") { inclusive = true }
             }
-        }
-
-        Spacer(modifier = Modifier.height(32.dp))
-
-        // Botones de navegación
-        Button(onClick = { navController.navigate("camera") }, modifier = Modifier.fillMaxWidth()) {
-            Text("Go to camera screen")
-        }
-        Spacer(modifier = Modifier.height(16.dp))
-        Button(onClick = { navController.navigate("api") }, modifier = Modifier.fillMaxWidth()) {
-            Text("Go to API consumption screen")
         }
     }
 }
+
+
