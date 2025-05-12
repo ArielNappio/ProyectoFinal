@@ -5,10 +5,13 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.FilterAlt
 import androidx.compose.material.icons.filled.Search
@@ -39,19 +42,19 @@ import androidx.compose.ui.graphics.Color
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
-fun HomeScreen(navController: NavController) {
+fun HomeScreen(navController: NavController, modifier: Modifier = Modifier) {
     val viewModel = koinViewModel<HomeScreenViewModel>()
     val notes by viewModel.notes.collectAsState()
 
     Column(
-        modifier = Modifier.fillMaxSize()
+        modifier = modifier
+            .fillMaxSize()
             .background(Color.Black)
+            .padding(16.dp)
     ) {
-
         Row(
             modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp, vertical = 8.dp),
+                .fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
@@ -59,6 +62,7 @@ fun HomeScreen(navController: NavController) {
                 text = "¡Bienvenido!",
                 fontSize = 24.sp,
                 fontWeight = FontWeight.Bold,
+                color = Color.White,
                 modifier = Modifier.semantics { contentDescription = "Bienvenido" }
             )
             Image(
@@ -68,14 +72,22 @@ fun HomeScreen(navController: NavController) {
             )
         }
 
-        Row(modifier = Modifier.padding(16.dp)) {
+        Spacer(modifier = Modifier.height(16.dp))
+
+        // Buscador
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
             var searchText by remember { mutableStateOf("") }
 
             TextField(
                 value = searchText,
                 onValueChange = { searchText = it },
                 label = { Text("Buscar") },
-                modifier = Modifier.weight(1f),
+                modifier = Modifier
+                    .weight(1f)
+                    .height(56.dp),
                 leadingIcon = {
                     Icon(
                         imageVector = Icons.Default.Search,
@@ -83,13 +95,23 @@ fun HomeScreen(navController: NavController) {
                     )
                 }
             )
+            Spacer(modifier = Modifier.width(8.dp))
             IconButton(onClick = { /* Acción de filtro */ }) {
-                Icon(imageVector = Icons.Default.FilterAlt, contentDescription = "Filtrar")
+                Icon(
+                    imageVector = Icons.Default.FilterAlt,
+                    contentDescription = "Filtrar",
+                    tint = Color.White
+                )
             }
         }
 
+        Spacer(modifier = Modifier.height(16.dp))
+
         // Lista de notas
-        LazyColumn(modifier = Modifier.weight(1f)) {
+        LazyColumn(
+            modifier = Modifier
+                .fillMaxSize()
+        ) {
             items(notes) { note ->
                 NoteCard(
                     note = note,
@@ -99,3 +121,4 @@ fun HomeScreen(navController: NavController) {
         }
     }
 }
+

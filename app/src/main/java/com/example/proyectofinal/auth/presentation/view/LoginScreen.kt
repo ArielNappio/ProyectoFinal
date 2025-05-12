@@ -1,6 +1,5 @@
 package com.example.proyectofinal.auth.presentation.view
 
-import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -14,7 +13,6 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -27,8 +25,8 @@ import com.example.proyectofinal.auth.presentation.viewmodel.LoginViewModel
 import org.koin.androidx.compose.koinViewModel
 import androidx.compose.runtime.getValue
 import androidx.navigation.NavController
-import com.example.proyectofinal.core.network.NetworkResponse
 import com.example.proyectofinal.core.util.UiState
+import com.example.proyectofinal.navigation.ScreensRoute
 
 @Composable
 fun LoginScreen(
@@ -43,16 +41,16 @@ fun LoginScreen(
 
     LaunchedEffect(navigateToMain) {
         if (navigateToMain) {
-            navController.navigate("main") {
-                popUpTo("login") { inclusive = true }
+            navController.navigate(ScreensRoute.Home.route) {
+                popUpTo(ScreensRoute.Login.route) { inclusive = true }
             }
         }
     }
 
     LaunchedEffect(loginState) {
         if (loginState is UiState.Success) {
-            navController.navigate("main") {
-                popUpTo("login") { inclusive = true }
+            navController.navigate(ScreensRoute.Home.route) {
+                popUpTo(ScreensRoute.Login.route) { inclusive = true }
             }
         }
     }
