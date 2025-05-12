@@ -15,6 +15,7 @@ import androidx.navigation.compose.rememberNavController
 import com.example.proyectofinal.auth.presentation.view.LoginScreen
 import com.example.proyectofinal.camera.presentation.view.MainCameraScreen
 import com.example.proyectofinal.navigation.presentation.view.MainScreen
+import com.example.proyectofinal.task_student.presentation.view.TaskStudent
 import com.example.proyectofinal.ui.theme.ProyectoFinalTheme
 
 class MainActivity : ComponentActivity() {
@@ -27,7 +28,8 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    NavigationApp()
+                    //NavigationApp()
+                    TaskStudent()
                 }
             }
         }
