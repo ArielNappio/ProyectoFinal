@@ -24,7 +24,7 @@ class HomeScreenViewModel : ViewModel() {
         }
     }
 
-    private fun loadNotes() {
+     fun loadNotes() {
         _notes.value = listOf(
             Note(1, "Apunte de Redes", "Resumen de los modelos OSI y TCP/IP con ejemplos.", false),
             Note(2, "Práctica de Estadística", "Ejercicios de media, mediana, moda y desvío estándar.", true),
