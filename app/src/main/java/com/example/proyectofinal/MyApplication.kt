@@ -6,6 +6,7 @@ import com.example.proyectofinal.auth.di.repositoryModule
 import com.example.proyectofinal.auth.di.tokenManagerModule
 import com.example.proyectofinal.core.di.useCaseModule
 import com.example.proyectofinal.core.di.viewModelModule
+import com.example.proyectofinal.task_student.di.ttsModule
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.context.GlobalContext.startKoin
 
@@ -21,7 +22,8 @@ class MyApplication: Application() {
                 repositoryModule,
                 viewModelModule,
                 useCaseModule,
-                tokenManagerModule
+                tokenManagerModule,
+                ttsModule
             )
         }
 

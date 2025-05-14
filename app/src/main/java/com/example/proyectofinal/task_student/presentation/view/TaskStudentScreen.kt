@@ -1,30 +1,51 @@
 package com.example.proyectofinal.task_student.presentation.view
 
+
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.scaleOut
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowForward
+import androidx.compose.material.icons.automirrored.filled.MenuBook
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.ArrowForward
+import androidx.compose.material.icons.filled.Description
 import androidx.compose.material.icons.filled.FileDownload
+import androidx.compose.material.icons.filled.MenuBook
+import androidx.compose.material.icons.filled.Pause
+import androidx.compose.material.icons.filled.PauseCircleOutline
+import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Remove
 import androidx.compose.material.icons.filled.VolumeUp
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -33,9 +54,24 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
 import com.example.proyectofinal.task_student.presentation.component.AccessibleIconButton
+import com.example.proyectofinal.task_student.presentation.viewmodel.TaskStudentViewModel
+import org.koin.androidx.compose.koinViewModel
+import androidx.compose.runtime.getValue
+import com.example.proyectofinal.task_student.presentation.component.DownloadOption
+
 
 @Composable
 fun TaskStudent() {
+
+    val viewModel = koinViewModel<TaskStudentViewModel>()
+    val texto by viewModel.texto.collectAsState()
+    val isSpeaking by viewModel.isSpeaking.collectAsState()
+    val isPaused by viewModel.isPaused.collectAsState()
+
+    val showExtraButtons by viewModel.showExtraButton.collectAsState()
+    val showDownloadDialog by viewModel.showDownloadDialog.collectAsState()
+    val fontSize by viewModel.fontSize.collectAsState()
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -61,17 +97,21 @@ fun TaskStudent() {
                 AccessibleIconButton(
                     icon = Icons.Default.FileDownload,
                     label = "Descargar",
-                    onClick = { /* Descargar */ }
+                    onClick = { viewModel.showDownloadDialog() }
                 )
                 AccessibleIconButton(
                     icon = Icons.Default.Add,
                     label = "Aumentar",
-                    onClick = { /* Aumentar */ }
+                    onClick = {
+                        viewModel.fontSizeIncrease()
+                    }
                 )
                 AccessibleIconButton(
                     icon = Icons.Default.Remove,
                     label = "Disminuir",
-                    onClick = { /* Disminuir */ }
+                    onClick = {
+                        viewModel.fontSizeDecrease()
+                    }
                 )
             }
         }
@@ -80,15 +120,46 @@ fun TaskStudent() {
         Box(modifier = Modifier.weight(1f)) {
             // Botón "Escuchar" flotante
             IconButton(
-                onClick = { /* Escuchar */ },
+                onClick = {
+                    if (!isSpeaking) {
+                        viewModel.startSpeech()
+                    } else {
+                        viewModel.stopSpeech()
+                    }
+                    viewModel.showExtraButton()
+                },
                 modifier = Modifier
                     .align(Alignment.TopEnd)
-                    .padding(top = 24.dp, end = 16.dp) // debajo del header
-                    .background(Color(0xFFFFA500), shape = RoundedCornerShape(50))
+                    .padding(top = 24.dp, end = 16.dp)
+                    .background(color = Color(0xFFFFA500), shape = RoundedCornerShape(50))
                     .size(48.dp)
                     .zIndex(1f)
             ) {
-                Icon(Icons.Default.VolumeUp, contentDescription = "Escuchar", tint = Color.White)
+                Icon(
+                    imageVector = if (isSpeaking) Icons.Default.PauseCircleOutline else Icons.Default.VolumeUp,
+                    contentDescription = if (isSpeaking) "Pausar" else "Escuchar",
+                    tint = Color.White
+                )
+            }
+
+            if (showExtraButtons) {
+                IconButton(
+                    onClick = {
+                        if(isPaused) viewModel.resumeSpeech() else viewModel.pauseSpeech()
+                    },
+                    modifier = Modifier
+                        .align(Alignment.TopEnd)
+                        .padding(top = 80.dp, end = 16.dp)
+                        .background(color = if(!isPaused) Color.Red else Color.Green, shape = RoundedCornerShape(50))
+                        .size(48.dp)
+                        .zIndex(1f)
+                ) {
+                    Icon(
+                        imageVector = if(!isPaused) Icons.Default.Pause else Icons.Default.PlayArrow,
+                        contentDescription = "Pausar",
+                        tint = Color.White
+                    )
+                }
             }
 
             // Contenido scrolleable
@@ -99,16 +170,9 @@ fun TaskStudent() {
                     .padding(horizontal = 16.dp)
             ) {
                 Text(
-                    text = "Las ecuaciones cuadráticas son una herramienta fundamental en Matemática utilizadas para resolver problemas en áreas como la física la economía y la ingeniería. Su estructura estándar es de la forma ax² + bx + c = 0 donde a b y c son coeficientes que determinan el comportamiento de la función cuadrática.\n\n" +
-                            "Este documento está diseñado para reforzar la comprensión y aplicación de los diferentes métodos de resolución de ecuaciones cuadráticas proporcionando ejercicios de dificultad progresiva que ayudarán a desarrollar habilidades analíticas y de razonamiento matemático:\n\n" +
-                            "• Conceptos básicos\n" +
-                            "• Identificación de coeficientes en ecuaciones cuadráticas\n" +
-                            "• Interpretación gráfica de la función cuadrática y su representación como parábola\n" +
-                            "• Relación entre las raíces de la ecuación y los puntos de intersección con el eje x\n" +
-                            "• Métodos de resolución\n" +
-                            "• Factorización: descomposición de expresiones cuadráticas en factores más simples para encontrar soluciones",
+                    text = texto,
                     color = Color.White,
-                    fontSize = 14.sp
+                    fontSize = fontSize
                 )
             }
         }
@@ -147,6 +211,61 @@ fun TaskStudent() {
                     .padding(8.dp)
             ) {
                 Icon(Icons.Default.ArrowForward, contentDescription = "Siguiente", tint = Color.White)
+            }
+        }
+    }
+
+    if (showDownloadDialog) {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(Color.Black.copy(alpha = 0.5f)) // Fondo difuminado
+                .clickable(onClick = { viewModel.showDownloadDialog() }) // Toca afuera para cerrar
+        ) {
+            AnimatedVisibility(
+                visible = showDownloadDialog,
+                enter = fadeIn() + scaleIn(),
+                exit = fadeOut() + scaleOut(),
+                modifier = Modifier.align(Alignment.Center)
+            ) {
+                Column(
+                    modifier = Modifier
+                        .padding(24.dp)
+                        .background(Color(0xFF1C1C1E), RoundedCornerShape(16.dp))
+                        .border(1.dp, Color(0xFF4F4F52), RoundedCornerShape(16.dp))
+                        .padding(24.dp)
+                ) {
+                    Text(
+                        text = "Descargar como:",
+                        style = MaterialTheme.typography.titleLarge,
+                        color = Color.White,
+                        modifier = Modifier.padding(bottom = 16.dp)
+                    )
+
+                    DownloadOption(".MP3", Icons.Default.VolumeUp) {
+                        // Acción al presionar MP3
+                    }
+                    Spacer(modifier = Modifier.height(8.dp))
+
+                    DownloadOption(".PDF", Icons.Default.MenuBook) {
+                        // Acción al presionar PDF
+                    }
+                    Spacer(modifier = Modifier.height(8.dp))
+
+                    DownloadOption("Texto Plano", Icons.Default.Description) {
+                        // Acción al presionar Texto Plano
+                    }
+
+                    Spacer(modifier = Modifier.height(24.dp))
+
+                    Button(
+                        onClick = { viewModel.showDownloadDialog() },
+                        modifier = Modifier.fillMaxWidth(),
+                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF3B6EF6))
+                    ) {
+                        Text("Cancelar")
+                    }
+                }
             }
         }
     }

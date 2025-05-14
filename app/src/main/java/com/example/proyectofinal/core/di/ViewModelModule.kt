@@ -3,6 +3,7 @@ package com.example.proyectofinal.core.di
 import com.example.proyectofinal.camera.presentation.viewmodel.CameraViewModel
 import com.example.proyectofinal.auth.presentation.viewmodel.LoginViewModel
 import com.example.proyectofinal.navigation.presentation.viewmodel.MainViewModel
+import com.example.proyectofinal.task_student.presentation.viewmodel.TaskStudentViewModel
 import org.koin.core.module.dsl.viewModel
 
 import org.koin.core.module.dsl.viewModelOf
@@ -12,4 +13,5 @@ val viewModelModule = module {
     viewModelOf(::CameraViewModel)
     viewModel{ LoginViewModel(get(), get()) }
     viewModel{ MainViewModel(get(), get()) }
+    viewModel { TaskStudentViewModel(get()) }
 }
