@@ -96,7 +96,7 @@ fun HomeScreen(navController: NavController, modifier: Modifier = Modifier) {
                 }
             )
             Spacer(modifier = Modifier.width(8.dp))
-            IconButton(onClick = { /* Acción de filtro */ }) {
+            IconButton(onClick = { }) {
                 Icon(
                     imageVector = Icons.Default.FilterAlt,
                     contentDescription = "Filtrar",

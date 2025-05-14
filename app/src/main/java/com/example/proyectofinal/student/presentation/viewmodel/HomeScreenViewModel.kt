@@ -26,7 +26,7 @@ class HomeScreenViewModel : ViewModel() {
 
      fun loadNotes() {
         _notes.value = listOf(
-            Note(1, "Apunte de Redes", "Resumen de los modelos OSI y TCP/IP con ejemplos.", false),
+            Note(1, "Apunte de Redes", "Resumen de los modelos OSI y TCP/IP con ejemplos.", true),
             Note(2, "Práctica de Estadística", "Ejercicios de media, mediana, moda y desvío estándar.", true),
             Note(3, "Parcial de Base de Datos", "Preguntas resueltas del parcial de SQL y modelado.", true),
             Note(4, "Trabajo Práctico de UI/UX", "Prototipo y diseño de app para gestión de turnos médicos.", false),
