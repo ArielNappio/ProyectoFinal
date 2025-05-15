@@ -44,7 +44,7 @@ import org.koin.androidx.compose.koinViewModel
 @Composable
 fun HomeScreen(navController: NavController, modifier: Modifier = Modifier) {
     val viewModel = koinViewModel<HomeScreenViewModel>()
-    val notes by viewModel.notes.collectAsState()
+    val notes by viewModel.tasks.collectAsState()
 
     Column(
         modifier = modifier
@@ -74,7 +74,6 @@ fun HomeScreen(navController: NavController, modifier: Modifier = Modifier) {
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        // Buscador
         Row(
             modifier = Modifier.fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically
@@ -107,15 +106,15 @@ fun HomeScreen(navController: NavController, modifier: Modifier = Modifier) {
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        // Lista de notas
         LazyColumn(
             modifier = Modifier
                 .fillMaxSize()
         ) {
             items(notes) { note ->
-                NoteCard(
-                    note = note,
-                    onToggleFavorite = { noteId -> viewModel.toggleFavorite(noteId) }
+                TaskCard(
+                    task = note,
+                    onToggleFavorite = { id -> viewModel.toggleFavorite(id) },
+                    navController = navController
                 )
             }
         }

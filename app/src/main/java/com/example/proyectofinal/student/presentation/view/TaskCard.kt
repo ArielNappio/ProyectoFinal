@@ -1,6 +1,7 @@
 package com.example.proyectofinal.student.presentation.view
 
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -19,21 +20,26 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.example.proyectofinal.student.data.model.Note
+import androidx.navigation.NavController
+import androidx.navigation.NavHostController
+import com.example.proyectofinal.navigation.ScreensRoute
+import com.example.proyectofinal.student.data.model.Task
 import com.example.proyectofinal.ui.theme.CustomBlue
 import com.example.proyectofinal.ui.theme.CustomOrange
 
 @Composable
-fun NoteCard(note: Note, onToggleFavorite: (Int) -> Unit) {
+fun TaskCard(task: Task, onToggleFavorite: (Int) -> Unit, navController: NavController) {
     Card(
         modifier = Modifier
             .padding(8.dp)
-            .fillMaxWidth(),
+            .fillMaxWidth()
+            .clickable { navController.navigate("${ScreensRoute.TaskDetails.route}/${task.id}") },
         border = BorderStroke(4.dp, CustomBlue),
         colors = CardDefaults.cardColors(
             containerColor = Color.Black
@@ -45,39 +51,39 @@ fun NoteCard(note: Note, onToggleFavorite: (Int) -> Unit) {
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Text(
-                    text = note.name,
+                    text = task.name,
                     style = MaterialTheme.typography.titleMedium,
                     color = Color.White,
                     modifier = Modifier
                         .weight(1f)
                         .semantics {
-                            contentDescription = note.name
+                            contentDescription = task.name
                         }
                 )
                 IconButton(
-                    onClick = { onToggleFavorite(note.id) },
+                    onClick = { onToggleFavorite(task.id) },
                     modifier = Modifier.semantics {
-                        contentDescription = if (note.isFavorite)
+                        contentDescription = if (task.isFavorite)
                             "Quitar de favoritos"
                         else
                             "Agregar a favoritos"
                     }
                 ) {
                     Icon(
-                        imageVector = if (note.isFavorite) Icons.Default.Star else Icons.Default.StarBorder,
+                        imageVector = if (task.isFavorite) Icons.Default.Star else Icons.Default.StarBorder,
                         contentDescription = null,
-                        tint = if (note.isFavorite) CustomOrange else Color.Gray,
+                        tint = if (task.isFavorite) CustomOrange else Color.Gray,
                         modifier = Modifier.size(32.dp)
                     )
                 }
             }
             Text(
-                text = note.description,
+                text = task.description,
                 color = Color.White,
                 maxLines = 2,
                 overflow = TextOverflow.Ellipsis,
                 modifier = Modifier.semantics {
-                    contentDescription = note.description
+                    contentDescription = task.description
                 }
             )
 
@@ -85,9 +91,9 @@ fun NoteCard(note: Note, onToggleFavorite: (Int) -> Unit) {
     }
 }
 
-@Preview (showBackground = true)
+@Preview(showBackground = true)
 @Composable
 fun NoteCardPreview() {
-    val note = Note(1, "Título del apunte", "Descripción del apunte", false)
-    NoteCard(note = note, onToggleFavorite = {})
+    val task = Task(1, "Título del apunte", "Descripción del apunte", false)
+    TaskCard(task = task, onToggleFavorite = {}, navController = NavHostController(LocalContext.current))
 }
