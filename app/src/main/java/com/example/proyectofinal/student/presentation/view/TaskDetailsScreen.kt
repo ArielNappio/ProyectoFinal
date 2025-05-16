@@ -5,22 +5,21 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Text
-import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Button
-import androidx.compose.material3.Icon
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.ChevronRight
+import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Icon
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -28,11 +27,14 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
+import com.example.proyectofinal.navigation.ScreensRoute
 import com.example.proyectofinal.student.presentation.viewmodel.DetailsViewModel
 import com.example.proyectofinal.ui.theme.CustomBlue
 import com.example.proyectofinal.ui.theme.CustomOrange
@@ -43,7 +45,8 @@ fun TaskDetailScreen(
     modifier: Modifier,
     taskId: Int,
     onBackClick: () -> Unit,
-    onViewNoteClick: () -> Unit
+    onViewNoteClick: () -> Unit,
+    navController: NavController
 ) {
     val detailViewModel = koinViewModel<DetailsViewModel>()
     val task by detailViewModel.task.collectAsState()
@@ -116,7 +119,7 @@ fun TaskDetailScreen(
                 Spacer(modifier = Modifier.height(24.dp))
 
                 Button(
-                    onClick = onViewNoteClick,
+                    onClick = { navController.navigate(ScreensRoute.Task.route) },
                     modifier = modifier
                         .align(Alignment.CenterHorizontally)
                         .semantics {

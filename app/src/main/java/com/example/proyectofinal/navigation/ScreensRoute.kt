@@ -6,4 +6,5 @@ sealed class ScreensRoute(val route: String) {
     data object Favorites : ScreensRoute("favorites")
     data object Profile : ScreensRoute("profile")
     object TaskDetails : ScreensRoute("task_details")
+    object Task: ScreensRoute("task")
 }

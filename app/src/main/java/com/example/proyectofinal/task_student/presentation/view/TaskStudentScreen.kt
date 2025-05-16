@@ -59,6 +59,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
+import androidx.navigation.NavHostController
 import com.example.proyectofinal.task_student.presentation.component.AccessibleIconButton
 import com.example.proyectofinal.task_student.presentation.component.DownloadOption
 import com.example.proyectofinal.task_student.presentation.component.MicControl
@@ -69,7 +70,7 @@ import org.koin.androidx.compose.koinViewModel
 
 
 @Composable
-fun TaskStudent() {
+fun TaskStudent(navController: NavHostController) {
 
     val viewModel = koinViewModel<TaskStudentViewModel>()
     val text by viewModel.texto.collectAsState()
@@ -101,7 +102,7 @@ fun TaskStudent() {
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            TextButton(onClick = { /* volver */ }) {
+            TextButton(onClick = { navController.popBackStack() }) {
                 Icon(Icons.Default.ArrowBack, contentDescription = "Volver", tint = Color(0xFFFFA500))
                 Text("Volver", color = Color(0xFFFFA500))
             }

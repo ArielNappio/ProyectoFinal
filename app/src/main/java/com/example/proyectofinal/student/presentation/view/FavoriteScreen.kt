@@ -1,22 +1,15 @@
 package com.example.proyectofinal.student.presentation.view
 
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -28,7 +21,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
@@ -103,34 +95,34 @@ fun Header_fav() {
 }
 
 
-@Composable
-fun Body_fav(titulo: String, descripcion: String) {
-    Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 8.dp),
-        colors = CardDefaults.cardColors(containerColor = Color.Black),
-        border = BorderStroke(1.dp, Color(0xFF00BFFF)),
-        shape = RoundedCornerShape(8.dp)
-    ) {
-        Column(modifier = Modifier.padding(16.dp)) {
-            Text(
-                text = titulo,
-                color = Color.White,
-                style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.Bold
-            )
-            Spacer(modifier = Modifier.height(4.dp))
-            Text(
-                text = descripcion,
-                color = Color.LightGray,
-                style = MaterialTheme.typography.bodyMedium,
-                maxLines = 2,
-                overflow = TextOverflow.Ellipsis
-            )
-        }
-    }
-}
+//@Composable
+//fun Body_fav(titulo: String, descripcion: String) {
+//    Card(
+//        modifier = Modifier
+//            .fillMaxWidth()
+//            .padding(horizontal = 16.dp, vertical = 8.dp),
+//        colors = CardDefaults.cardColors(containerColor = Color.Black),
+//        border = BorderStroke(1.dp, Color(0xFF00BFFF)),
+//        shape = RoundedCornerShape(8.dp)
+//    ) {
+//        Column(modifier = Modifier.padding(16.dp)) {
+//            Text(
+//                text = titulo,
+//                color = Color.White,
+//                style = MaterialTheme.typography.titleMedium,
+//                fontWeight = FontWeight.Bold
+//            )
+//            Spacer(modifier = Modifier.height(4.dp))
+//            Text(
+//                text = descripcion,
+//                color = Color.LightGray,
+//                style = MaterialTheme.typography.bodyMedium,
+//                maxLines = 2,
+//                overflow = TextOverflow.Ellipsis
+//            )
+//        }
+//    }
+//}
 
 
 

@@ -11,6 +11,7 @@ import com.example.proyectofinal.auth.presentation.view.LoginScreen
 import com.example.proyectofinal.student.presentation.view.FavoriteScreen
 import com.example.proyectofinal.student.presentation.view.HomeScreen
 import com.example.proyectofinal.student.presentation.view.TaskDetailScreen
+import com.example.proyectofinal.task_student.presentation.view.TaskStudent
 
 @Composable
 fun NavigationComponent(
@@ -39,14 +40,19 @@ fun NavigationComponent(
                 modifier = modifier,
                 taskId = taskID,
                 onBackClick = { navController.popBackStack() },
-                onViewNoteClick = {}
+                onViewNoteClick = {},
+                navController = navController
             )
         }
+        composable(route = ScreensRoute.Task.route){
+            TaskStudent(navController)
+        }
+
         composable(route = ScreensRoute.Favorites.route) {
             FavoriteScreen(navController)
         }
         composable(route = ScreensRoute.Profile.route) {
-//            ProfileScreen()
+//            MainScreen(navController)
         }
     }
 }
