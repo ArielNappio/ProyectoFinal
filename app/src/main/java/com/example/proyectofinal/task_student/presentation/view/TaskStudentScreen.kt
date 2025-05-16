@@ -49,6 +49,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -60,8 +61,10 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
 import com.example.proyectofinal.task_student.presentation.component.AccessibleIconButton
 import com.example.proyectofinal.task_student.presentation.component.DownloadOption
-import com.example.proyectofinal.task_student.presentation.component.MicButtonWithWave
+import com.example.proyectofinal.task_student.presentation.component.MicControl
 import com.example.proyectofinal.task_student.presentation.viewmodel.TaskStudentViewModel
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 
 
@@ -306,7 +309,7 @@ fun TaskStudent() {
                         modifier = Modifier.fillMaxWidth(),
                         colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF3B6EF6))
                     ) {
-                        Text("Cancelar")
+                        Text(text = "Cancelar", color = Color.White)
                     }
                 }
             }
@@ -318,8 +321,8 @@ fun TaskStudent() {
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .background(Color.Black.copy(alpha = 0.5f)) // Fondo difuminado
-                .clickable(onClick = { viewModel.showFeedback() }) // Toca afuera para cerrar
+                .background(Color.Black.copy(alpha = 0.5f))
+                .clickable(onClick = { viewModel.showFeedback() })
         ) {
             AnimatedVisibility(
                 visible = showFeedback,
@@ -365,26 +368,82 @@ fun TaskStudent() {
 
                     Spacer(modifier = Modifier.height(20.dp))
 
+                    Text(
+                        text = "Mandanos un audio con tu opinión!",
+                        style = MaterialTheme.typography.titleMedium,
+                        textAlign = TextAlign.Center,
+                        color = Color.Black,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+
+                    Spacer(modifier = Modifier.height(20.dp))
+
+                    var isRecording by remember { mutableStateOf(false) }
+                    var hasRecording by remember { mutableStateOf(false) }
+                    var isPlaying by remember { mutableStateOf(false) }
+                    var recordingDuration by remember { mutableStateOf(0L) }
+
+                    // Simula el tiempo grabado
+                    val timer = rememberCoroutineScope()
+                    var playbackTimeLeft by remember { mutableStateOf(0L) }
+                    val displayTime = if (isPlaying) playbackTimeLeft else recordingDuration
+
+
+                    MicControl(
+                        isRecording = isRecording,
+                        hasRecording = hasRecording,
+                        isPlaying = isPlaying,
+                        recordingDuration = recordingDuration,
+                        onStartRecording = {
+                            isRecording = true
+                            hasRecording = false
+                            recordingDuration = 0L
+                            timer.launch {
+                                while (isRecording) {
+                                    delay(1000)
+                                    recordingDuration += 1000
+                                }
+                            }
+                        },
+                        onStopRecording = {
+                            isRecording = false
+                            hasRecording = true
+                        },
+                        onPlay = {
+                            isPlaying = true
+                            playbackTimeLeft = recordingDuration
+                            timer.launch {
+                                while (playbackTimeLeft > 0 && isPlaying) {
+                                    delay(1000)
+                                    playbackTimeLeft -= 1000
+                                }
+                                isPlaying = false
+                                playbackTimeLeft = recordingDuration
+                            }
+                        },
+                        onStop = {
+                            isPlaying = false
+                        },
+                        onDiscard = {
+                            hasRecording = false
+                            isPlaying = false
+                            recordingDuration = 0L
+                            playbackTimeLeft = 0L
+                            //poner pa borrar archivo
+                        }
+                    )
+
+                    Spacer(modifier = Modifier.height(20.dp))
+
                     Button(
                         onClick = {
                             viewModel.showFeedback()
-                            // acá podrías guardar el rating
                         },
                         modifier = Modifier.fillMaxWidth(),
                         colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF3B6EF6))
                     ) {
-                        Text("Enviar opinión")
+                        Text(text = "Enviar opinión", color = Color.White)
                     }
-
-                    var isRecording by remember { mutableStateOf(false) }
-
-
-                    MicButtonWithWave(
-                        isRecording = isRecording,
-                        onStartRecording = { isRecording = true },
-                        onStopRecording = { isRecording = false },
-                        modifier = Modifier.padding(horizontal = 16.dp)
-                    )
 
                 }
             }
