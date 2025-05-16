@@ -14,6 +14,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 
 @Composable
 fun DownloadOption(text: String, icon: ImageVector, onClick: () -> Unit) {
@@ -27,6 +28,6 @@ fun DownloadOption(text: String, icon: ImageVector, onClick: () -> Unit) {
     ) {
         Icon(icon, contentDescription = null)
         Spacer(modifier = Modifier.width(8.dp))
-        Text(text)
+        Text(text = text, fontSize = 20.sp,)
     }
 }

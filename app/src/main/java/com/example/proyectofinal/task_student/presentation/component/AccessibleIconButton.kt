@@ -30,13 +30,13 @@ fun AccessibleIconButton(
         Icon(
             imageVector = icon,
             contentDescription = label,
-            modifier = Modifier.size(36.dp),
+            modifier = Modifier.size(40.dp),
             tint = Color.White
         )
         Text(
             text = label,
             color = Color.White,
-            fontSize = 12.sp,
+            fontSize = 16.sp,
             textAlign = TextAlign.Center
         )
     }

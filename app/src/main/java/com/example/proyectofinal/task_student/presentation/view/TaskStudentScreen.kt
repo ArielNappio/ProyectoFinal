@@ -32,10 +32,10 @@ import androidx.compose.material.icons.filled.Feedback
 import androidx.compose.material.icons.filled.FileDownload
 import androidx.compose.material.icons.filled.MenuBook
 import androidx.compose.material.icons.filled.Pause
-import androidx.compose.material.icons.filled.PauseCircleOutline
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Remove
 import androidx.compose.material.icons.filled.Star
+import androidx.compose.material.icons.filled.Stop
 import androidx.compose.material.icons.filled.VolumeUp
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -147,12 +147,12 @@ fun TaskStudent() {
                 modifier = Modifier
                     .align(Alignment.TopEnd)
                     .padding(top = 24.dp, end = 16.dp)
-                    .background(color = Color(0xFFFFA500), shape = RoundedCornerShape(50))
+                    .background(color = Color(0xFFFFA500).copy(alpha = 0.7f), shape = RoundedCornerShape(50))
                     .size(48.dp)
                     .zIndex(1f)
             ) {
                 Icon(
-                    imageVector = if (isSpeaking) Icons.Default.PauseCircleOutline else Icons.Default.VolumeUp,
+                    imageVector = if (isSpeaking) Icons.Default.Stop else Icons.Default.VolumeUp,
                     contentDescription = if (isSpeaking) "Pausar" else "Escuchar",
                     tint = Color.White
                 )
