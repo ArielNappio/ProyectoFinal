@@ -1,13 +1,12 @@
 package com.example.proyectofinal.task_student.presentation.view
 
 
+import android.util.Log
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.scaleIn
 import androidx.compose.animation.scaleOut
-import androidx.compose.animation.slideInVertically
-import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -25,17 +24,18 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.MenuBook
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.ArrowForward
 import androidx.compose.material.icons.filled.Description
+import androidx.compose.material.icons.filled.Feedback
 import androidx.compose.material.icons.filled.FileDownload
 import androidx.compose.material.icons.filled.MenuBook
 import androidx.compose.material.icons.filled.Pause
 import androidx.compose.material.icons.filled.PauseCircleOutline
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Remove
+import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.filled.VolumeUp
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -46,31 +46,44 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
 import com.example.proyectofinal.task_student.presentation.component.AccessibleIconButton
+import com.example.proyectofinal.task_student.presentation.component.DownloadOption
+import com.example.proyectofinal.task_student.presentation.component.MicButtonWithWave
 import com.example.proyectofinal.task_student.presentation.viewmodel.TaskStudentViewModel
 import org.koin.androidx.compose.koinViewModel
-import androidx.compose.runtime.getValue
-import com.example.proyectofinal.task_student.presentation.component.DownloadOption
 
 
 @Composable
 fun TaskStudent() {
 
     val viewModel = koinViewModel<TaskStudentViewModel>()
-    val texto by viewModel.texto.collectAsState()
+    val text by viewModel.texto.collectAsState()
     val isSpeaking by viewModel.isSpeaking.collectAsState()
     val isPaused by viewModel.isPaused.collectAsState()
 
     val showExtraButtons by viewModel.showExtraButton.collectAsState()
     val showDownloadDialog by viewModel.showDownloadDialog.collectAsState()
+    val showFeedback by viewModel.showFeedback.collectAsState()
     val fontSize by viewModel.fontSize.collectAsState()
+
+    val currentPageIndex by viewModel.currentPageIndex.collectAsState()
+    val isFirstPage by viewModel.isFirstPage.collectAsState()
+    val isLastPage by viewModel.isLastPage.collectAsState()
+
+    var rating by remember { mutableStateOf(0) }
+
 
     Column(
         modifier = Modifier
@@ -170,7 +183,7 @@ fun TaskStudent() {
                     .padding(horizontal = 16.dp)
             ) {
                 Text(
-                    text = texto,
+                    text = text,
                     color = Color.White,
                     fontSize = fontSize
                 )
@@ -186,16 +199,30 @@ fun TaskStudent() {
             verticalAlignment = Alignment.CenterVertically
         ) {
             IconButton(
-                onClick = { /* página anterior */ },
+                onClick = { viewModel.previousPage() },
+                enabled = currentPageIndex > 0,
                 modifier = Modifier
-                    .background(Color(0xFFFFA500), shape = RoundedCornerShape(8.dp))
+                    .background(
+                        if(isFirstPage){
+                            Color.Black
+                        }
+                        else {
+                            Color(0xFFFFA500)
+                        }
+                        , shape = RoundedCornerShape(8.dp))
                     .padding(8.dp)
             ) {
-                Icon(Icons.Default.ArrowBack, contentDescription = "Anterior", tint = Color.White)
+                Icon(Icons.Default.ArrowBack, contentDescription = "Anterior", tint =
+                    if(isFirstPage){
+                        Color.Black
+                    }
+                    else {
+                        Color.White
+                    })
             }
 
             Text(
-                text = "1",
+                text = "${currentPageIndex + 1} / ${viewModel.totalPages}",
                 color = Color.Black,
                 fontSize = 24.sp,
                 modifier = Modifier
@@ -205,15 +232,31 @@ fun TaskStudent() {
             )
 
             IconButton(
-                onClick = { /* página siguiente */ },
+                onClick = { 
+                    if(isLastPage) {
+                        Log.d("DEBUG", "Última página: mostrando diálogo")
+                        viewModel.showFeedback()
+                    }
+                    else {
+                        viewModel.nextPage()
+                    }
+                          },
                 modifier = Modifier
                     .background(Color(0xFFFFA500), shape = RoundedCornerShape(8.dp))
                     .padding(8.dp)
             ) {
-                Icon(Icons.Default.ArrowForward, contentDescription = "Siguiente", tint = Color.White)
+                Icon(if(isLastPage){
+                    Icons.Default.Feedback
+                }
+                        else {
+                    Icons.Default.ArrowForward
+                },
+                    contentDescription = "Siguiente", tint = Color.White)
             }
         }
     }
+
+    // DIALOG DE DESCARGAS
 
     if (showDownloadDialog) {
         Box(
@@ -265,6 +308,84 @@ fun TaskStudent() {
                     ) {
                         Text("Cancelar")
                     }
+                }
+            }
+        }
+    }
+    
+    if(showFeedback){
+
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(Color.Black.copy(alpha = 0.5f)) // Fondo difuminado
+                .clickable(onClick = { viewModel.showFeedback() }) // Toca afuera para cerrar
+        ) {
+            AnimatedVisibility(
+                visible = showFeedback,
+                enter = fadeIn() + scaleIn(),
+                exit = fadeOut() + scaleOut(),
+                modifier = Modifier.align(Alignment.Center)
+            ) {
+                Column(
+                    modifier = Modifier
+                        .padding(24.dp)
+                        .clip(RoundedCornerShape(12.dp))
+                        .border(1.dp, Color(0xFFB6C7D1), RoundedCornerShape(12.dp))
+                        .background(Color.White)
+                        .padding(24.dp)
+                ) {
+                    Text(
+                        text = "¿Qué tal te pareció el apunte?",
+                        style = MaterialTheme.typography.titleMedium,
+                        textAlign = TextAlign.Center,
+                        color = Color.Black,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+
+                    Spacer(modifier = Modifier.height(16.dp))
+
+                    Row(
+                        horizontalArrangement = Arrangement.Center,
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        repeat(5) { index ->
+                            IconButton(onClick = {
+                                rating = index + 1
+                            }) {
+                                Icon(
+                                    imageVector = Icons.Default.Star,
+                                    contentDescription = "Estrella ${index + 1}",
+                                    tint = if (index < rating) Color(0xFFFF6D00) else Color.LightGray,
+                                    modifier = Modifier.size(36.dp)
+                                )
+                            }
+                        }
+                    }
+
+                    Spacer(modifier = Modifier.height(20.dp))
+
+                    Button(
+                        onClick = {
+                            viewModel.showFeedback()
+                            // acá podrías guardar el rating
+                        },
+                        modifier = Modifier.fillMaxWidth(),
+                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF3B6EF6))
+                    ) {
+                        Text("Enviar opinión")
+                    }
+
+                    var isRecording by remember { mutableStateOf(false) }
+
+
+                    MicButtonWithWave(
+                        isRecording = isRecording,
+                        onStartRecording = { isRecording = true },
+                        onStopRecording = { isRecording = false },
+                        modifier = Modifier.padding(horizontal = 16.dp)
+                    )
+
                 }
             }
         }

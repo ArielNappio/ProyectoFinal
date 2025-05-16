@@ -9,9 +9,10 @@ import android.util.Log
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import java.io.File
 
 
-class TextToSpeechManager(context: Context) : TextToSpeech.OnInitListener {
+class TextToSpeechManager(private val context: Context) : TextToSpeech.OnInitListener {
 
     private var tts: TextToSpeech? = null
     private var isReady = false
@@ -103,4 +104,29 @@ class TextToSpeechManager(context: Context) : TextToSpeech.OnInitListener {
     fun resetStoppedFlag(){
         _isStoped.value = false
     }
+
+    fun generateAudio(text: String, file: File, onComplete: () -> Unit = {}) {
+        if (!isReady) return
+
+        val params = Bundle().apply {
+            putString(TextToSpeech.Engine.KEY_PARAM_UTTERANCE_ID, "tts_export")
+        }
+
+        tts?.setOnUtteranceProgressListener(object : UtteranceProgressListener() {
+            override fun onStart(utteranceId: String?) {}
+
+            override fun onDone(utteranceId: String?) {
+                if (utteranceId == "tts_export") {
+                    onComplete()
+                }
+            }
+
+            override fun onError(utteranceId: String?) {
+                Log.e("TTS", "Error al generar audio")
+            }
+        })
+
+        tts?.synthesizeToFile(text, params, file, "tts_export")
+    }
+
 }
