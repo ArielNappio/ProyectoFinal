@@ -12,4 +12,5 @@ class HomeScreenViewModel(private val repository: TaskRepository) : ViewModel() 
     fun toggleFavorite(noteId: Int) {
         repository.toggleFavorite(noteId)
     }
+
 }

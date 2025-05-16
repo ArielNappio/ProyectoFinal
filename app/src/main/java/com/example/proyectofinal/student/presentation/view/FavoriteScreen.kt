@@ -36,7 +36,6 @@ fun FavoriteScreen(
     val notasVm by  viewModel.tasks.collectAsState()
     val favoriteNotes = notasVm.filter { it.isFavorite }
 
-
     Scaffold(
         containerColor = Color.Black,
     ) { innerPadding ->
@@ -44,9 +43,12 @@ fun FavoriteScreen(
             modifier = Modifier
                 .padding(innerPadding)
                 .fillMaxSize()
-        ) {
+        )
+        {
             Header_fav()
-
+            if(favoriteNotes.isEmpty()){
+                Text(text = "Aca deberian estar tus favoritos :(")
+            }
             LazyColumn(
                 modifier = Modifier
                     .fillMaxSize()
@@ -54,7 +56,7 @@ fun FavoriteScreen(
                 items(favoriteNotes) { nota ->
                     TaskCard(
                         task = nota,
-                        onToggleFavorite = {  },
+                        onToggleFavorite = { id -> viewModel.toggleFavorite(id) },
                         navController = navController
                     )
                  }
