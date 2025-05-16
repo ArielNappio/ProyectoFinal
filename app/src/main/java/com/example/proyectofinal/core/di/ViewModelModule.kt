@@ -5,6 +5,7 @@ import com.example.proyectofinal.auth.presentation.viewmodel.LoginViewModel
 import com.example.proyectofinal.navigation.presentation.viewmodel.MainViewModel
 import com.example.proyectofinal.student.presentation.viewmodel.DetailsViewModel
 import com.example.proyectofinal.student.presentation.viewmodel.HomeScreenViewModel
+import com.example.proyectofinal.task_student.presentation.viewmodel.TaskStudentViewModel
 import org.koin.core.module.dsl.viewModel
 
 import org.koin.core.module.dsl.viewModelOf
@@ -16,4 +17,5 @@ val viewModelModule = module {
     viewModel { MainViewModel(get(), get()) }
     viewModel { HomeScreenViewModel(get ()) }
     viewModel { DetailsViewModel(get()) }
+    viewModel { TaskStudentViewModel(get()) }
 }
