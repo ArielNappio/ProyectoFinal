@@ -8,7 +8,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import com.example.proyectofinal.auth.presentation.view.LoginScreen
-import com.example.proyectofinal.navigation.presentation.view.MainScreen
+import com.example.proyectofinal.student.presentation.view.FavoriteScreen
 import com.example.proyectofinal.student.presentation.view.HomeScreen
 import com.example.proyectofinal.student.presentation.view.TaskDetailScreen
 
@@ -43,8 +43,7 @@ fun NavigationComponent(
             )
         }
         composable(route = ScreensRoute.Favorites.route) {
-//            FavoritesScreen()
-            MainScreen(navController)
+            FavoriteScreen(navController)
         }
         composable(route = ScreensRoute.Profile.route) {
 //            ProfileScreen()
