@@ -32,7 +32,6 @@ import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.proyectofinal.navigation.ScreensRoute
 import com.example.proyectofinal.student.presentation.viewmodel.DetailsViewModel
@@ -50,6 +49,9 @@ fun TaskDetailScreen(
 ) {
     val detailViewModel = koinViewModel<DetailsViewModel>()
     val task by detailViewModel.task.collectAsState()
+
+    val fontSizeText by detailViewModel._fontSizeText.collectAsState()
+    val fontSizeTitle by detailViewModel._fontSizeTitle.collectAsState()
 
     LaunchedEffect(taskId) {
         println("taskId recibido: $taskId")
@@ -98,7 +100,7 @@ fun TaskDetailScreen(
                 Text(
                     text = task!!.name,
                     color = CustomBlue,
-                    fontSize = 20.sp,
+                    fontSize = fontSizeTitle,
                     fontWeight = FontWeight.Bold,
                     modifier = modifier.semantics {
                         contentDescription = task!!.name
@@ -110,7 +112,7 @@ fun TaskDetailScreen(
                 Text(
                     text = task!!.description,
                     color = Color.White,
-                    fontSize = 16.sp,
+                    fontSize = fontSizeText,
                     modifier = modifier.semantics {
                         contentDescription = task!!.description
                     }
@@ -134,7 +136,7 @@ fun TaskDetailScreen(
                         tint = Color.White
                     )
                     Spacer(modifier = Modifier.width(8.dp))
-                    Text("Ver apunte en la app", color = Color.White)
+                    Text("Ver apunte en la app", color = Color.White, fontSize = fontSizeText)
                 }
             }
         } else {

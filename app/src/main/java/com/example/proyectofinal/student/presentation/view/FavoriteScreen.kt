@@ -4,8 +4,10 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
@@ -20,7 +22,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
@@ -47,7 +48,24 @@ fun FavoriteScreen(
         {
             Header_fav()
             if(favoriteNotes.isEmpty()){
-                Text(text = "Aca deberian estar tus favoritos :(")
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize(),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ){
+                    Spacer(modifier = Modifier.height(32.dp))
+                    Text(text = "Aca deberian estar tus favoritos :(", fontSize = 24.sp)
+                    Spacer(modifier = Modifier.height(16.dp))
+                    Image(
+                        painter = painterResource(id = R.drawable.logo_para_fondo_negro),
+                        contentDescription = "Logo de Wirin",
+                        modifier = Modifier.size(186.dp)
+                    )
+                    Text(
+                        text = "😢",
+                        fontSize = 48.sp
+                    )
+                }
             }
             LazyColumn(
                 modifier = Modifier
@@ -76,21 +94,21 @@ fun Header_fav() {
         verticalAlignment = Alignment.CenterVertically
     ) {
         TextButton(onClick = { }) {
-            Text("Tus favoritos", color = Color.White)
+            Text("Tus favoritos", color = Color.White, fontSize = 24.sp)
         }
 
         Column {
             Image(
-                painter = painterResource(id = R.drawable.wirin_logo),
+                painter = painterResource(id = R.drawable.logo_para_fondo_negro),
                 contentDescription = "Logo de Wirin",
-                modifier = Modifier.size(56.dp)
+                modifier = Modifier.size(72.dp)
             )
-            Text(
-                text = "WIRIN",
-                color = Color.White,
-                fontWeight = FontWeight.Bold,
-                fontSize = 18.sp
-            )
+//            Text(
+//                text = "WIRIN",
+//                color = Color.White,
+//                fontWeight = FontWeight.Bold,
+//                fontSize = 18.sp
+//            )
         }
     }
 
