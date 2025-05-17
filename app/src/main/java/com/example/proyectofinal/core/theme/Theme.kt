@@ -15,7 +15,6 @@ data class CurrentTheme(
     val isDark: Boolean = false,
     private val isCustomFontFamilySelected: Boolean = false // TODO: Change to enum with different font families
 ) {
-    val colorScheme = if (isDark) DarkColorScheme else LightColorScheme
     val font = atkinsonHyperlegibleFamily.takeIf { isCustomFontFamilySelected }
 }
 val LocalTheme = compositionLocalOf { CurrentTheme() }

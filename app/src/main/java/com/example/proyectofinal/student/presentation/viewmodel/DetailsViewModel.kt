@@ -19,10 +19,10 @@ class DetailsViewModel(private val repository: TaskRepository) : ViewModel() {
     val _fontSizeText = MutableStateFlow(22.sp)
     val fontSizeText = _fontSizeText.asStateFlow()
 
-    fun getNoteById(noteId: Int) {
-        val foundNote = repository.getTaskById(noteId)
-        println("Buscando nota con id $noteId, encontrada: $foundNote")
-        _task.value = foundNote
+    fun getTaskById(taskId: Int) {
+        val foundTask = repository.getTaskById(taskId)
+        println("Buscando nota con id $taskId, encontrada: $foundTask")
+        _task.value = foundTask
     }
 
 }

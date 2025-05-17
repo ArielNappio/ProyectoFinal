@@ -1,12 +1,9 @@
 package com.example.proyectofinal
 
 import android.os.Bundle
-import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.foundation.background
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.CompositionLocalProvider
@@ -27,26 +24,23 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
 
         setContent {
-            val themeViewModel: ThemeViewModel = koinViewModel() // TODO: Move scope to Main or NavigationComponent composables
+            val themeViewModel: ThemeViewModel = koinViewModel()
             val isDarkTheme by themeViewModel.isDarkTheme.collectAsState()
             val isCustomFontFamilySelected by themeViewModel.fontFamilySelected.collectAsState()
 
-            val darkTheme = if (isDarkTheme) CurrentTheme(false, isCustomFontFamilySelected)
-                else CurrentTheme(true, isCustomFontFamilySelected)
+            val currentTheme = CurrentTheme(isDarkTheme, isCustomFontFamilySelected)
 
             ProyectoFinalTheme(
-                darkTheme = darkTheme.isDark,
+                darkTheme = isDarkTheme,
                 customTypographySelected = isCustomFontFamilySelected
             ) {
-                CompositionLocalProvider(LocalTheme provides darkTheme) {
-                    Log.d("MainActivity", "isDarkTheme: ${LocalTheme.current.colorScheme.background}")
+                CompositionLocalProvider(LocalTheme provides currentTheme) {
                     Surface(
                         modifier = Modifier
                             .fillMaxSize()
-//                            .background(LocalTheme.current.colorScheme.background)
                     ) {
                         val navController = rememberNavController()
-                        Main(themeViewModel, navController)
+                        Main(Modifier.fillMaxSize(), navController)
                     }
                 }
             }

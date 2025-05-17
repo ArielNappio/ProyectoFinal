@@ -20,11 +20,11 @@ class TaskRepository {
 
     fun getAllTasks() = tasks.asStateFlow()
 
-    fun getTaskById(noteId: Int): Task? = tasks.value.find { it.id == noteId }
+    fun getTaskById(taskId: Int): Task? = tasks.value.find { it.id == taskId }
 
-    fun toggleFavorite(noteId: Int) {
+    fun toggleFavorite(taskId: Int) {
         tasks.value = tasks.value.map {
-            if (it.id == noteId) it.copy(isFavorite = !it.isFavorite) else it
+            if (it.id == taskId) it.copy(isFavorite = !it.isFavorite) else it
         }
     }
 }

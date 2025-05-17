@@ -9,8 +9,8 @@ class HomeScreenViewModel(private val repository: TaskRepository) : ViewModel() 
 
     val tasks: StateFlow<List<Task>> = repository.getAllTasks()
 
-    fun toggleFavorite(noteId: Int) {
-        repository.toggleFavorite(noteId)
+    fun toggleFavorite(taskId: Int) {
+        repository.toggleFavorite(taskId)
     }
 
 }

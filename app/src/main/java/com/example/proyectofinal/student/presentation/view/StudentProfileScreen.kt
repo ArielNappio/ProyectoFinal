@@ -34,7 +34,8 @@ import com.example.proyectofinal.core.ui.ThemeViewModel
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
-fun StudentProfileScreen(themeViewModel: ThemeViewModel, modifier: Modifier = Modifier) {
+fun StudentProfileScreen(modifier: Modifier = Modifier) {
+    val themeViewModel = koinViewModel<ThemeViewModel>()
     var expanded by remember { mutableStateOf(false) }
     val isCustomFontFamilySelected by themeViewModel.fontFamilySelected.collectAsState()
 
@@ -42,7 +43,6 @@ fun StudentProfileScreen(themeViewModel: ThemeViewModel, modifier: Modifier = Mo
         modifier = modifier
             .fillMaxSize()
             .padding(16.dp)
-//            .background(LocalTheme.current.colorScheme.background)
     ) {
         Row(
             modifier = Modifier
@@ -52,16 +52,13 @@ fun StudentProfileScreen(themeViewModel: ThemeViewModel, modifier: Modifier = Mo
         ) {
             Text(
                 text = "Modo Oscuro",
-//                color = LocalTheme.current.colorScheme.onBackground,
                 fontSize = 16.sp,
                 fontWeight = FontWeight.Bold,
                 modifier = Modifier.semantics { contentDescription = "Toggle de modo oscuro" }
             )
             Switch(
                 checked = LocalTheme.current.isDark,
-                onCheckedChange = {
-                    themeViewModel.toggleTheme()
-                }
+                onCheckedChange = { themeViewModel.toggleTheme() }
             )
         }
 
@@ -73,14 +70,6 @@ fun StudentProfileScreen(themeViewModel: ThemeViewModel, modifier: Modifier = Mo
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-//            Text(
-//                text = "Tipografia:",
-//                fontFamily = LocalTheme.current.font ?: FontFamily.SansSerif,
-//                color = LocalTheme.current.colorScheme.onBackground,
-//                fontSize = 20.sp,
-//                fontWeight = FontWeight.Bold,
-//                modifier = Modifier.semantics { contentDescription = "Selector de tipografía" }
-//            )
             OutlinedTextField(
                 value = if (isCustomFontFamilySelected) "Atkinson Hyperlegible" else "System Default",
                 onValueChange = {},
@@ -91,7 +80,6 @@ fun StudentProfileScreen(themeViewModel: ThemeViewModel, modifier: Modifier = Mo
                 label = { Text(
                     text = "Tipografia:",
                     fontFamily = LocalTheme.current.font ?: FontFamily.SansSerif,
-//                    color = LocalTheme.current.colorScheme.onBackground,
                     fontSize = 20.sp,
                     fontWeight = FontWeight.Bold,
                     modifier = Modifier.semantics { contentDescription = "Selector de tipografía" }

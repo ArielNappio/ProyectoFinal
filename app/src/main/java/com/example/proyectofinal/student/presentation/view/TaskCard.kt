@@ -11,7 +11,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.filled.StarBorder
 import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -28,10 +27,10 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
+import com.example.proyectofinal.core.theme.CustomBlue
+import com.example.proyectofinal.core.theme.CustomOrange
 import com.example.proyectofinal.navigation.ScreensRoute
 import com.example.proyectofinal.student.data.model.Task
-import com.example.proyectofinal.ui.theme.CustomBlue
-import com.example.proyectofinal.ui.theme.CustomOrange
 
 @Composable
 fun TaskCard(task: Task, onToggleFavorite: (Int) -> Unit, navController: NavController) {
@@ -40,10 +39,7 @@ fun TaskCard(task: Task, onToggleFavorite: (Int) -> Unit, navController: NavCont
             .padding(8.dp)
             .fillMaxWidth()
             .clickable { navController.navigate("${ScreensRoute.TaskDetails.route}/${task.id}") },
-        border = BorderStroke(4.dp, CustomBlue),
-        colors = CardDefaults.cardColors(
-            containerColor = Color.Black
-        )
+        border = BorderStroke(4.dp, CustomBlue)
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
             Row(
@@ -53,7 +49,6 @@ fun TaskCard(task: Task, onToggleFavorite: (Int) -> Unit, navController: NavCont
                 Text(
                     text = task.name,
                     style = MaterialTheme.typography.titleMedium,
-                    color = Color.White,
                     modifier = Modifier
                         .weight(1f)
                         .semantics {
@@ -79,7 +74,6 @@ fun TaskCard(task: Task, onToggleFavorite: (Int) -> Unit, navController: NavCont
             }
             Text(
                 text = task.description,
-                color = Color.White,
                 maxLines = 2,
                 overflow = TextOverflow.Ellipsis,
                 modifier = Modifier.semantics {
@@ -93,7 +87,7 @@ fun TaskCard(task: Task, onToggleFavorite: (Int) -> Unit, navController: NavCont
 
 @Preview(showBackground = true)
 @Composable
-fun NoteCardPreview() {
+fun TaskCardPreview() {
     val task = Task(1, "Título del apunte", "Descripción del apunte", false)
     TaskCard(task = task, onToggleFavorite = {}, navController = NavHostController(LocalContext.current))
 }

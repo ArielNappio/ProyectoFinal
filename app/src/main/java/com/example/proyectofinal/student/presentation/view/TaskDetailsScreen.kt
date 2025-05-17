@@ -1,8 +1,7 @@
 package com.example.proyectofinal.student.presentation.view
 
-import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -13,10 +12,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.ChevronRight
 import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
@@ -26,25 +23,21 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import com.example.proyectofinal.core.theme.CustomBlue
 import com.example.proyectofinal.navigation.ScreensRoute
 import com.example.proyectofinal.student.presentation.viewmodel.DetailsViewModel
-import com.example.proyectofinal.ui.theme.CustomBlue
-import com.example.proyectofinal.ui.theme.CustomOrange
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
 fun TaskDetailScreen(
     modifier: Modifier,
     taskId: Int,
-    onBackClick: () -> Unit,
-    onViewNoteClick: () -> Unit,
     navController: NavController
 ) {
     val detailViewModel = koinViewModel<DetailsViewModel>()
@@ -55,41 +48,20 @@ fun TaskDetailScreen(
 
     LaunchedEffect(taskId) {
         println("taskId recibido: $taskId")
-        detailViewModel.getNoteById(taskId)
+        detailViewModel.getTaskById(taskId)
     }
 
     Column(
         modifier = modifier
             .fillMaxSize()
-            .background(Color.Black)
-            .padding(16.dp)
+            .padding(16.dp),
+        verticalArrangement = Arrangement.Center
     ) {
-        Button(
-            onClick = onBackClick,
-            modifier = modifier.semantics {
-                contentDescription = "Volver a la pantalla anterior"
-            },
-            colors = ButtonDefaults.buttonColors(
-                containerColor = Color.Transparent,
-                contentColor = Color.White
-            ),
-            border = BorderStroke(1.dp, CustomOrange)
-        ) {
-            Icon(
-                imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                contentDescription = null,
-                tint = CustomOrange
-            )
-            Spacer(modifier = Modifier.width(8.dp))
-            Text("Volver", color = CustomOrange)
-        }
-
-        Spacer(modifier = Modifier.height(24.dp))
-
-        if (task != null) {
+        task?.let {
             Column(
-                modifier = modifier
+                modifier = Modifier
                     .fillMaxWidth()
+                    .align(Alignment.CenterHorizontally)
                     .border(2.dp, CustomBlue, shape = RoundedCornerShape(16.dp))
                     .padding(16.dp)
                     .semantics {
@@ -102,7 +74,7 @@ fun TaskDetailScreen(
                     color = CustomBlue,
                     fontSize = fontSizeTitle,
                     fontWeight = FontWeight.Bold,
-                    modifier = modifier.semantics {
+                    modifier = Modifier.semantics {
                         contentDescription = task!!.name
                     }
                 )
@@ -111,9 +83,8 @@ fun TaskDetailScreen(
 
                 Text(
                     text = task!!.description,
-                    color = Color.White,
                     fontSize = fontSizeText,
-                    modifier = modifier.semantics {
+                    modifier = Modifier.semantics {
                         contentDescription = task!!.description
                     }
                 )
@@ -122,30 +93,26 @@ fun TaskDetailScreen(
 
                 Button(
                     onClick = { navController.navigate(ScreensRoute.Task.route) },
-                    modifier = modifier
+                    modifier = Modifier
                         .align(Alignment.CenterHorizontally)
                         .semantics {
                             contentDescription = "Botón para ver el apunte en la app"
                         },
-                    shape = RoundedCornerShape(50),
-                    colors = ButtonDefaults.buttonColors(containerColor = CustomBlue)
+                    shape = RoundedCornerShape(50)
                 ) {
                     Icon(
                         imageVector = Icons.Default.ChevronRight,
-                        contentDescription = null,
-                        tint = Color.White
+                        contentDescription = null
                     )
                     Spacer(modifier = Modifier.width(8.dp))
-                    Text("Ver apunte en la app", color = Color.White, fontSize = fontSizeText)
+                    Text("Ver apunte en la app", fontSize = fontSizeText)
                 }
             }
-        } else {
-            Box(
-                modifier = Modifier.fillMaxSize(),
-                contentAlignment = Alignment.Center
-            ) {
-                CircularProgressIndicator(color = CustomBlue)
-            }
+        } ?: Box(
+            modifier = modifier.fillMaxSize(),
+            contentAlignment = Alignment.Center
+        ) {
+            CircularProgressIndicator(color = CustomBlue)
         }
     }
 }
