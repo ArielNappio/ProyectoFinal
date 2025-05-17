@@ -1,5 +1,6 @@
 package com.example.proyectofinal.navigation.presentation.view
 
+import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -11,18 +12,17 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import com.example.proyectofinal.navigation.presentation.viewmodel.MainViewModel
-import org.koin.androidx.compose.koinViewModel
-import androidx.compose.runtime.getValue
-import androidx.compose.ui.graphics.Color
 import com.example.proyectofinal.core.util.UiState
 import com.example.proyectofinal.navigation.presentation.viewmodel.MainScreenUiState
+import com.example.proyectofinal.navigation.presentation.viewmodel.MainViewModel
+import org.koin.androidx.compose.koinViewModel
 
 @Composable
 fun MainScreen(
@@ -75,6 +75,7 @@ fun MainScreen(
                     is UiState.Error -> {
                         val errorMessage = (userState as UiState.Error).message
                         Text("Error al cargar datos del usuario: $errorMessage", color = Color.Red)
+                        Log.d("DATA STATE","Error al cargar datos del usuario")
                     }
                 }
             }
