@@ -24,6 +24,7 @@ import com.example.proyectofinal.navigation.component.BottomBar
 
 @Composable
 fun Main(
+    themeViewModel: ThemeViewModel,
     navController: NavHostController,
 ) {
     val viewModel = koinViewModel<MainViewModel>()
@@ -72,7 +73,8 @@ fun Main(
     ) { innerPadding ->
         NavigationComponent(
             navController = navController,
-            modifier = Modifier.padding(innerPadding)
+            modifier = Modifier.fillMaxSize().padding(innerPadding),
+            themeViewModel = themeViewModel
         )
     }
 }

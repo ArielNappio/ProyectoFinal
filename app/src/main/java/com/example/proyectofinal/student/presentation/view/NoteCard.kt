@@ -25,19 +25,16 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.proyectofinal.student.data.model.Note
-import com.example.proyectofinal.ui.theme.CustomBlue
-import com.example.proyectofinal.ui.theme.CustomOrange
+import com.example.proyectofinal.core.theme.CustomBlue
+import com.example.proyectofinal.core.theme.CustomOrange
 
 @Composable
-fun NoteCard(note: Note, onToggleFavorite: (Int) -> Unit) {
+fun NoteCard(note: Note, onToggleFavorite: (Int) -> Unit = {}) {
     Card(
         modifier = Modifier
-            .padding(8.dp)
+            .padding(vertical = 8.dp)
             .fillMaxWidth(),
         border = BorderStroke(4.dp, CustomBlue),
-        colors = CardDefaults.cardColors(
-            containerColor = Color.Black
-        )
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
             Row(
@@ -47,7 +44,6 @@ fun NoteCard(note: Note, onToggleFavorite: (Int) -> Unit) {
                 Text(
                     text = note.name,
                     style = MaterialTheme.typography.titleMedium,
-                    color = Color.White,
                     modifier = Modifier
                         .weight(1f)
                         .semantics {
