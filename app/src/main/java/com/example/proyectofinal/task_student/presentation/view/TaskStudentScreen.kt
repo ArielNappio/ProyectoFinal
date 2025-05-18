@@ -185,12 +185,13 @@ fun TaskStudent(navController: NavHostController) {
                 modifier = Modifier
                     .fillMaxSize()
                     .verticalScroll(rememberScrollState())
-                    .padding(horizontal = 16.dp)
+                    .padding(16.dp)
             ) {
                 Text(
                     text = text,
                     color = Color.White,
-                    fontSize = fontSize
+                    fontSize = fontSize,
+                    lineHeight = fontSize * 1.5f,
                 )
             }
         }

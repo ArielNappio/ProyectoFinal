@@ -17,21 +17,38 @@ class TaskStudentViewModel(
     private val ttsManager: TextToSpeechManager
 ): ViewModel() {
 
-    val FONTSIZE_CHANGER_VALUE = 5
-    val fontsize_max = 32.sp
-    val fontsize_min = 14.sp
-
     // Texto que se muestra y se lee - hay que cambiar y que traiga texto de la api
     private val rawText = """
-        Esta es la página uno. Waaauu bichon.
+        1- ¿A que ataque del OWASP Top-Ten se refiere la siguiente definición: "El atacante puede ejecutar secuencias de
+        comandos en el navegador de la víctima..."?
+        A. Secuencia de Comandos en Sitios Cruzados (XSS)
+        B. Ausencia de Control de Acceso a Funciones
+        C. Falsificación de Peticiones en sitios Cruzados (CSRF)
+        D. Referencia Directa Insegura a Objetos
 
-        Página dos aparece justo después de esta.
+        2- ¿Cuál de estas tecnologías es considerada generadora de riesgo por ser ejecutada en el cliente?
+        A. Java Applet
+        B. Active X
+        C. JavaScript
+        D. Todas son correctas
 
-        Finalmente, llegamos a la página tres.
+        3- ¿Cuál de los siguientes puntos NO corresponde a un tipo de vulnerabilidad?
+        A. Debidas al uso
+        B. Debidas al diseño
+        C. Debidas a la implementación
+        D. Ninguna de las anteriores
         
-        Y pero si hay una página número cuatro?
+        4- ¿Cuál de estas afirmaciones es verdadera con relación a los Firewalls?
+        A. No protege de ataques internos
+        B. No protege de ataques internos
+        C. No protege de todos los ataques dañinos
+        D. Todas las anteriores
         
-        Y ni te digo si hay página número cinco. por el culo te la hinco
+        5- ¿Cuál de los siguientes puntos no es un atributo del protocolo TCP?
+        A. No es orientado a conexión
+        B. Corre sobre IP
+        C. Cada paquete tiene un numero de secuencia y un flag
+        D. Un paquete tiene un numero de puerto origen y destino
     """.trimIndent()
 
     // Manejo de texto y páginas
@@ -77,7 +94,7 @@ class TaskStudentViewModel(
 
     // Estado del fontsize
 
-    private val _fontSize = MutableStateFlow(14.sp)
+    private val _fontSize = MutableStateFlow(MIN_FONT_SIZE)
     val fontSize = _fontSize.asStateFlow()
 
     init {
@@ -98,11 +115,11 @@ class TaskStudentViewModel(
     }
 
     fun fontSizeIncrease(){
-        if (_fontSize.value < fontsize_max) _fontSize.value = (_fontSize.value.value + FONTSIZE_CHANGER_VALUE).sp
+        if (_fontSize.value < MAX_FONT_SIZE) _fontSize.value = (_fontSize.value.value + FONT_SIZE_CHANGER_VALUE).sp
     }
 
     fun fontSizeDecrease(){
-        if (_fontSize.value > fontsize_min) _fontSize.value = (_fontSize.value.value - FONTSIZE_CHANGER_VALUE).sp
+        if (_fontSize.value > MIN_FONT_SIZE) _fontSize.value = (_fontSize.value.value - FONT_SIZE_CHANGER_VALUE).sp
     }
 
     fun showDownloadDialog(){
@@ -188,6 +205,12 @@ class TaskStudentViewModel(
 
     fun stopRecording(){
         TODO()
+    }
+
+    companion object {
+        private const val FONT_SIZE_CHANGER_VALUE = 6
+        private val MAX_FONT_SIZE = 52.sp
+        private val MIN_FONT_SIZE = 28.sp
     }
 
 }

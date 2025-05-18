@@ -8,9 +8,9 @@ class TaskRepository {
 
     private val tasks = MutableStateFlow(
         listOf(
-            Task(1, "Apunte de Redes", "Resumen de los modelos OSI y TCP/IP con ejemplos.", false),
-            Task(2, "Práctica de Estadística", "Ejercicios de media, mediana, moda y desvío estándar.", true),
-            Task(3, "Parcial de Base de Datos", "Preguntas resueltas del parcial de SQL y modelado.", true),
+            Task(1, "Parcial de Seguridad en Applicaciones Web", "Preguntas modelo del primer parcial de vulnerabilidades y Protocolo TCP/IP.", true),
+            Task(2, "Apunte de Redes", "Resumen de los modelos OSI y TCP/IP con ejemplos.", false),
+            Task(3, "Práctica de Estadística", "Ejercicios de media, mediana, moda y desvío estándar.", true),
             Task(4, "Trabajo Práctico de UI/UX", "Prototipo y diseño de app para gestión de turnos médicos.", false),
             Task(5, "Resumen de Historia Económica", "Principales crisis económicas del siglo XX.", true),
             Task(6, "Apunte de Arquitectura de Computadoras", "Resumen de tipos de memoria y ciclos de instrucción.", false),
