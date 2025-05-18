@@ -14,10 +14,13 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
@@ -30,6 +33,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.semantics.contentDescription
@@ -119,13 +123,23 @@ fun StudentProfileScreen(modifier: Modifier = Modifier) {
                 modifier = Modifier
                     .fillMaxWidth()
                     .clickable { expanded = true },
-                label = { Text(
-                    text = "Tipografia:",
-                    fontFamily = LocalTheme.current.font ?: FontFamily.SansSerif,
-                    fontSize = 20.sp,
-                    fontWeight = FontWeight.Bold,
-                    modifier = Modifier.semantics { contentDescription = "Selector de tipografía" }
-                ) }
+                label = {
+                    Text(
+                        text = "Tipografia:",
+                        fontFamily = LocalTheme.current.font ?: FontFamily.SansSerif,
+                        fontSize = 20.sp,
+                        fontWeight = FontWeight.Bold,
+                        modifier = Modifier.semantics { contentDescription = "Selector de tipografía" }
+                    )
+                },
+                trailingIcon = {
+                    Icon(
+                        imageVector = Icons.Default.ArrowDropDown,
+                        contentDescription = "Abrir selector",
+                        modifier = Modifier
+                            .rotate(if (expanded) 180f else 0f)
+                    )
+                }
             )
             DropdownMenu(
                 expanded = expanded,
@@ -134,7 +148,7 @@ fun StudentProfileScreen(modifier: Modifier = Modifier) {
                 listOf("System Default", "Atkinson Hyperlegible").forEach { option ->
                     DropdownMenuItem(
                         onClick = {
-                            expanded = false
+                            expanded = !expanded
                             themeViewModel.setFontFamilySelected(option == "Atkinson Hyperlegible")
                         },
                         text = { Text(option) }
@@ -146,7 +160,7 @@ fun StudentProfileScreen(modifier: Modifier = Modifier) {
         Spacer(modifier = Modifier.weight(1f))
 
         // Blue buttons
-        val buttonLabels = listOf("Aviso legal", "Acerca de")
+        val buttonLabels = listOf("Aviso legal", "Sección Tutorial?")
         buttonLabels.forEach { label ->
             Button(
                 onClick = {},
