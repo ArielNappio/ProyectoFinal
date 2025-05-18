@@ -12,5 +12,4 @@ interface OrderRepository {
     fun updateOrder(order: Order): Flow<NetworkResponse<Unit>>
     fun deleteOrder(id: Int): Flow<NetworkResponse<Unit>>
 
-
 }
