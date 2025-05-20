@@ -1,19 +1,25 @@
 package com.example.proyectofinal.navigation.presentation.view
 
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
-import com.example.proyectofinal.core.ui.ThemeViewModel
 import com.example.proyectofinal.navigation.NavigationComponent
 import com.example.proyectofinal.navigation.ScreensRoute
 import com.example.proyectofinal.navigation.component.BottomBar
 import com.example.proyectofinal.navigation.component.TopBar
+import com.example.proyectofinal.navigation.presentation.viewmodel.MainScreenUiState
 import com.example.proyectofinal.navigation.presentation.viewmodel.MainViewModel
 import com.example.proyectofinal.navigation.util.showsBottomBar
 import com.example.proyectofinal.navigation.util.showsTopBar

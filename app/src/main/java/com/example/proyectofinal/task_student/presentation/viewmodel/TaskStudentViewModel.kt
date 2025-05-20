@@ -37,13 +37,13 @@ class TaskStudentViewModel(
         B. Debidas al diseño
         C. Debidas a la implementación
         D. Ninguna de las anteriores
-        
+       
         4- ¿Cuál de estas afirmaciones es verdadera con relación a los Firewalls?
         A. No protege de ataques internos
         B. No protege de ataques internos
         C. No protege de todos los ataques dañinos
         D. Todas las anteriores
-        
+       
         5- ¿Cuál de los siguientes puntos no es un atributo del protocolo TCP?
         A. No es orientado a conexión
         B. Corre sobre IP
@@ -92,6 +92,12 @@ class TaskStudentViewModel(
     private val _showFeedback = MutableStateFlow(false)
     val showFeedback = _showFeedback.asStateFlow()
 
+    private val _showFont = MutableStateFlow(false)
+    val showFont = _showFont.asStateFlow()
+
+    private val _showAnnotations = MutableStateFlow(false)
+    val showAnnotations = _showAnnotations.asStateFlow()
+
     // Estado del fontsize
 
     private val _fontSize = MutableStateFlow(MIN_FONT_SIZE)
@@ -121,6 +127,15 @@ class TaskStudentViewModel(
     fun fontSizeDecrease(){
         if (_fontSize.value > MIN_FONT_SIZE) _fontSize.value = (_fontSize.value.value - FONT_SIZE_CHANGER_VALUE).sp
     }
+
+    fun showFont(){
+        _showFont.value = !_showFont.value
+    }
+
+    fun showAnnotations(){
+        _showAnnotations.value = !_showAnnotations.value
+    }
+
 
     fun showDownloadDialog(){
         _showDownloadDialog.value = !showDownloadDialog.value
