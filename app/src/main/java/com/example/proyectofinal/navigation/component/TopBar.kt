@@ -2,12 +2,14 @@ package com.example.proyectofinal.navigation.component
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.Chat
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -42,21 +44,31 @@ fun TopBar(navController: NavController) {
     ) {
         if (navBackStackEntry?.showBackButton() == true) {
             BackTextButton(navController)
+            Image(
+                painter = painterResource(
+                    id = if (LocalTheme.current.isDark) R.drawable.wirin_logo_dark else R.drawable.wirin_logo_light
+                ),
+                contentDescription = "Logo de Wirin",
+                modifier = Modifier.size(56.dp)
+            )
         } else {
+            Image(
+                painter = painterResource(
+                    id = if (LocalTheme.current.isDark) R.drawable.wirin_logo_dark else R.drawable.wirin_logo_light
+                ),
+                contentDescription = "Logo de Wirin",
+                modifier = Modifier.size(56.dp)
+            )
             Text(
                 text = "¡Bienvenido!",
                 fontSize = 24.sp,
                 fontWeight = FontWeight.Bold,
                 modifier = Modifier.semantics { contentDescription = "Bienvenido" }
             )
+            ChatButton(onClick = {
+                navController.navigate("chat")
+            })
         }
-        Image(
-            painter = painterResource(
-                id = if (LocalTheme.current.isDark) R.drawable.wirin_logo_dark else R.drawable.wirin_logo_light
-            ),
-            contentDescription = "Logo de Wirin",
-            modifier = Modifier.size(56.dp)
-        )
     }
 }
 
@@ -65,5 +77,21 @@ fun BackTextButton(navController: NavController) {
     TextButton(onClick = { navController.popBackStack() }) {
         Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Volver", tint = Color(0xFFFFA500))
         Text("Volver", color = Color(0xFFFFA500))
+    }
+}
+
+@Composable
+fun ChatButton(onClick: () -> Unit) {
+    TextButton(onClick = onClick) {
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally
+        ){
+            Icon(
+                Icons.AutoMirrored.Filled.Chat,
+                contentDescription = "Chat",
+                tint = Color(0xFF0084FF)
+            )
+            Text("Chat", color = Color(0xFF0084FF))
+        }
     }
 }

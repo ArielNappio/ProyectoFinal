@@ -19,14 +19,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import androidx.navigation.NavHostController
 import com.example.proyectofinal.core.theme.CustomBlue
 import com.example.proyectofinal.core.theme.CustomOrange
 import com.example.proyectofinal.navigation.ScreensRoute
@@ -53,7 +51,9 @@ fun TaskCard(task: Task, onToggleFavorite: (Int) -> Unit, navController: NavCont
                         .weight(1f)
                         .semantics {
                             contentDescription = task.name
-                        }
+                        },
+                    fontSize = 26.sp
+
                 )
                 IconButton(
                     onClick = { onToggleFavorite(task.id) },
@@ -73,21 +73,48 @@ fun TaskCard(task: Task, onToggleFavorite: (Int) -> Unit, navController: NavCont
                 }
             }
             Text(
-                text = task.description,
+                text = "📅 Ultima vez leído: ${task.lastRead ?: "Sin leer"}",
                 maxLines = 2,
+                style = MaterialTheme.typography.bodyMedium,
                 overflow = TextOverflow.Ellipsis,
-                modifier = Modifier.semantics {
-                    contentDescription = task.description
-                }
+                fontSize = 18.sp
             )
+
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 8.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+
+                Text(
+                    text = "📄 ${task.pageCount ?: 0} pág.",
+                    style = MaterialTheme.typography.bodyMedium,
+                    modifier = Modifier.weight(1f)
+                )
+                if (task.hasComments == true) {
+                    Text(
+                        text = "💬 Hay comentarios",
+                        style = MaterialTheme.typography.bodyMedium,
+                        modifier = Modifier.weight(1f)
+                    )
+                }
+                else {
+                    Text(
+                        text = "💬 No hay comentarios",
+                        style = MaterialTheme.typography.bodyMedium,
+                        modifier = Modifier.weight(1f)
+                    )
+                }
+            }
 
         }
     }
 }
 
-@Preview(showBackground = true)
-@Composable
-fun TaskCardPreview() {
-    val task = Task(1, "Título del apunte", "Descripción del apunte", false)
-    TaskCard(task = task, onToggleFavorite = {}, navController = NavHostController(LocalContext.current))
-}
+//@Preview(showBackground = true)
+//@Composable
+//fun TaskCardPreview() {
+//    val task = Task(1, "Título del apunte", "Descripción del apunte", false)
+//    TaskCard(task = task, onToggleFavorite = {}, navController = NavHostController(LocalContext.current))
+//}

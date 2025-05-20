@@ -10,5 +10,7 @@ enum class ScreensRoute(
     Favorites("favorites"),
     Profile("profile"),
     TaskDetails("task_details", showsBottomBar = false),
-    Task("task", false, false)
+    Task("task", false, false),
+    Comments("comments", showsTopBar = false, showsBottomBar = false),
+    Chat("chat")
 }

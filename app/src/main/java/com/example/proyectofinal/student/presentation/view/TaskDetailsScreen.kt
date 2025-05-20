@@ -89,6 +89,51 @@ fun TaskDetailScreen(
                     }
                 )
 
+                Column(modifier = Modifier.padding(top = 8.dp)) {
+                    task!!.lastRead?.let { date ->
+                        Text(
+                            text = "📅 Última lectura: $date",
+                            fontSize = fontSizeText
+                        )
+                    }
+                    task!!.pageCount?.let { pages ->
+                        Text(
+                            text = "📄 Cantidad de páginas: $pages",
+                            fontSize = fontSizeText
+                        )
+                    }
+                    if (task!!.hasComments == true) {
+                        Text(
+                            text = "💬 Esta tarea tiene comentarios",
+                            fontSize = fontSizeText
+                        )
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(24.dp))
+
+                if (task!!.hasComments == true) {
+                    Spacer(modifier = Modifier.height(12.dp))
+                    Button(
+                        onClick = {
+                            navController.navigate("${ScreensRoute.Comments.route}/$taskId")
+                        },
+                        modifier = Modifier
+                            .align(Alignment.CenterHorizontally)
+                            .semantics {
+                                contentDescription = "Botón para ver comentarios en audio"
+                            },
+                        shape = RoundedCornerShape(50)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.ChevronRight,
+                            contentDescription = null
+                        )
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text("Ver comentarios", fontSize = fontSizeText)
+                    }
+                }
+
                 Spacer(modifier = Modifier.height(24.dp))
 
                 Button(
