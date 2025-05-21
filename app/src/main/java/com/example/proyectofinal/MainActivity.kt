@@ -5,43 +5,45 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
+import androidx.compose.material3.Surface
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
-import com.example.proyectofinal.ui.theme.ProyectoFinalTheme
+import androidx.navigation.compose.rememberNavController
+import com.example.proyectofinal.core.theme.CurrentTheme
+import com.example.proyectofinal.core.theme.LocalTheme
+import com.example.proyectofinal.core.theme.ProyectoFinalTheme
+import com.example.proyectofinal.core.ui.ThemeViewModel
+import com.example.proyectofinal.navigation.presentation.view.Main
+import org.koin.androidx.compose.koinViewModel
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+
         setContent {
-            ProyectoFinalTheme {
-                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    Greeting(
-                        name = "Android",
-                        modifier = Modifier.padding(innerPadding)
-                    )
+            val themeViewModel: ThemeViewModel = koinViewModel()
+            val isDarkTheme by themeViewModel.isDarkTheme.collectAsState()
+            val isCustomFontFamilySelected by themeViewModel.fontFamilySelected.collectAsState()
+
+            val currentTheme = CurrentTheme(isDarkTheme, isCustomFontFamilySelected)
+
+            ProyectoFinalTheme(
+                darkTheme = isDarkTheme,
+                customTypographySelected = isCustomFontFamilySelected
+            ) {
+                CompositionLocalProvider(LocalTheme provides currentTheme) {
+                    Surface(
+                        modifier = Modifier
+                            .fillMaxSize()
+                    ) {
+                        val navController = rememberNavController()
+                        Main(Modifier.fillMaxSize(), navController)
+                    }
                 }
             }
         }
-    }
-}
-
-@Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello $name!",
-        modifier = modifier
-    )
-}
-
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    ProyectoFinalTheme {
-        Greeting("Android")
     }
 }
