@@ -2,7 +2,7 @@ package com.example.proyectofinal.student.presentation.viewmodel
 
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.ViewModel
-import com.example.proyectofinal.student.data.model.Task
+import com.example.proyectofinal.student.domain.model.Task
 import com.example.proyectofinal.student.data.repository.TaskRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow

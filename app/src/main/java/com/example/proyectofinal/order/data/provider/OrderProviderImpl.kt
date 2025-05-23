@@ -1,8 +1,9 @@
-package com.example.proyectofinal.order.data.repository
+package com.example.proyectofinal.order.data.provider
 
-import com.example.proyectofinal.order.data.model.Order
+import com.example.proyectofinal.order.domain.model.Order
 import com.example.proyectofinal.core.network.ApiUrls
 import com.example.proyectofinal.core.network.NetworkResponse
+import com.example.proyectofinal.order.domain.provider.OrderProvider
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.request.delete
@@ -16,9 +17,9 @@ import io.ktor.http.contentType
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 
-class OrderRepoImpl(
+class OrderProviderImpl(
     private val ktorClient: HttpClient
-): OrderRepository {
+): OrderProvider {
 
     override fun getOrders(): Flow<NetworkResponse<List<Order>>> = flow {
         emit(NetworkResponse.Loading())

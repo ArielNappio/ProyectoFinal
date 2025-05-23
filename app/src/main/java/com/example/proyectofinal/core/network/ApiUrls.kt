@@ -8,4 +8,6 @@ object ApiUrls {
     const val REGISTER = "${BASE_URL}api/Auth/register"
     const val ORDERS = "${BASE_URL}api/Order"
     const val ORDER = "${BASE_URL}api/Order/{id}"
+    const val TASKS = "${BASE_URL}api/Task"
+    const val TASK = "${BASE_URL}api/Task/{id}"
 }

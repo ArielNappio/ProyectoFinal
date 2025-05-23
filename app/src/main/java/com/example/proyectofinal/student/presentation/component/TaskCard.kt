@@ -1,4 +1,4 @@
-package com.example.proyectofinal.student.presentation.view
+package com.example.proyectofinal.student.presentation.component
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
@@ -28,7 +28,7 @@ import androidx.navigation.NavController
 import com.example.proyectofinal.core.theme.CustomBlue
 import com.example.proyectofinal.core.theme.CustomOrange
 import com.example.proyectofinal.navigation.ScreensRoute
-import com.example.proyectofinal.student.data.model.Task
+import com.example.proyectofinal.student.domain.model.Task
 
 @Composable
 fun TaskCard(task: Task, onToggleFavorite: (Int) -> Unit, navController: NavController) {

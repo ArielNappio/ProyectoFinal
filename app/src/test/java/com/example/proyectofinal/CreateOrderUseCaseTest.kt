@@ -1,8 +1,8 @@
 package com.example.proyectofinal
 
 import com.example.proyectofinal.core.network.NetworkResponse
-import com.example.proyectofinal.order.data.model.Order
-import com.example.proyectofinal.order.data.repository.OrderRepository
+import com.example.proyectofinal.order.domain.model.Order
+import com.example.proyectofinal.order.domain.provider.OrderProvider
 import com.example.proyectofinal.order.domain.usecase.CreateOrderUseCase
 import io.mockk.coEvery
 import io.mockk.coVerify
@@ -23,7 +23,7 @@ import org.junit.Test
 @OptIn(ExperimentalCoroutinesApi::class)
 class CreateOrderUseCaseTest {
 
-    private lateinit var repository: OrderRepository
+    private lateinit var repository: OrderProvider
     private lateinit var createOrderUseCase: CreateOrderUseCase
 
     private val testDispatcher = StandardTestDispatcher()

@@ -1,7 +1,7 @@
 package com.example.proyectofinal.student.presentation.viewmodel
 
 import androidx.lifecycle.ViewModel
-import com.example.proyectofinal.student.data.model.AudioComment
+import com.example.proyectofinal.student.domain.model.AudioComment
 import com.example.proyectofinal.student.data.repository.CommentsRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow

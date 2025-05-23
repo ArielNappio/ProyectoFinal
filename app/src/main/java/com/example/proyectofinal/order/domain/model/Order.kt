@@ -1,4 +1,4 @@
-package com.example.proyectofinal.order.data.model
+package com.example.proyectofinal.order.domain.model
 
 import kotlinx.serialization.Serializable
 

@@ -1,6 +1,6 @@
 package com.example.proyectofinal.student.data.repository
 
-import com.example.proyectofinal.student.data.model.AudioComment
+import com.example.proyectofinal.student.domain.model.AudioComment
 
 class CommentsRepository {
     fun getCommentsByTaskId(taskId: Int): List<AudioComment> {

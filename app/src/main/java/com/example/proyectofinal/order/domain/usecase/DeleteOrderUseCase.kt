@@ -1,8 +1,7 @@
 package com.example.proyectofinal.order.domain.usecase
 
-import com.example.proyectofinal.auth.data.remoteData.repository.AuthRemoteRepository
-import com.example.proyectofinal.order.data.repository.OrderRepository
+import com.example.proyectofinal.order.domain.provider.OrderProvider
 
-class DeleteOrderUseCase(private val authRemoteRepository: OrderRepository) {
+class DeleteOrderUseCase(private val authRemoteRepository: OrderProvider) {
     operator fun invoke(id: Int) = authRemoteRepository.deleteOrder(id)
 }

@@ -33,7 +33,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import com.example.proyectofinal.student.data.model.ChatMessage
+import com.example.proyectofinal.student.domain.model.ChatMessage
 
 @Composable
 fun ChatScreen(modifier: Modifier = Modifier, navController: NavController) {

@@ -1,10 +1,10 @@
-package com.example.proyectofinal.order.data.repository
+package com.example.proyectofinal.order.domain.provider
 
-import com.example.proyectofinal.order.data.model.Order
+import com.example.proyectofinal.order.domain.model.Order
 import com.example.proyectofinal.core.network.NetworkResponse
 import kotlinx.coroutines.flow.Flow
 
-interface OrderRepository {
+interface OrderProvider {
 
     fun getOrders(): Flow<NetworkResponse<List<Order>>>
     fun getOrderById(id: Int): Flow<NetworkResponse<Order>>

@@ -1,4 +1,4 @@
-package com.example.proyectofinal.student.data.model
+package com.example.proyectofinal.student.domain.model
 
 data class Task(
     val id: Int,
