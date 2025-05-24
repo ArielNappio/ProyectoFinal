@@ -28,93 +28,93 @@ import com.example.proyectofinal.core.util.UiState
 import com.example.proyectofinal.navigation.ScreensRoute
 import org.koin.androidx.compose.koinViewModel
 
-@Composable
-fun LoginScreen(
-    navController: NavController
-) {
-
-    val viewmodel = koinViewModel<LoginViewModel>()
-    val email by viewmodel.email.collectAsState()
-    val password by viewmodel.password.collectAsState()
-    val loginState by viewmodel.loginState.collectAsState()
-    val navigateToMain by viewmodel.navigateToMain.collectAsState()
-    val isLoading by viewmodel.isLoading.collectAsState()
-
-    LaunchedEffect(navigateToMain) {
-        if (navigateToMain) {
-            navController.navigate(ScreensRoute.Home.route) {
-                popUpTo(ScreensRoute.Login.route) { inclusive = true }
-            }
-        }
-    }
-
-    LaunchedEffect(loginState) {
-        if (loginState is UiState.Success) {
-            navController.navigate(ScreensRoute.Home.route) {
-                popUpTo(ScreensRoute.Login.route) { inclusive = true }
-            }
-        }
-    }
-
-    if(isLoading){
-        Column(
-            modifier = Modifier.fillMaxSize(),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
-        ) {
-            Text("Cargando...")
-            CircularProgressIndicator()
-        }
-    }
-
-    else {
-
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(24.dp),
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            Text(text = "BiblioAccess6", style = MaterialTheme.typography.headlineMedium)
-
-            Spacer(modifier = Modifier.height(24.dp))
-
-            OutlinedTextField(
-                value = email,
-                onValueChange = { viewmodel.onEmailChange(it) },
-                label = { Text("Email") },
-                modifier = Modifier.fillMaxWidth(),
-                keyboardOptions = KeyboardOptions.Default.copy(
-                    keyboardType = KeyboardType.Email
-                )
-            )
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            OutlinedTextField(
-                value = password,
-                onValueChange = { viewmodel.onPasswordChange(it) },
-                label = { Text("Contraseña") },
-                modifier = Modifier.fillMaxWidth(),
-                visualTransformation = PasswordVisualTransformation(),
-                keyboardOptions = KeyboardOptions.Default.copy(
-                    keyboardType = KeyboardType.Password
-                )
-            )
-
-            Spacer(modifier = Modifier.height(24.dp))
-
-            Button(
-                onClick = { viewmodel.onLoginClick() },
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Text("Iniciar sesión")
-            }
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-        }
-    }
-
-}
+//@Composable
+//fun LoginScreen(
+//    navController: NavController
+//) {
+//
+//    val viewmodel = koinViewModel<LoginViewModel>()
+//    val email by viewmodel.email.collectAsState()
+//    val password by viewmodel.password.collectAsState()
+//    val loginState by viewmodel.loginState.collectAsState()
+//    val navigateToMain by viewmodel.navigateToMain.collectAsState()
+//    val isLoading by viewmodel.isLoading.collectAsState()
+//
+//    LaunchedEffect(navigateToMain) {
+//        if (navigateToMain) {
+//            navController.navigate(ScreensRoute.Home.route) {
+//                popUpTo(ScreensRoute.Login.route) { inclusive = true }
+//            }
+//        }
+//    }
+//
+//    LaunchedEffect(loginState) {
+//        if (loginState is UiState.Success) {
+//            navController.navigate(ScreensRoute.Home.route) {
+//                popUpTo(ScreensRoute.Login.route) { inclusive = true }
+//            }
+//        }
+//    }
+//
+//    if(isLoading){
+//        Column(
+//            modifier = Modifier.fillMaxSize(),
+//            horizontalAlignment = Alignment.CenterHorizontally,
+//            verticalArrangement = Arrangement.Center
+//        ) {
+//            Text("Cargando...")
+//            CircularProgressIndicator()
+//        }
+//    }
+//
+//    else {
+//
+//        Column(
+//            modifier = Modifier
+//                .fillMaxSize()
+//                .padding(24.dp),
+//            verticalArrangement = Arrangement.Center,
+//            horizontalAlignment = Alignment.CenterHorizontally
+//        ) {
+//            Text(text = "BiblioAccess6", style = MaterialTheme.typography.headlineMedium)
+//
+//            Spacer(modifier = Modifier.height(24.dp))
+//
+//            OutlinedTextField(
+//                value = email,
+//                onValueChange = { viewmodel.onEmailChange(it) },
+//                label = { Text("Email") },
+//                modifier = Modifier.fillMaxWidth(),
+//                keyboardOptions = KeyboardOptions.Default.copy(
+//                    keyboardType = KeyboardType.Email
+//                )
+//            )
+//
+//            Spacer(modifier = Modifier.height(16.dp))
+//
+//            OutlinedTextField(
+//                value = password,
+//                onValueChange = { viewmodel.onPasswordChange(it) },
+//                label = { Text("Contraseña") },
+//                modifier = Modifier.fillMaxWidth(),
+//                visualTransformation = PasswordVisualTransformation(),
+//                keyboardOptions = KeyboardOptions.Default.copy(
+//                    keyboardType = KeyboardType.Password
+//                )
+//            )
+//
+//            Spacer(modifier = Modifier.height(24.dp))
+//
+//            Button(
+//                onClick = { viewmodel.onLoginClick() },
+//                modifier = Modifier.fillMaxWidth()
+//            ) {
+//                Text("Iniciar sesión")
+//            }
+//
+//            Spacer(modifier = Modifier.height(16.dp))
+//
+//        }
+//    }
+//
+//}

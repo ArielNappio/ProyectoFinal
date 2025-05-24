@@ -12,3 +12,5 @@ val Pink40 = Color(0xFF7D5260)
 
 val CustomBlue = Color(0xFF1E69CD)
 val CustomOrange = Color(0xFFF2A127)
+
+val BlackGray = Color(0xFF1E1E1E)

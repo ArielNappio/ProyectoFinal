@@ -7,8 +7,9 @@ import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
-import com.example.proyectofinal.auth.presentation.view.LoginScreen
-import com.example.proyectofinal.student.presentation.view.ChatScreen
+//import com.example.proyectofinal.auth.presentation.view.LoginScreen
+import com.example.proyectofinal.mail.presentation.view.InboxScreen
+import com.example.proyectofinal.mail.presentation.view.MessageScreen
 import com.example.proyectofinal.student.presentation.view.CommentsScreen
 import com.example.proyectofinal.student.presentation.view.FavoritesScreen
 import com.example.proyectofinal.student.presentation.view.HomeScreen
@@ -23,11 +24,11 @@ fun NavigationComponent(
 ) {
     NavHost(
         navController = navController,
-        startDestination = ScreensRoute.Login.route
+        startDestination = ScreensRoute.Home.route
     ) {
-        composable(route = ScreensRoute.Login.route) {
-            LoginScreen(navController)
-        }
+//        composable(route = ScreensRoute.Login.route) {
+//            LoginScreen(navController)
+//        }
         composable(route = ScreensRoute.Home.route) {
             HomeScreen(navController, modifier)
         }
@@ -66,8 +67,12 @@ fun NavigationComponent(
                 taskId = taskId
             )
         }
-        composable(route = ScreensRoute.Chat.route) {
-            ChatScreen(modifier, navController)
+        composable(route = ScreensRoute.Mail.route) {
+//            ChatScreen(modifier, navController)
+            InboxScreen(navController, {})
+        }
+        composable(route = ScreensRoute.Message.route) {
+            MessageScreen({})
         }
     }
 }

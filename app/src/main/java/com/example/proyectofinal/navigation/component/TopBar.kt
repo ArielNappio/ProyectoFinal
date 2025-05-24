@@ -9,7 +9,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.automirrored.filled.Chat
+import androidx.compose.material.icons.outlined.Email
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -28,6 +28,7 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import com.example.proyectofinal.R
 import com.example.proyectofinal.core.theme.LocalTheme
+import com.example.proyectofinal.navigation.ScreensRoute
 import com.example.proyectofinal.navigation.util.showBackButton
 
 @Composable
@@ -66,7 +67,7 @@ fun TopBar(navController: NavController) {
                 modifier = Modifier.semantics { contentDescription = "Bienvenido" }
             )
             ChatButton(onClick = {
-                navController.navigate("chat")
+                navController.navigate(ScreensRoute.Mail.route)
             })
         }
     }
@@ -87,11 +88,11 @@ fun ChatButton(onClick: () -> Unit) {
             horizontalAlignment = Alignment.CenterHorizontally
         ){
             Icon(
-                Icons.AutoMirrored.Filled.Chat,
-                contentDescription = "Chat",
+                Icons.Outlined.Email,
+                contentDescription = "Correo",
                 tint = Color(0xFF0084FF)
             )
-            Text("Chat", color = Color(0xFF0084FF))
+            Text("Correo", color = Color(0xFF0084FF))
         }
     }
 }
