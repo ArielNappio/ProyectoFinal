@@ -5,17 +5,38 @@ import android.util.Log
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.proyectofinal.audio.domain.model.RecordedAudio
+import com.example.proyectofinal.audio.domain.repository.AudioRepository
+import com.example.proyectofinal.audio.player.AudioPlayerManager
+import com.example.proyectofinal.audio.recorder.AudioRecorderManager
 import com.example.proyectofinal.task_student.presentation.tts.TextToSpeechManager
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import java.io.File
 
 class TaskStudentViewModel(
-    private val ttsManager: TextToSpeechManager
+    private val ttsManager: TextToSpeechManager,
+    private val audioRecorderManager: AudioRecorderManager,
+    private val audioPlayerManager: AudioPlayerManager,
+    private val audioRepositoryImpl: AudioRepository
 ): ViewModel() {
+
+    private val _comments = MutableStateFlow<List<RecordedAudio>>(emptyList())
+    val comments: StateFlow<List<RecordedAudio>> = _comments
+
+    private val _currentlyPlayingPath = MutableStateFlow<String>("")
+    val currentlyPlayingPath : StateFlow<String> = _currentlyPlayingPath
+
+    private val _isPlaying = MutableStateFlow(false)
+    val isPlaying: StateFlow<Boolean> = _isPlaying
+
+    private var currentAudioFile: File? = null
+
 
     // Texto que se muestra y se lee - hay que cambiar y que traiga texto de la api
     private val rawText = """
@@ -105,6 +126,7 @@ class TaskStudentViewModel(
 
     init {
         viewModelScope.launch {
+            _comments.value = audioRepositoryImpl.getAllAudios()
             ttsManager.isStoped.collect { stopped ->
                 _isStopped.value = stopped
                 if(_isStopped.value == true){
@@ -118,6 +140,44 @@ class TaskStudentViewModel(
                 }
             }
         }
+    }
+
+    // audio
+
+    fun playAudio(filePath: String){
+        if (audioPlayerManager.isPlaying(filePath)) {
+            stopAudio()
+        } else {
+            audioPlayerManager.play(filePath = filePath) {
+                _currentlyPlayingPath.value = "" // Cuando termina de sonar
+            }
+            _currentlyPlayingPath.value = filePath
+        }
+    }
+
+    fun stopAudio(){
+        audioPlayerManager.stop()
+        _currentlyPlayingPath.value = ""
+    }
+
+    fun deleteComment(filePath: String) {
+        viewModelScope.launch {
+            // 1. Eliminar archivo físicamente (si existe)
+            val file = java.io.File(filePath)
+            if (file.exists()) {
+                file.delete()
+            }
+
+            // 2. Eliminar de Room
+            audioRepositoryImpl.deleteAudio(filePath)
+
+            // 3. Actualizar lista en memoria
+            _comments.value = _comments.value.filterNot { it.filePath == filePath }
+        }
+    }
+
+    fun isPlaying(){
+        _isPlaying.value = !_isPlaying.value
     }
 
     fun fontSizeIncrease(){
@@ -215,11 +275,23 @@ class TaskStudentViewModel(
     }
 
     fun startRecording(){
-        TODO()
+        currentAudioFile = audioRecorderManager.startRecording()
     }
 
     fun stopRecording(){
-        TODO()
+        val recordedFile = audioRecorderManager.stopRecording()
+        recordedFile?.takeIf { it.exists() && it.length() > 0 }?.let { file ->
+            viewModelScope.launch {
+                audioRepositoryImpl.saveAudio(
+                    path = file.absolutePath,
+                    taskId = "0",
+                    title = "audio_${currentPageIndex.value}_${System.currentTimeMillis()}",
+                    page = currentPageIndex.value,
+                    date = "hoy"
+                )
+                _comments.value = audioRepositoryImpl.getAllAudios()
+            }
+        }
     }
 
     companion object {

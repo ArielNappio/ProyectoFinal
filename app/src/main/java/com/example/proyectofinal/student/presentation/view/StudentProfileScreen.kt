@@ -40,16 +40,17 @@ import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
 import com.example.proyectofinal.R
 import com.example.proyectofinal.core.theme.LocalTheme
 import com.example.proyectofinal.core.ui.ThemeViewModel
+import com.example.proyectofinal.navigation.ScreensRoute
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
-fun StudentProfileScreen(modifier: Modifier = Modifier) {
+fun StudentProfileScreen(modifier: Modifier = Modifier, navController: NavController) {
     val themeViewModel = koinViewModel<ThemeViewModel>()
     var expanded by remember { mutableStateOf(false) }
     val isCustomFontFamilySelected by themeViewModel.fontFamilySelected.collectAsState()
@@ -182,7 +183,10 @@ fun StudentProfileScreen(modifier: Modifier = Modifier) {
 
         // Logout button (Red)
         Button(
-            onClick = {},
+            onClick = {
+                themeViewModel.logout()
+                navController.navigate(ScreensRoute.Login.route)
+                      },
             modifier = Modifier
                 .fillMaxWidth()
                 .height(48.dp),
@@ -198,9 +202,9 @@ fun StudentProfileScreen(modifier: Modifier = Modifier) {
         Spacer(modifier = Modifier.height(16.dp))
     }
 }
-
-@Preview
-@Composable
-fun PreviewStudentProfileScreen() {
-    StudentProfileScreen(koinViewModel())
-}
+//
+//@Preview
+//@Composable
+//fun PreviewStudentProfileScreen() {
+//    StudentProfileScreen(koinViewModel())
+//}

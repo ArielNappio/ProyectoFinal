@@ -51,7 +51,7 @@ fun NavigationComponent(
             FavoritesScreen(modifier, navController)
         }
         composable(route = ScreensRoute.Profile.route) {
-            StudentProfileScreen(modifier)
+            StudentProfileScreen(modifier, navController)
         }
         composable(
             route = "comments/{taskId}",

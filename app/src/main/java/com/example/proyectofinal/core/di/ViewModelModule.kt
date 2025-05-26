@@ -18,7 +18,7 @@ val viewModelModule = module {
     viewModel { MainViewModel(get(), get()) }
     viewModel { HomeScreenViewModel(get ()) }
     viewModel { DetailsViewModel(get()) }
-    viewModel { TaskStudentViewModel(get()) }
-    single { ThemeViewModel() }
-    viewModel { CommentsViewModel(get()) }
+    viewModel { TaskStudentViewModel(get(), get(), get(), get()) }
+    single { ThemeViewModel(get()) }
+    viewModel { CommentsViewModel(get(),get())}
 }
