@@ -3,7 +3,7 @@ package com.example.proyectofinal.audio.data.repository
 import com.example.proyectofinal.audio.data.local.AudioDao
 import com.example.proyectofinal.audio.data.model.RecordedAudioEntity
 import com.example.proyectofinal.audio.domain.model.RecordedAudio
-import com.example.proyectofinal.audio.domain.model.toDomain
+import com.example.proyectofinal.audio.util.toDomain
 import com.example.proyectofinal.audio.domain.repository.AudioRepository
 import java.io.File
 

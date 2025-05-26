@@ -1,6 +1,7 @@
-package com.example.proyectofinal.audio.domain.model
+package com.example.proyectofinal.audio.util
 
 import com.example.proyectofinal.audio.data.model.RecordedAudioEntity
+import com.example.proyectofinal.audio.domain.model.RecordedAudio
 
 fun RecordedAudioEntity.toDomain(): RecordedAudio {
     return RecordedAudio(
