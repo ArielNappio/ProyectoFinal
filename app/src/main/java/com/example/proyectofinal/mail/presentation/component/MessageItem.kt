@@ -15,7 +15,7 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.tooling.preview.Preview
 import com.example.proyectofinal.core.theme.BlackGray
-import com.example.proyectofinal.mail.domain.MessageModel
+import com.example.proyectofinal.mail.domain.model.MessageModel
 
 @Composable
 fun MessageItem(message: MessageModel, onClick: () -> Unit) {

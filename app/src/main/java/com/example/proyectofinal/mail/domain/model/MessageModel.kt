@@ -1,4 +1,4 @@
-package com.example.proyectofinal.mail.domain
+package com.example.proyectofinal.mail.domain.model
 
 data class MessageModel(
     val sender: String,

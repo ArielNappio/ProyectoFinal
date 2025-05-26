@@ -2,14 +2,13 @@ package com.example.proyectofinal.mail.presentation.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.proyectofinal.mail.domain.MessageModel
+import com.example.proyectofinal.mail.domain.model.MessageModel
+import com.example.proyectofinal.mail.domain.usecase.SendMessageUseCase
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
-class InboxViewModel : ViewModel() {
-
-   //TODO: INJECT CU EN EL CONSTRUCTOR
+class InboxViewModel(private val sendMessageUseCase: SendMessageUseCase) : ViewModel() {
 
     private val _inboxMessages = MutableStateFlow<List<MessageModel>>(emptyList())
     val inboxMessages: StateFlow<List<MessageModel>> = _inboxMessages

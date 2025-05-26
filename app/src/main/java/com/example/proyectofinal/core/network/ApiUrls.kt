@@ -10,4 +10,6 @@ object ApiUrls {
     const val ORDER = "${BASE_URL}api/Order/{id}"
     const val TASKS = "${BASE_URL}api/Task"
     const val TASK = "${BASE_URL}api/Task/{id}"
+    const val MESSAGES = "${BASE_URL}api/Message"
+    const val MESSAGE = "${BASE_URL}api/Message/{id}"
 }
