@@ -7,6 +7,7 @@ import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
+import com.example.proyectofinal.mail.domain.MailboxType
 //import com.example.proyectofinal.auth.presentation.view.LoginScreen
 import com.example.proyectofinal.mail.presentation.view.InboxScreen
 import com.example.proyectofinal.mail.presentation.view.MessageScreen
@@ -67,12 +68,21 @@ fun NavigationComponent(
                 taskId = taskId
             )
         }
-        composable(route = ScreensRoute.Mail.route) {
-//            ChatScreen(modifier, navController)
-            InboxScreen(navController, {})
+        composable(ScreensRoute.Mail.route) { backStackEntry ->
+            val mailboxType = when (backStackEntry.arguments?.getString("mailboxType")) {
+                "inbox" -> MailboxType.INBOX
+                "outbox" -> MailboxType.OUTBOX
+                else -> MailboxType.INBOX
+            }
+
+            InboxScreen(
+                navController = navController,
+                mailboxType = mailboxType,
+                onMessageClick = { }
+            )
         }
         composable(route = ScreensRoute.Message.route) {
-            MessageScreen({})
+            MessageScreen ({},{navController.popBackStack()})
         }
     }
 }

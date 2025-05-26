@@ -5,26 +5,37 @@ import androidx.lifecycle.viewModelScope
 import com.example.proyectofinal.mail.domain.MessageModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
-class InboxViewModel() : ViewModel() {
+class InboxViewModel : ViewModel() {
 
-    private val _messages = MutableStateFlow<List<MessageModel>>(emptyList())
-    val messages: StateFlow<List<MessageModel>> = _messages.asStateFlow()
+   //TODO: INJECT CU EN EL CONSTRUCTOR
+
+    private val _inboxMessages = MutableStateFlow<List<MessageModel>>(emptyList())
+    val inboxMessages: StateFlow<List<MessageModel>> = _inboxMessages
+
+    private val _outboxMessages = MutableStateFlow<List<MessageModel>>(emptyList())
+    val outboxMessages: StateFlow<List<MessageModel>> = _outboxMessages
 
     init {
-        fetchMessages()
+        loadInboxMessages()
+        loadOutboxMessages()
     }
 
-    fun fetchMessages() {
+    private fun loadInboxMessages() {
+        // Lógica para cargar mensajes de la bandeja de entrada
         viewModelScope.launch {
-//            val fetchedMessages = messageRepository.getAllMessages()
-//            _messages.value = fetchedMessages
+//            val messages = inboxRepository.fetchInboxMessages()
+//            _inboxMessages.value = messages
         }
     }
 
-    fun addMessage(message: MessageModel) {
-        _messages.value = _messages.value + message
+    private fun loadOutboxMessages() {
+        // Lógica para cargar mensajes de la bandeja de salida
+        viewModelScope.launch {
+//            val messages = inboxRepository.fetchOutboxMessages()
+//            _outboxMessages.value = messages
+        }
     }
+
 }

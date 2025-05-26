@@ -15,15 +15,15 @@ class MessageViewModel : ViewModel() {
     private val _message = MutableStateFlow("")
     val message: StateFlow<String> = _message
 
-    fun onToChange(value: String) {
+    fun updateTo(value: String) {
         _to.value = value
     }
 
-    fun onSubjectChange(value: String) {
+    fun updateSubject(value: String) {
         _subject.value = value
     }
 
-    fun onMessageChange(value: String) {
+    fun updateMessage(value: String) {
         _message.value = value
     }
 

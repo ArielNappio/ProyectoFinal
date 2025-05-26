@@ -40,6 +40,7 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.proyectofinal.R
 import com.example.proyectofinal.core.theme.LocalTheme
+import com.example.proyectofinal.mail.domain.MailboxType
 import com.example.proyectofinal.mail.domain.MessageModel
 import com.example.proyectofinal.mail.presentation.component.MessageItem
 import com.example.proyectofinal.mail.presentation.viewmodel.InboxViewModel
@@ -50,10 +51,14 @@ import org.koin.androidx.compose.koinViewModel
 @Composable
 fun InboxScreen(
     navController: NavController,
+    mailboxType: MailboxType,
     onMessageClick: (MessageModel) -> Unit
 ) {
     val viewModel = koinViewModel<InboxViewModel>()
-    val messages by viewModel.messages.collectAsState()
+    val messages by when (mailboxType) {
+        MailboxType.INBOX -> viewModel.inboxMessages.collectAsState()
+        MailboxType.OUTBOX -> viewModel.outboxMessages.collectAsState()
+    }
     val menuExpanded = remember { mutableStateOf(false) }
 
     Column(modifier = Modifier.fillMaxSize()) {
@@ -66,12 +71,15 @@ fun InboxScreen(
                         painter = painterResource(
                             id = if (LocalTheme.current.isDark) R.drawable.wirin_logo_dark else R.drawable.wirin_logo_light
                         ),
-                        contentDescription = "Logo de Wubiream",
+                        contentDescription = "Logo de Wirin",
                         modifier = Modifier.size(40.dp)
                     )
                     Spacer(modifier = Modifier.width(8.dp))
                     Text(
-                        text = "Bandeja de Entrada",
+                        text = when (mailboxType) {
+                            MailboxType.INBOX -> "Bandeja de Entrada"
+                            MailboxType.OUTBOX -> "Bandeja de Salida"
+                        },
                         fontSize = 20.sp,
                         fontWeight = FontWeight.Bold
                     )
@@ -91,11 +99,19 @@ fun InboxScreen(
                             onClick = { navController.navigate(ScreensRoute.Message.route) })
                         DropdownMenuItem(
                             text = { Text("Bandeja de Entrada") },
-                            onClick = { /* navegar */ })
+                            onClick = {
+                                navController.navigate("mail/inbox")
+                            }
+                        )
                         DropdownMenuItem(
                             text = { Text("Bandeja de Salida") },
-                            onClick = { /* navegar */ })
-                        DropdownMenuItem(text = { Text("Borradores") }, onClick = { /* navegar */ })
+                            onClick = {
+                                navController.navigate("mail/outbox")
+                            }
+                        )
+                        DropdownMenuItem(
+                            text = { Text("Borradores") },
+                            onClick = { })
                     }
                 }
             }
@@ -112,10 +128,10 @@ fun InboxScreen(
             Text(text = "Redactar")
         }
 
-        // Lista de mensajes
         MessageList(messages, onMessageClick)
     }
 }
+
 
 
 @Composable

@@ -12,6 +12,6 @@ enum class ScreensRoute(
     TaskDetails("task_details", showsBottomBar = false),
     Task("task", false, false),
     Comments("comments", showsTopBar = false, showsBottomBar = false),
-    Mail("mail", false, false),
+    Mail("mail/{mailboxType}", false, false),
     Message("message", false, false)
 }
