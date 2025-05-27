@@ -1,5 +1,7 @@
 package com.example.proyectofinal.mail.presentation.view
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -28,6 +30,7 @@ import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
@@ -37,10 +40,14 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
+import com.example.proyectofinal.core.network.NetworkResponse
 import com.example.proyectofinal.core.theme.CustomGreen2
+import com.example.proyectofinal.mail.domain.model.MessageModel
 import com.example.proyectofinal.mail.presentation.viewmodel.MessageViewModel
 import org.koin.androidx.compose.koinViewModel
+import java.time.LocalDateTime
 
+@RequiresApi(Build.VERSION_CODES.O)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MessageScreen(
@@ -51,7 +58,15 @@ fun MessageScreen(
     val to by viewModel.to.collectAsState()
     val subject by viewModel.subject.collectAsState()
     val message by viewModel.message.collectAsState()
+    val sendState by viewModel.sendMessageState.collectAsState()
+
     var showDialog by remember { mutableStateOf(false) }
+
+    LaunchedEffect(sendState) {
+        if (sendState is NetworkResponse.Success) {
+            onSendComplete()
+        }
+    }
 
     Scaffold(
         containerColor = Color(0xFF121212),
@@ -70,9 +85,15 @@ fun MessageScreen(
                 actions = {
                     Button(
                         onClick = {
-                            viewModel.sendMessage()
-                            onSendComplete()
+                            val newMessage = MessageModel(
+                                sender = to,
+                                subject = subject,
+                                content = message,
+                                date = LocalDateTime.now().toString(),
+                            )
+                            viewModel.sendMessage(newMessage)
                         },
+                        enabled = to.isNotBlank() && message.isNotBlank(),
                         colors = ButtonDefaults.buttonColors(containerColor = CustomGreen2)
                     ) {
                         Icon(
@@ -84,9 +105,7 @@ fun MessageScreen(
                         Text("Enviar", color = Color.White)
                     }
                 },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = Color(0xFF1E1E1E)
-                )
+                colors = TopAppBarDefaults.topAppBarColors(containerColor = Color(0xFF1E1E1E))
             )
         }
     ) { padding ->
@@ -97,27 +116,24 @@ fun MessageScreen(
         ) {
             Spacer(Modifier.height(18.dp))
 
-            // Campo Para
             OutlinedTextField(
                 value = to,
-                onValueChange = { viewModel.updateTo(to) },
+                onValueChange = { viewModel.updateTo(it) },
                 label = { Text("Para") },
                 modifier = Modifier.fillMaxWidth()
             )
 
             Spacer(Modifier.height(8.dp))
 
-            // Campo Asunto
             OutlinedTextField(
                 value = subject,
-                onValueChange = { viewModel.updateSubject(subject) },
+                onValueChange = { viewModel.updateSubject(it) },
                 label = { Text("Asunto") },
                 modifier = Modifier.fillMaxWidth()
             )
 
             Spacer(Modifier.height(8.dp))
 
-            // Botón Adjuntar arriba del mensaje
             Button(
                 onClick = {},
                 modifier = Modifier.align(Alignment.End)
@@ -129,7 +145,6 @@ fun MessageScreen(
 
             Spacer(Modifier.height(8.dp))
 
-            // Campo Mensaje con grabador adentro
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -137,10 +152,9 @@ fun MessageScreen(
             ) {
                 OutlinedTextField(
                     value = message,
-                    onValueChange = { viewModel.updateMessage(message) },
+                    onValueChange = { viewModel.updateMessage(it) },
                     label = { Text("Mensaje") },
-                    modifier = Modifier
-                        .fillMaxSize()
+                    modifier = Modifier.fillMaxSize()
                 )
 
                 IconButton(
@@ -155,7 +169,6 @@ fun MessageScreen(
 
             Spacer(Modifier.height(24.dp))
 
-            // Botones Guardar y Descartar
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceEvenly
@@ -168,7 +181,7 @@ fun MessageScreen(
                 }
 
                 Button(
-                    onClick = {},
+                    onClick = { viewModel.saveDraft() },
                     colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFFF9800))
                 ) {
                     Text("Guardar como borrador")

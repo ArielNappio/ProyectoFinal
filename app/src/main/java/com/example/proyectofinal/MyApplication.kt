@@ -6,6 +6,8 @@ import com.example.proyectofinal.auth.di.tokenManagerModule
 import com.example.proyectofinal.core.di.networkModule
 import com.example.proyectofinal.core.di.useCaseModule
 import com.example.proyectofinal.core.di.viewModelModule
+import com.example.proyectofinal.mail.di.databaseModule
+import com.example.proyectofinal.mail.di.mailModule
 import com.example.proyectofinal.student.data.di.CommentsRepositoryModule
 import com.example.proyectofinal.student.data.di.taskRepositoryModule
 import com.example.proyectofinal.task_student.di.ttsModule
@@ -27,7 +29,9 @@ class MyApplication: Application() {
                 tokenManagerModule,
                 taskRepositoryModule,
                 ttsModule,
-                CommentsRepositoryModule
+                CommentsRepositoryModule,
+                databaseModule,
+                mailModule
             )
         }
 

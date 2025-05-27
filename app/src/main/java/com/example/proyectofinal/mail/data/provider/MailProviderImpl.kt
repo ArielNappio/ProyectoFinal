@@ -6,8 +6,11 @@ import com.example.proyectofinal.core.network.NetworkResponse
 import com.example.proyectofinal.mail.domain.model.MessageModel
 import com.example.proyectofinal.mail.domain.provider.MailProvider
 import io.ktor.client.HttpClient
+import io.ktor.client.call.body
+import io.ktor.client.request.get
 import io.ktor.client.request.post
 import io.ktor.client.request.setBody
+import io.ktor.client.statement.HttpResponse
 import io.ktor.http.ContentType
 import io.ktor.http.HttpStatusCode
 import kotlinx.coroutines.flow.Flow
@@ -29,15 +32,19 @@ class MailProviderImpl(private val ktorClient: HttpClient) : MailProvider {
         }
     }
 
-    override fun receiveMessage(): Flow<NetworkResponse<MessageModel>> {
-        TODO("Not yet implemented")
-    }
+    override fun receiveMessage(): Flow<NetworkResponse<MessageModel>> = flow {
+        try {
+            emit(NetworkResponse.Loading())
+            val response: HttpResponse = ktorClient.get(ApiUrls.MESSAGE)
 
-    override fun saveDraft(): Flow<NetworkResponse<Unit>> {
-        TODO("Not yet implemented")
-    }
-
-    override fun deleteDraft(): Flow<NetworkResponse<Unit>> {
-        TODO("Not yet implemented")
+            if (response.status == HttpStatusCode.OK) {
+                val message = response.body<MessageModel>()
+                emit(NetworkResponse.Success(message))
+            } else {
+                emit(NetworkResponse.Failure("Error ${response.status.value}"))
+            }
+        } catch (e: Exception) {
+            emit(NetworkResponse.Failure(error = e.toString()))
+        }
     }
 }

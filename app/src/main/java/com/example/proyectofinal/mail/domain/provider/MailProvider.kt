@@ -8,7 +8,5 @@ interface MailProvider {
 
     fun sendMessage(message: MessageModel): Flow<NetworkResponse<MessageModel>>
     fun receiveMessage(): Flow<NetworkResponse<MessageModel>>
-    fun saveDraft(): Flow<NetworkResponse<Unit>>
-    fun deleteDraft(): Flow<NetworkResponse<Unit>>
 
 }

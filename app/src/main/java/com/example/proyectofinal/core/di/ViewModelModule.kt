@@ -3,8 +3,6 @@ package com.example.proyectofinal.core.di
 import com.example.proyectofinal.auth.presentation.viewmodel.LoginViewModel
 import com.example.proyectofinal.camera.presentation.viewmodel.CameraViewModel
 import com.example.proyectofinal.core.ui.ThemeViewModel
-import com.example.proyectofinal.mail.presentation.viewmodel.InboxViewModel
-import com.example.proyectofinal.mail.presentation.viewmodel.MessageViewModel
 import com.example.proyectofinal.navigation.presentation.viewmodel.MainViewModel
 import com.example.proyectofinal.student.presentation.viewmodel.CommentsViewModel
 import com.example.proyectofinal.student.presentation.viewmodel.DetailsViewModel
@@ -23,6 +21,4 @@ val viewModelModule = module {
     viewModel { TaskStudentViewModel(get()) }
     single { ThemeViewModel() }
     viewModel { CommentsViewModel(get()) }
-    viewModel { InboxViewModel() }
-    viewModel { MessageViewModel() }
 }

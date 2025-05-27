@@ -1,5 +1,7 @@
 package com.example.proyectofinal.navigation
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
@@ -7,7 +9,7 @@ import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
-import com.example.proyectofinal.mail.domain.MailboxType
+import com.example.proyectofinal.mail.domain.model.MailboxType
 //import com.example.proyectofinal.auth.presentation.view.LoginScreen
 import com.example.proyectofinal.mail.presentation.view.InboxScreen
 import com.example.proyectofinal.mail.presentation.view.MessageScreen
@@ -18,6 +20,7 @@ import com.example.proyectofinal.student.presentation.view.StudentProfileScreen
 import com.example.proyectofinal.student.presentation.view.TaskDetailScreen
 import com.example.proyectofinal.task_student.presentation.view.TaskStudent
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun NavigationComponent(
     navController: NavHostController,

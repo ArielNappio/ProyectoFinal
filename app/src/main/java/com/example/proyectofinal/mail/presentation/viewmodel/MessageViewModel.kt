@@ -1,10 +1,18 @@
 package com.example.proyectofinal.mail.presentation.viewmodel
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.example.proyectofinal.core.network.NetworkResponse
+import com.example.proyectofinal.mail.domain.model.MessageModel
+import com.example.proyectofinal.mail.domain.usecase.SendMessageUseCase
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.launch
 
-class MessageViewModel : ViewModel() {
+class MessageViewModel(private val sendMessageUseCase: SendMessageUseCase) : ViewModel() {
+
+    private val _sendMessageState = MutableStateFlow<NetworkResponse<MessageModel>?>(null)
+    val sendMessageState: StateFlow<NetworkResponse<MessageModel>?> = _sendMessageState
 
     private val _to = MutableStateFlow("")
     val to: StateFlow<String> = _to
@@ -27,10 +35,12 @@ class MessageViewModel : ViewModel() {
         _message.value = value
     }
 
-    fun sendMessage() {
-        // Aquí podrías usar un repositorio para enviar
-        println("Enviando mensaje a: $to\nAsunto: $subject\nMensaje: $message")
-        clearFields()
+    fun sendMessage(message: MessageModel) {
+        viewModelScope.launch {
+            sendMessageUseCase(message).collect { response ->
+                _sendMessageState.value = response
+            }
+        }
     }
 
     fun saveDraft() {
