@@ -69,5 +69,8 @@ fun NavigationComponent(
         composable(route = ScreensRoute.Chat.route) {
             ChatScreen(modifier, navController)
         }
+        composable(route = ScreensRoute.TextEdit.route) {
+            TextEditScreen()
+        }
     }
 }

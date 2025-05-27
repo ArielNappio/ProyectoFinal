@@ -76,7 +76,7 @@ fun LoginScreen(
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Text(text = "BiblioAccess6", style = MaterialTheme.typography.headlineMedium)
+            Text(text = "BiblioAccess", style = MaterialTheme.typography.headlineMedium)
 
             Spacer(modifier = Modifier.height(24.dp))
 

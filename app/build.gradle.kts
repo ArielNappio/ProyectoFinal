@@ -81,6 +81,9 @@ dependencies {
     implementation(libs.androidx.navigation.runtime.ktx)
     implementation(libs.androidx.navigation.runtime.android)
 
+    // Coil
+    implementation(libs.coil.compose)
+
     //mockito
     testImplementation(libs.mockk)
     testImplementation(libs.kotlinx.coroutines.test)
