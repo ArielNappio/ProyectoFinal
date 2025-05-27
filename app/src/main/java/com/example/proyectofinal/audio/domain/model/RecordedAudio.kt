@@ -7,5 +7,6 @@ data class RecordedAudio(
     val filePath: String,
     val timestamp: Long,
     val date: String,
-    val associatedTaskId: String? = null // si lo vinculás a tareas
+    val associatedTaskId: String? = null, // si lo vinculás a tareas
+    val duration: Long
 )

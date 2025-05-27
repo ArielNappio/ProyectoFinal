@@ -11,7 +11,8 @@ fun RecordedAudioEntity.toDomain(): RecordedAudio {
         associatedTaskId = associatedTaskId,
         title = title,
         page = page,
-        date = date
+        date = date,
+        duration = duration
     )
 }
 
@@ -23,6 +24,7 @@ fun RecordedAudio.toEntity(): RecordedAudioEntity {
         associatedTaskId = associatedTaskId,
         title = title,
         page = page,
-        date = date
+        date = date,
+        duration = duration
     )
 }

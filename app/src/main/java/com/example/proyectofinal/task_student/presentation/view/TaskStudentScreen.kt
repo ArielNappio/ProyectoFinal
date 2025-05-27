@@ -300,6 +300,7 @@ fun TaskStudent(navController: NavHostController) {
                             CommentAudioCard(
                                 comment = comment,
                                 isPlaying = currentlyPlayingPath == comment.filePath,
+                                currentPosition = 0L,
                                 onPlayClick = {
                                     viewModel.playAudio(comment.filePath)
                                     viewModel.isPlaying()
@@ -319,7 +320,6 @@ fun TaskStudent(navController: NavHostController) {
                     content = {
                         Column(
                             modifier = Modifier
-                                .fillMaxSize()
                                 .padding(16.dp),
                             verticalArrangement = Arrangement.Center,
                             horizontalAlignment = Alignment.CenterHorizontally

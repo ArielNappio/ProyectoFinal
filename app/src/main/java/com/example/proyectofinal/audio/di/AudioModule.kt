@@ -16,7 +16,9 @@ val databaseModule = module {
             androidContext(), // Koin's way to get application context
             AudioDatabase::class.java,
             "audio_database" // Your database name
-        ).build()
+        )
+            .fallbackToDestructiveMigration()
+            .build()
     }
 
 }

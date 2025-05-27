@@ -43,7 +43,7 @@ fun CommentsScreen(
     val comments by viewModel.comments.collectAsState()
     val currentlyPlayingPath by viewModel.currentlyPlayingPath.collectAsState()
     val isPlaying by viewModel.isPlaying.collectAsState()
-
+    val currentPosition by viewModel.currentPosition.collectAsState()
 
     Column(modifier = modifier.fillMaxSize()) {
         CommentsTopBar(
@@ -70,6 +70,7 @@ fun CommentsScreen(
                     CommentAudioCard(
                         comment = comment,
                         isPlaying = isPlaying && comment.filePath == currentlyPlayingPath,
+                        currentPosition = if (currentlyPlayingPath== comment.filePath) currentPosition else 0L,
                         onPlayClick = {
                             println("Reproduciendo ${comment.filePath}")
                             viewModel.playAudio(comment.filePath)

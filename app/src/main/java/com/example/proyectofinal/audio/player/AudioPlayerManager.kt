@@ -48,4 +48,12 @@ class AudioPlayerManager {
 
     fun getCurrentPath(): String? = currentPath
 
+    fun getCurrentPosition(): Long {
+        return mediaPlayer?.currentPosition?.toLong() ?: 0L
+    }
+
+    fun getDuration(): Long {
+        return mediaPlayer?.duration?.toLong() ?: 1L
+    }
+
 }
