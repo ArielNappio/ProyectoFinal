@@ -13,13 +13,15 @@ import org.koin.android.ext.koin.androidContext
 import org.koin.core.module.dsl.viewModel
 import org.koin.dsl.module
 
-val databaseModule = module {
+val mailDatabaseModule = module {
     single {
         Room.databaseBuilder(
             androidContext(),
             MailDatabase::class.java,
-            "audio_database" // Your database name
-        ).build()
+            "mail_database"
+        )
+            .fallbackToDestructiveMigration(false)
+            .build()
     }
 
 }
