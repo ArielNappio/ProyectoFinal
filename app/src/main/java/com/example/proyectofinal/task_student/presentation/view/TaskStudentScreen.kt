@@ -100,6 +100,7 @@ fun TaskStudent(navController: NavHostController) {
     val comments = viewModel.comments.collectAsState().value
     val filteredComments = comments.filter { it.page == currentPageIndex }
     val currentlyPlayingPath by viewModel.currentlyPlayingPath.collectAsState()
+    val currentPosition by viewModel.currentPosition.collectAsState()
 
     var rating by remember { mutableStateOf(0) }
 
@@ -300,7 +301,7 @@ fun TaskStudent(navController: NavHostController) {
                             CommentAudioCard(
                                 comment = comment,
                                 isPlaying = currentlyPlayingPath == comment.filePath,
-                                currentPosition = 0L,
+                                currentPosition = if (currentlyPlayingPath== comment.filePath) currentPosition else 0L,
                                 onPlayClick = {
                                     viewModel.playAudio(comment.filePath)
                                     viewModel.isPlaying()

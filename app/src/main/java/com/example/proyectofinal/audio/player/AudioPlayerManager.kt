@@ -46,6 +46,14 @@ class AudioPlayerManager {
         return mediaPlayer?.isPlaying == true && (path == null || currentPath == path)
     }
 
+    fun pause() {
+        mediaPlayer?.takeIf { it.isPlaying }?.pause()
+    }
+
+    fun resume() {
+        mediaPlayer?.takeIf { !it.isPlaying }?.start()
+    }
+
     fun getCurrentPath(): String? = currentPath
 
     fun getCurrentPosition(): Long {

@@ -74,7 +74,6 @@ fun CommentsScreen(
                         onPlayClick = {
                             println("Reproduciendo ${comment.filePath}")
                             viewModel.playAudio(comment.filePath)
-                            viewModel.isPlaying()
                         },
                         onDeleteClick = {
                             viewModel.deleteComment(comment.filePath)

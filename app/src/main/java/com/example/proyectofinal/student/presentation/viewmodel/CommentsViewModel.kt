@@ -36,23 +36,46 @@ class CommentsViewModel(
         }
     }
 
-    fun playAudio(filePath: String){
-        if (audioPlayerManager.isPlaying(filePath)) {
-            stopAudio()
-        } else {
-            audioPlayerManager.play(filePath = filePath) {
-                _currentlyPlayingPath.value = ""
-                _currentPosition.value = 0L
-                positionJob?.cancel()
-            }
-            _currentlyPlayingPath.value = filePath
-
-            positionJob?.cancel()
-            positionJob = viewModelScope.launch {
-                while (_currentlyPlayingPath.value == filePath) {
-                    _currentPosition.value = audioPlayerManager.getCurrentPosition()
-                    delay(200L)
+    fun playAudio(filePath: String) {
+        viewModelScope.launch {
+            when {
+                // Si es el mismo archivo y está reproduciendo, pausamos
+                _currentlyPlayingPath.value == filePath && _isPlaying.value -> {
+                    audioPlayerManager.pause()
+                    _isPlaying.value = false
+                    positionJob?.cancel()
                 }
+
+                // Si es el mismo archivo y está pausado, reanudamos
+                _currentlyPlayingPath.value == filePath && !_isPlaying.value -> {
+                    audioPlayerManager.resume()
+                    _isPlaying.value = true
+                    startPositionTracking(filePath)
+                }
+
+                // Si es otro archivo, reproducimos desde cero
+                else -> {
+                    stopAudio() // por si había algo sonando
+                    audioPlayerManager.play(filePath) {
+                        _currentlyPlayingPath.value = ""
+                        _currentPosition.value = 0L
+                        _isPlaying.value = false
+                        positionJob?.cancel()
+                    }
+                    _currentlyPlayingPath.value = filePath
+                    _isPlaying.value = true
+                    startPositionTracking(filePath)
+                }
+            }
+        }
+    }
+
+    private fun startPositionTracking(filePath: String) {
+        positionJob?.cancel()
+        positionJob = viewModelScope.launch {
+            while (_currentlyPlayingPath.value == filePath && _isPlaying.value) {
+                _currentPosition.value = audioPlayerManager.getCurrentPosition()
+                delay(200L)
             }
         }
     }
@@ -79,9 +102,4 @@ class CommentsViewModel(
             _comments.value = _comments.value.filterNot { it.filePath == filePath }
         }
     }
-
-    fun isPlaying(){
-        _isPlaying.value = !_isPlaying.value
-    }
-
 }
