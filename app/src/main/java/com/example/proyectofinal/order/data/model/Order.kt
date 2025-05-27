@@ -1,14 +1,22 @@
 package com.example.proyectofinal.order.data.model
 
 import kotlinx.serialization.Serializable
+import java.io.File
+import java.util.Date
 
-@Serializable
 data class Order(
     val id: Int,
     val name: String,
     val description: String,
-    val state: String,
-    val dateCreation: String,
-    val dateLimit: String,
-    val userId: Int
+    val status : String,
+    val creationdate : String,
+    val limitdate : Date,
+    val createdbyuserid : String,
+    val filePath : String,
+    val assigneduserid : String ,
+    val isFavorite: Boolean,
+    val lastRead: String,
+    val pageCount: Int,
+    val hasComments: Boolean,
+    val file : File
 )

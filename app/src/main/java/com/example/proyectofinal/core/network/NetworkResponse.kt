@@ -1,6 +1,7 @@
 package com.example.proyectofinal.core.network
 
-sealed class NetworkResponse<T>(
+sealed class
+NetworkResponse<T>(
     val data: T? = null,
     val error: String? = null
 ){
