@@ -1,11 +1,14 @@
 package com.example.proyectofinal.task_student.presentation.component
 
+
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -16,6 +19,7 @@ import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Mic
 import androidx.compose.material.icons.filled.Pause
 import androidx.compose.material.icons.filled.PlayArrow
+import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -34,6 +38,10 @@ import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.unit.dp
+import com.google.accompanist.permissions.ExperimentalPermissionsApi
+import com.google.accompanist.permissions.isGranted
+import com.google.accompanist.permissions.rememberPermissionState
+import com.google.accompanist.permissions.shouldShowRationale
 import kotlinx.coroutines.delay
 
 @Composable
@@ -194,5 +202,48 @@ fun MicControl(
                 }
             }
         }
+    }
+}
+
+@OptIn(ExperimentalPermissionsApi::class)
+@Composable
+fun MicPermissionWrapper(
+    content: @Composable () -> Unit,
+    onPermissionDenied: () -> Unit = {}
+) {
+    val permissionState = rememberPermissionState(android.Manifest.permission.RECORD_AUDIO)
+
+    LaunchedEffect(Unit) {
+        permissionState.launchPermissionRequest()
+    }
+
+    when {
+        permissionState.status.isGranted -> {
+            content()
+        }
+        permissionState.status.shouldShowRationale -> {
+            PermissionRationale {
+                permissionState.launchPermissionRequest()
+            }
+        }
+        else -> {
+            onPermissionDenied()
+        }
+    }
+}
+
+
+
+@Composable
+fun PermissionRationale(onRequestPermission: () -> Unit) {
+    Box(
+        modifier = Modifier.fillMaxSize(),
+        contentAlignment = Alignment.Center
+    ) {
+            Text("Este permiso es necesario para grabar audio")
+            Spacer(modifier = Modifier.height(8.dp))
+            Button(onClick = onRequestPermission) {
+                Text("Conceder permiso")
+            }
     }
 }

@@ -22,6 +22,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
@@ -64,15 +65,19 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
+import com.example.proyectofinal.student.presentation.component.CommentAudioCard
 import com.example.proyectofinal.task_student.presentation.component.AccessibleIconButton
 import com.example.proyectofinal.task_student.presentation.component.DownloadOption
 import com.example.proyectofinal.task_student.presentation.component.MicControl
+import com.example.proyectofinal.task_student.presentation.component.MicPermissionWrapper
 import com.example.proyectofinal.task_student.presentation.viewmodel.TaskStudentViewModel
+import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 
 
+@OptIn(ExperimentalPermissionsApi::class)
 @Composable
 fun TaskStudent(navController: NavHostController) {
 
@@ -92,7 +97,13 @@ fun TaskStudent(navController: NavHostController) {
     val isFirstPage by viewModel.isFirstPage.collectAsState()
     val isLastPage by viewModel.isLastPage.collectAsState()
 
+    val comments = viewModel.comments.collectAsState().value
+    val filteredComments = comments.filter { it.page == currentPageIndex }
+    val currentlyPlayingPath by viewModel.currentlyPlayingPath.collectAsState()
+
     var rating by remember { mutableStateOf(0) }
+
+    val coroutineScope = rememberCoroutineScope()
 
     var isRecording by remember { mutableStateOf(false) }
     var hasRecording by remember { mutableStateOf(false) }
@@ -102,6 +113,7 @@ fun TaskStudent(navController: NavHostController) {
     // Simula el tiempo grabado
     val timer = rememberCoroutineScope()
     var playbackTimeLeft by remember { mutableStateOf(0L) }
+
 
     Column(
         modifier = Modifier
@@ -275,68 +287,107 @@ fun TaskStudent(navController: NavHostController) {
                     modifier = Modifier.padding(bottom = 16.dp)
                 )
 
-                CenteredAudioBar(
-                    isPlaying = isPlaying,
-                    onPlayPauseClick = { isPlaying = !isPlaying }
-                )
-
-                Spacer(modifier = Modifier.height(24.dp))
-
-                MicControl(
-                    isRecording = isRecording,
-                    hasRecording = hasRecording,
-                    isPlaying = isPlaying,
-                    recordingDuration = recordingDuration,
-                    onStartRecording = {
-                        isRecording = true
-                        hasRecording = false
-                        recordingDuration = 0L
-                        timer.launch {
-                            while (isRecording) {
-                                delay(1000)
-                                recordingDuration += 1000
-                            }
-                        }
-                    },
-                    onStopRecording = {
-                        isRecording = false
-                        hasRecording = true
-                    },
-                    onPlay = {
-                        isPlaying = true
-                        playbackTimeLeft = recordingDuration
-                        timer.launch {
-                            while (playbackTimeLeft > 0 && isPlaying) {
-                                delay(1000)
-                                playbackTimeLeft -= 1000
-                            }
-                            isPlaying = false
-                            playbackTimeLeft = recordingDuration
-                        }
-                    },
-                    onStop = {
-                        isPlaying = false
-                    },
-                    onDiscard = {
-                        hasRecording = false
-                        isPlaying = false
-                        recordingDuration = 0L
-                        playbackTimeLeft = 0L
-                        //poner pa borrar archivo
-                    }
-                )
-
-                Spacer(modifier = Modifier.height(24.dp))
-
-                Button(
-                    onClick = { viewModel.showAnnotations() },
-                    modifier = Modifier.align(Alignment.End),
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = MaterialTheme.colorScheme.primary
+                if (filteredComments.isEmpty()) {
+                    Text(
+                        text = "No hay anotaciones para esta página",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
                     )
-                ) {
-                    Text("Cerrar", color = MaterialTheme.colorScheme.onPrimary)
+                } else {
+                    LazyColumn {
+                        items(filteredComments.size) { index ->
+                            val comment = filteredComments[index]
+                            CommentAudioCard(
+                                comment = comment,
+                                isPlaying = currentlyPlayingPath == comment.filePath,
+                                currentPosition = 0L,
+                                onPlayClick = {
+                                    viewModel.playAudio(comment.filePath)
+                                    viewModel.isPlaying()
+                                },
+                                onDeleteClick = {
+                                    viewModel.deleteComment(comment.filePath)
+                                }
+                            )
+                            Spacer(modifier = Modifier.height(8.dp))
+                        }
+                    }
                 }
+
+                Spacer(modifier = Modifier.height(24.dp))
+
+                MicPermissionWrapper(
+                    content = {
+                        Column(
+                            modifier = Modifier
+                                .padding(16.dp),
+                            verticalArrangement = Arrangement.Center,
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
+
+                            MicControl(
+                                isRecording = isRecording,
+                                hasRecording = hasRecording,
+                                isPlaying = isPlaying,
+                                recordingDuration = recordingDuration,
+                                onStartRecording = {
+                                    isRecording = true
+                                    hasRecording = false
+                                    recordingDuration = 0L
+                                    viewModel.startRecording()
+
+                                    coroutineScope.launch {
+                                        while (isRecording) {
+                                            kotlinx.coroutines.delay(1000)
+                                            recordingDuration += 1000
+                                        }
+                                    }
+                                },
+                                onStopRecording = {
+                                    isRecording = false
+                                    hasRecording = true
+                                    viewModel.stopRecording()
+                                },
+                                onPlay = {
+                                    isPlaying = true
+                                    playbackTimeLeft = recordingDuration
+
+                                    coroutineScope.launch {
+                                        while (playbackTimeLeft > 0 && isPlaying) {
+                                            kotlinx.coroutines.delay(1000)
+                                            playbackTimeLeft -= 1000
+                                        }
+                                        isPlaying = false
+                                        playbackTimeLeft = recordingDuration
+                                    }
+                                },
+                                onStop = {
+                                    isPlaying = false
+                                },
+                                onDiscard = {
+                                    hasRecording = false
+                                    isPlaying = false
+                                    recordingDuration = 0L
+                                    playbackTimeLeft = 0L
+                                }
+                            )
+
+                            Spacer(modifier = Modifier.height(24.dp))
+
+                            Button(
+                                onClick = { viewModel.showAnnotations() }, // tu función
+                                modifier = Modifier.align(Alignment.End),
+                                colors = androidx.compose.material3.ButtonDefaults.buttonColors(
+                                    containerColor = MaterialTheme.colorScheme.primary
+                                )
+                            ) {
+                                Text("Cerrar", color = MaterialTheme.colorScheme.onPrimary)
+                            }
+                        }
+                    },
+                    onPermissionDenied = {}
+                )
+
             }
         }
     }

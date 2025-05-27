@@ -50,18 +50,18 @@ fun Main(
         is MainScreenUiState.Authenticated -> {
             LaunchedEffect(Unit) {
                 navController.navigate(ScreensRoute.Home.route) {
-//                    popUpTo(ScreensRoute.Login.route) { inclusive = true }
+                    popUpTo(ScreensRoute.Login.route) { inclusive = true }
                     popUpTo(ScreensRoute.Home.route) { inclusive = true }
                 }
             }
         }
 
         is MainScreenUiState.Unauthenticated -> {
-//            LaunchedEffect(Unit) {
-//                navController.navigate(ScreensRoute.Login.route) {
-//                    popUpTo(ScreensRoute.Login.route) { inclusive = true }
-//                }
-//            }
+            LaunchedEffect(Unit) {
+                navController.navigate(ScreensRoute.Home.route) {
+                    popUpTo(ScreensRoute.Login.route) { inclusive = true }
+                }
+            }
         }
     }
 

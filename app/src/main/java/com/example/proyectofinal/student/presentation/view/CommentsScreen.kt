@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -19,7 +20,6 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -41,10 +41,9 @@ fun CommentsScreen(
     val viewModel = koinViewModel< CommentsViewModel>()
 
     val comments by viewModel.comments.collectAsState()
-
-    LaunchedEffect(Unit) {
-        viewModel.getCommentsByTaskId(taskId)
-    }
+    val currentlyPlayingPath by viewModel.currentlyPlayingPath.collectAsState()
+    val isPlaying by viewModel.isPlaying.collectAsState()
+    val currentPosition by viewModel.currentPosition.collectAsState()
 
     Column(modifier = modifier.fillMaxSize()) {
         CommentsTopBar(
@@ -60,12 +59,28 @@ fun CommentsScreen(
                 modifier = Modifier.padding(16.dp)
             )
         } else {
-            Column(modifier = Modifier.padding(horizontal = 16.dp)) {
-                comments.forEach { comment ->
+            LazyColumn(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(horizontal = 16.dp),
+                verticalArrangement = Arrangement.spacedBy(16.dp)
+            ) {
+                items(comments.size) { index ->
+                    val comment = comments[index]
                     CommentAudioCard(
                         comment = comment,
-                        onPlayClick = { /* solo UI, nada de media player */ }
+                        isPlaying = isPlaying && comment.filePath == currentlyPlayingPath,
+                        currentPosition = if (currentlyPlayingPath== comment.filePath) currentPosition else 0L,
+                        onPlayClick = {
+                            println("Reproduciendo ${comment.filePath}")
+                            viewModel.playAudio(comment.filePath)
+                            viewModel.isPlaying()
+                        },
+                        onDeleteClick = {
+                            viewModel.deleteComment(comment.filePath)
+                        }
                     )
+
                     Spacer(modifier = Modifier.height(12.dp))
 
                     // Info extra abajo de cada card
@@ -82,10 +97,9 @@ fun CommentsScreen(
                             style = MaterialTheme.typography.bodyMedium
                         )
                     }
-
-                    Spacer(modifier = Modifier.height(16.dp))
                 }
             }
+
         }
     }
 }

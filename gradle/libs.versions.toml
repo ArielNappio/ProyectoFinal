@@ -19,6 +19,9 @@ navigationCompose = "2.8.9"
 navigationRuntimeKtx = "2.8.9"
 navigationRuntimeAndroid = "2.9.0-beta01"
 datastore = "1.1.4"
+roomVersion = "2.6.1"
+ksp = "2.0.0-1.0.24"
+roomCommonJvm = "2.7.1"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -73,6 +76,12 @@ androidx-navigation-runtime-ktx = { group = "androidx.navigation", name = "navig
 androidx-navigation-runtime-android = { group = "androidx.navigation", name = "navigation-runtime-android", version.ref = "navigationRuntimeAndroid" }
 mockk = { module = "io.mockk:mockk", version.ref = "mockk" }
 
+#Room
+androidx-room-compiler = { module = "androidx.room:room-compiler", version.ref = "roomVersion" }
+androidx-room-ktx = { module = "androidx.room:room-ktx", version.ref = "roomVersion" }
+androidx-room-runtime = { module = "androidx.room:room-runtime", version.ref = "roomVersion" }
+androidx-room-common-jvm = { group = "androidx.room", name = "room-common-jvm", version.ref = "roomCommonJvm" }
+
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
@@ -80,3 +89,5 @@ kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 
 jetbrainsKotlinSerialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
+
+ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }

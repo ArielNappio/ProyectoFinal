@@ -1,6 +1,8 @@
 package com.example.proyectofinal
 
 import android.app.Application
+import com.example.proyectofinal.audio.di.audioModule
+import com.example.proyectofinal.audio.di.databaseModule
 import com.example.proyectofinal.auth.di.repositoryModule
 import com.example.proyectofinal.auth.di.tokenManagerModule
 import com.example.proyectofinal.core.di.networkModule
@@ -22,6 +24,8 @@ class MyApplication: Application() {
         startKoin {
             androidContext(this@MyApplication)
             modules(
+                audioModule,
+                databaseModule,
                 networkModule,
                 repositoryModule,
                 viewModelModule,
