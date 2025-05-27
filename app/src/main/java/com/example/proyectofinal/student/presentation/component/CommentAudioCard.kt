@@ -22,6 +22,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -40,6 +41,12 @@ fun CommentAudioCard(
 ) {
     val totalDuration = comment.duration.coerceAtLeast(1L)
     val currentProgress = (currentPosition / totalDuration.toFloat()).coerceIn(0f, 1f)
+
+    val remainingTime = remember(currentPosition, isPlaying) {
+        (comment.duration - currentPosition).coerceAtLeast(0L)
+    }
+
+    val formattedRemainingTime = formatDuration(remainingTime)
 
     val animatedProgress by animateFloatAsState(
         targetValue = currentProgress,
@@ -60,7 +67,7 @@ fun CommentAudioCard(
             Spacer(modifier = Modifier.height(4.dp))
 
             Text(
-                text = formatDuration(comment.duration),
+                text = formattedRemainingTime,
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
             )

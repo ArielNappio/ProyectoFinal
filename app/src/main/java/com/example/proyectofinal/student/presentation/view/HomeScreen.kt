@@ -1,5 +1,6 @@
 package com.example.proyectofinal.student.presentation.view
 
+import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -15,7 +16,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.FilterAlt
+import androidx.compose.material.icons.filled.Mic
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.FloatingActionButton
@@ -26,6 +27,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -37,6 +39,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import com.example.proyectofinal.audio.speechrecognizer.SpeechRecognizerManager
 import com.example.proyectofinal.student.presentation.component.TaskCard
 import com.example.proyectofinal.student.presentation.viewmodel.HomeScreenViewModel
 import org.koin.androidx.compose.koinViewModel
@@ -56,6 +59,28 @@ fun HomeScreen(navController: NavController, modifier: Modifier = Modifier) {
     var signature by remember { mutableStateOf("") }
     var date by remember { mutableStateOf("") }
 
+    //speech recognizer
+    var searchText by remember { mutableStateOf("") }
+
+    val speechRecognizerManager = remember {
+        SpeechRecognizerManager(
+            context = context,
+            onResult = { result ->
+                searchText = result
+            },
+            onError = { error ->
+                Log.e("SpeechRecognizer", error)
+            }
+        )
+    }
+
+    DisposableEffect(Unit) {
+        onDispose {
+            speechRecognizerManager.stopListening()
+        }
+    }
+
+
     Box(modifier = modifier.fillMaxSize()) {
         Column(
             modifier = Modifier
@@ -66,7 +91,6 @@ fun HomeScreen(navController: NavController, modifier: Modifier = Modifier) {
                 modifier = Modifier.fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                var searchText by remember { mutableStateOf("") }
 
                 TextField(
                     value = searchText,
@@ -83,10 +107,10 @@ fun HomeScreen(navController: NavController, modifier: Modifier = Modifier) {
                     }
                 )
                 Spacer(modifier = Modifier.width(8.dp))
-                IconButton(onClick = { }) {
+                IconButton(onClick = { speechRecognizerManager.startListening() }) {
                     Icon(
-                        imageVector = Icons.Default.FilterAlt,
-                        contentDescription = "Filtrar",
+                        imageVector = Icons.Default.Mic,
+                        contentDescription = "Busqueda por voz",
                     )
                 }
             }
