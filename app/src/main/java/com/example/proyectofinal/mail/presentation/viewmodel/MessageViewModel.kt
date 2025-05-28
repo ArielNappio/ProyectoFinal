@@ -1,6 +1,7 @@
 package com.example.proyectofinal.mail.presentation.viewmodel
 
 import android.os.Build
+import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -66,6 +67,8 @@ class MessageViewModel(
                 date = LocalDateTime.now().toString()
             )
             saveDraftUseCase(draftMessage)
+            Log.d("Save draft", "${draftMessage.content}")
+            Log.d("Save draft","success")
             _draftSavedEvent.emit(Unit)
         }
     }

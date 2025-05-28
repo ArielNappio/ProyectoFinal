@@ -29,8 +29,8 @@ interface MessageDao {
     suspend fun saveDraft(draft: MessageEntity)
 
     // Traer todos los borradores
-    @Query("SELECT * FROM message WHERE isDraft = 1 AND userFromId = :currentUserId ORDER BY timestamp DESC")
-    fun getDrafts(currentUserId: Int): List<MessageEntity>
+    @Query("SELECT * FROM message WHERE isDraft = 1 ORDER BY timestamp DESC")
+    fun getDrafts(): List<MessageEntity>
 
     // Eliminar todos los borradores
     @Query("DELETE FROM message WHERE isDraft = 1")

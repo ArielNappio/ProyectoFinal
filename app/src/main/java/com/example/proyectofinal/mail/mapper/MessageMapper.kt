@@ -17,7 +17,7 @@ fun MessageModel.toEntity(
     id: Int = 0,
     userFromId: Int = 0,
     userToID: Int = 0,
-    isDraft: Boolean = false,
+    isDraft: Boolean = true,
     timestamp: Long = System.currentTimeMillis()
 ): MessageEntity {
     return MessageEntity(

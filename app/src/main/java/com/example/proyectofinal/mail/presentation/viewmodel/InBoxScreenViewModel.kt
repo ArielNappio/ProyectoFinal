@@ -6,6 +6,7 @@ import com.example.proyectofinal.mail.domain.model.MessageModel
 import com.example.proyectofinal.mail.domain.usecase.GetDraftMessagesUseCase
 import com.example.proyectofinal.mail.domain.usecase.GetInboxMessagesUseCase
 import com.example.proyectofinal.mail.domain.usecase.GetOutboxMessagesUseCase
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
@@ -28,7 +29,11 @@ class InboxViewModel(
     private var currentUserId: Int? = null
 
     init {
-        loadDraftMessages()
+        println("asdasdasdsa")
+
+        viewModelScope.launch {
+            loadDraftMessages()
+        }
     }
 
     fun setCurrentUserId(userId: Int) {
@@ -57,12 +62,18 @@ class InboxViewModel(
     }
 
     private fun loadDraftMessages() {
-        currentUserId?.let { id ->
-            viewModelScope.launch {
-                val drafts = getDraftMessagesUseCase(id)
+
+            viewModelScope.launch(Dispatchers.IO) {
+                val drafts: List<MessageModel> = getDraftMessagesUseCase()
+                if(drafts.isEmpty()){
+                    println("ta vacio")
+                }
+                else{
+                    println("algo cargo")
+                }
                 _draftMessages.value = drafts
             }
-        }
+
     }
 
 //    fun discardDraft(message: MessageModel) {

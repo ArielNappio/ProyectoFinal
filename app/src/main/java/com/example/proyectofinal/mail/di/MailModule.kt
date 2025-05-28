@@ -26,7 +26,7 @@ val mailDatabaseModule = module {
             MailDatabase::class.java,
             "mail_database"
         )
-            .fallbackToDestructiveMigration(false)
+            .fallbackToDestructiveMigration()
             .build()
     }
 
