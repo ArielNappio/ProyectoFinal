@@ -12,13 +12,13 @@ import com.example.proyectofinal.task_student.di.ttsModule
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.context.GlobalContext.startKoin
 
-class MyApplication: Application() {
+class WirinApplication: Application() {
 
     override fun onCreate() {
         super.onCreate()
 
         startKoin {
-            androidContext(this@MyApplication)
+            androidContext(this@WirinApplication)
             modules(
                 networkModule,
                 repositoryModule,

@@ -2,6 +2,7 @@ package com.example.proyectofinal.text_edit.presentation.component
 
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.gestures.detectTransformGestures
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -34,6 +35,10 @@ fun PdfViewer(
     val offsetX by viewModel.pdfViewOffsetX.collectAsState()
     val offsetY by viewModel.pdfViewOffsetY.collectAsState()
 
+    val scaleAnimated by animateFloatAsState(scale)
+    val offsetXAnimated by animateFloatAsState(offsetX)
+    val offsetYAnimated by animateFloatAsState(offsetY)
+
     val pdfUri by viewModel.pdfUri.collectAsState()
     val renderedPages by viewModel.renderedPages.collectAsState()
 
@@ -44,10 +49,10 @@ fun PdfViewer(
             }
         }
         .graphicsLayer(
-            scaleX = scale,
-            scaleY = scale,
-            translationX = offsetX,
-            translationY = offsetY
+            scaleX = scaleAnimated,
+            scaleY = scaleAnimated,
+            translationX = offsetXAnimated,
+            translationY = offsetYAnimated
         )
 
     val choosePdfLauncher = rememberLauncherForActivityResult(
