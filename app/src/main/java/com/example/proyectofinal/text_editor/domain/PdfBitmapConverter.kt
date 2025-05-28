@@ -1,4 +1,4 @@
-package com.example.proyectofinal.text_edit.domain
+package com.example.proyectofinal.text_editor.domain
 
 import android.content.Context
 import android.graphics.Bitmap

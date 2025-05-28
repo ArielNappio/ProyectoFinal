@@ -1,4 +1,4 @@
-package com.example.proyectofinal.text_edit.presentation.component
+package com.example.proyectofinal.text_editor.presentation.component
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.focusable
@@ -14,7 +14,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
-import com.example.proyectofinal.text_edit.presentation.viewmodel.TextEditorViewModel
+import com.example.proyectofinal.text_editor.presentation.viewmodel.TextEditorViewModel
 import org.koin.androidx.compose.koinViewModel
 
 @Composable

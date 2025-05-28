@@ -1,4 +1,4 @@
-package com.example.proyectofinal.text_edit.presentation.view
+package com.example.proyectofinal.text_editor.presentation.view
 
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -22,8 +22,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
-import com.example.proyectofinal.text_edit.presentation.component.PdfViewer
-import com.example.proyectofinal.text_edit.presentation.component.TextEditor
+import com.example.proyectofinal.text_editor.presentation.component.PdfViewer
+import com.example.proyectofinal.text_editor.presentation.component.TextEditor
 
 @Composable
 fun TextEditorScreen(navController: NavHostController) {

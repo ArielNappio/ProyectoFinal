@@ -1,4 +1,4 @@
-package com.example.proyectofinal.text_edit.presentation.component
+package com.example.proyectofinal.text_editor.presentation.component
 
 import android.graphics.Bitmap
 import androidx.compose.foundation.layout.aspectRatio

@@ -9,6 +9,7 @@ import com.example.proyectofinal.core.di.viewModelModule
 import com.example.proyectofinal.student.data.di.CommentsRepositoryModule
 import com.example.proyectofinal.student.data.di.taskRepositoryModule
 import com.example.proyectofinal.task_student.di.ttsModule
+import com.example.proyectofinal.text_editor.di.pdfBitmapConverterModule
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.context.GlobalContext.startKoin
 
@@ -27,6 +28,7 @@ class WirinApplication: Application() {
                 tokenManagerModule,
                 taskRepositoryModule,
                 ttsModule,
+                pdfBitmapConverterModule,
                 CommentsRepositoryModule
             )
         }
