@@ -60,13 +60,13 @@ fun HomeScreen(navController: NavController, modifier: Modifier = Modifier) {
     var date by remember { mutableStateOf("") }
 
     //speech recognizer
-    var searchText by remember { mutableStateOf("") }
+    val searchText by viewModel.searchText.collectAsState()
 
     val speechRecognizerManager = remember {
         SpeechRecognizerManager(
             context = context,
             onResult = { result ->
-                searchText = result
+                viewModel.updateSearchText(result)
             },
             onError = { error ->
                 Log.e("SpeechRecognizer", error)
@@ -94,7 +94,7 @@ fun HomeScreen(navController: NavController, modifier: Modifier = Modifier) {
 
                 TextField(
                     value = searchText,
-                    onValueChange = { searchText = it },
+                    onValueChange = { viewModel.updateSearchText(it) },
                     label = { Text("Buscar") },
                     modifier = Modifier
                         .weight(1f)
