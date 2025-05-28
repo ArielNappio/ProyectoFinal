@@ -31,9 +31,10 @@ class PdfBitmapConverter(
                         return@withContext (0 until pageCount).map { index ->
                             async {
                                 openPage(index).use { page ->
-                                    val bitmap = createBitmap(page.width, page.height)
+                                    val scaleFactor = 4
+                                    val bitmap = createBitmap(page.width * scaleFactor, page.height * scaleFactor)
 
-                                    val canvas = Canvas(bitmap).apply {
+                                    Canvas(bitmap).apply {
                                         drawColor(Color.WHITE)
                                         drawBitmap(bitmap, 0f, 0f, null)
                                     }
