@@ -18,12 +18,14 @@ import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
@@ -31,28 +33,22 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import com.example.proyectofinal.text_edit.domain.PdfBitmapConverter
+import com.example.proyectofinal.text_edit.presentation.viewmodel.TextEditorViewModel
+import org.koin.androidx.compose.koinViewModel
 
 @Composable
 fun PdfViewer(
     modifier: Modifier = Modifier
 ) {
-    var scale by remember { mutableStateOf(1f) }
-    val scaleState = remember { mutableStateOf(1f) }
-    var offsetX by remember { mutableStateOf(0f) }
-    var offsetY by remember { mutableStateOf(0f) }
+    val viewModel = koinViewModel<TextEditorViewModel>()
+    val scale by viewModel.pdfViewScale.collectAsState()
+    val offsetX by viewModel.pdfViewOffsetX.collectAsState()
+    val offsetY by viewModel.pdfViewOffsetY.collectAsState()
 
     val zoomModifier = Modifier
         .pointerInput(Unit) {
             detectTransformGestures { _, pan, zoom, _ ->
-                scaleState.value *= zoom
-                scale = scaleState.value.coerceIn(1f, 5f) // Limit zoom between 1x and 5x
-                if (scale > 1f) {
-                    offsetX += pan.x
-                    offsetY += pan.y
-                } else {
-                    offsetX = 0f
-                    offsetY = 0f
-                }
+                viewModel.updatePdfZoom(zoom, pan.x, pan.y)
             }
         }
         .graphicsLayer(
@@ -79,12 +75,9 @@ fun PdfViewer(
         }
     }
 
-    // LANZA LA ACTIVITY PARA OBTENER EL PDF DESDE FILES
     val choosePdfLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent()
-    ) {
-        pdfUri = it
-    }
+    ) { pdfUri = it }
 
     if(pdfUri == null) {
         Box(
@@ -100,7 +93,9 @@ fun PdfViewer(
         }
     } else {
         Box(
-            modifier = modifier.fillMaxSize()
+            modifier = modifier
+                .clipToBounds()
+                .fillMaxSize()
         ) {
             Column(
                 modifier = modifier
@@ -119,16 +114,16 @@ fun PdfViewer(
                 }
             }
             if (scale > 1f) {
-                // Floating action button to reset zoom
                 FloatingActionButton(
                     onClick = {
-                        scale = 1f
-                        offsetX = 0f
-                        offsetY = 0f
+                        viewModel.resetPdfZoom()
                     },
                     modifier = Modifier.align(Alignment.BottomEnd).padding(16.dp)
                 ) {
-                    Text(text = "Reset Zoom")
+                    Text(
+                        modifier = Modifier.padding(horizontal = 8.dp),
+                        text = "Reset Zoom"
+                    )
                 }
             }
         }
