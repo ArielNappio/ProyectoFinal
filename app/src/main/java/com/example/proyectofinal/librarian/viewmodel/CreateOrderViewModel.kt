@@ -1,9 +1,7 @@
 package com.example.proyectofinal.librarian.viewmodel
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.proyectofinal.core.network.NetworkResponse
 import com.example.proyectofinal.order.data.model.Order
 import com.example.proyectofinal.order.domain.usecase.CreateOrderUseCase
 import com.example.proyectofinal.order.domain.usecase.GetOrdersUseCase
@@ -14,7 +12,7 @@ import kotlinx.coroutines.launch
 import java.io.File
 import java.util.Date
 
-    class createOrderViewModel(
+    class CreateOrderViewModel(
         private val getOrdersUseCase: GetOrdersUseCase,
         private val createOrderUseCase: CreateOrderUseCase
 

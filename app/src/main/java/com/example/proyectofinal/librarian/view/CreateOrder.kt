@@ -19,9 +19,8 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.ui.graphics.Color
 import androidx.annotation.RequiresApi
 import androidx.compose.ui.platform.LocalInspectionMode
-import com.example.proyectofinal.librarian.viewmodel.createOrderViewModel
+import com.example.proyectofinal.librarian.viewmodel.CreateOrderViewModel
 import com.example.proyectofinal.order.data.model.Order
-import com.example.proyectofinal.order.presentation.viewmodel.OrderViewModel
 import org.koin.androidx.compose.koinViewModel
 import java.text.SimpleDateFormat
 import java.time.LocalDate
@@ -35,7 +34,7 @@ import java.util.Locale
     fun CreateTaskScreen() {
 
 
-        val viewModel: createOrderViewModel = koinViewModel()
+        val viewModel: CreateOrderViewModel = koinViewModel()
 
         val name by viewModel.name.collectAsState()
         val description by viewModel.description.collectAsState()
