@@ -1,6 +1,7 @@
 package com.example.proyectofinal.mail.presentation.view
 
 import android.os.Build
+import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -40,6 +41,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.platform.LocalContext
 import com.example.proyectofinal.core.network.NetworkResponse
 import com.example.proyectofinal.core.theme.CustomGreen2
 import com.example.proyectofinal.mail.domain.model.MessageModel
@@ -52,16 +54,25 @@ import java.time.LocalDateTime
 @Composable
 fun MessageScreen(
     onSendComplete: () -> Unit,
-    onCancel: () -> Unit
+    onCancel: () -> Unit,
+    onDraftSaved: () -> Unit
 ) {
     val viewModel: MessageViewModel = koinViewModel()
     val to by viewModel.to.collectAsState()
     val subject by viewModel.subject.collectAsState()
     val message by viewModel.message.collectAsState()
     val sendState by viewModel.sendMessageState.collectAsState()
-
+    val draftSavedEvent = viewModel.draftSavedEvent
+    val context = LocalContext.current
     var showDialog by remember { mutableStateOf(false) }
 
+
+    LaunchedEffect(draftSavedEvent) {
+        draftSavedEvent.collect {
+            Toast.makeText(context, "Borrador guardado", Toast.LENGTH_SHORT).show()
+            onDraftSaved()
+        }
+    }
     LaunchedEffect(sendState) {
         if (sendState is NetworkResponse.Success) {
             onSendComplete()

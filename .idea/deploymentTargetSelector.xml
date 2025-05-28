@@ -2,10 +2,13 @@
 <project version="4">
   <component name="deploymentTargetSelector">
     <selectionStates>
-      <SelectionState runConfigName="proyectoFinal.app">
+      <SelectionState runConfigName="PreviewMessageItem">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
-      <SelectionState runConfigName="PreviewMessageItem">
+      <SelectionState runConfigName="app">
+        <option name="selectionMode" value="DROPDOWN" />
+      </SelectionState>
+      <SelectionState runConfigName="messageItem_displaysCorrectContent()">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
     </selectionStates>

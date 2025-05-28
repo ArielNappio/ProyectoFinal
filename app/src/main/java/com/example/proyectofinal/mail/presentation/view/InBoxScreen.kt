@@ -55,10 +55,15 @@ fun InboxScreen(
     onMessageClick: (MessageModel) -> Unit
 ) {
     val viewModel = koinViewModel<InboxViewModel>()
-    val messages by when (mailboxType) {
-        MailboxType.INBOX -> viewModel.inboxMessages.collectAsState()
-        MailboxType.OUTBOX -> viewModel.outboxMessages.collectAsState()
+
+    val messagesState = when(mailboxType) {
+        MailboxType.INBOX -> viewModel.inboxMessages
+        MailboxType.OUTBOX -> viewModel.outboxMessages
+        MailboxType.DRAFT -> viewModel.draftMessages
     }
+
+    val messages by messagesState.collectAsState()
+
     val menuExpanded = remember { mutableStateOf(false) }
 
     Column(modifier = Modifier.fillMaxSize()) {
@@ -79,6 +84,7 @@ fun InboxScreen(
                         text = when (mailboxType) {
                             MailboxType.INBOX -> "Bandeja de Entrada"
                             MailboxType.OUTBOX -> "Bandeja de Salida"
+                            MailboxType.DRAFT -> "Borradores"
                         },
                         fontSize = 20.sp,
                         fontWeight = FontWeight.Bold
@@ -111,7 +117,9 @@ fun InboxScreen(
                         )
                         DropdownMenuItem(
                             text = { Text("Borradores") },
-                            onClick = { })
+                            onClick = {
+                                navController.navigate("mail/drafts")
+                            })
                     }
                 }
             }

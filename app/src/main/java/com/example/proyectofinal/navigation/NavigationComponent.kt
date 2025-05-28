@@ -75,9 +75,9 @@ fun NavigationComponent(
             val mailboxType = when (backStackEntry.arguments?.getString("mailboxType")) {
                 "inbox" -> MailboxType.INBOX
                 "outbox" -> MailboxType.OUTBOX
+                "drafts" -> MailboxType.DRAFT
                 else -> MailboxType.INBOX
             }
-
             InboxScreen(
                 navController = navController,
                 mailboxType = mailboxType,
@@ -85,7 +85,7 @@ fun NavigationComponent(
             )
         }
         composable(route = ScreensRoute.Message.route) {
-            MessageScreen ({},{navController.popBackStack()})
+            MessageScreen ({},{navController.popBackStack()}, {navController.navigate("mail/drafts")})
         }
     }
 }

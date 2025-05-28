@@ -7,7 +7,9 @@ import com.example.proyectofinal.mail.domain.provider.MailProvider
 import com.example.proyectofinal.mail.domain.repository.MailRepository
 import com.example.proyectofinal.mail.mapper.toDomain
 import com.example.proyectofinal.mail.mapper.toEntity
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.flow
 
 class MailRepoImpl(
     private val mailProvider: MailProvider,
@@ -60,8 +62,8 @@ class MailRepoImpl(
         messageDao.saveDraft(message.toEntity(isDraft = true))
     }
 
-    override suspend fun getDrafts(): List<MessageModel> {
-        return messageDao.getDrafts().map { it.toDomain() }
+    override suspend fun getDrafts(currentUserId: Int): Flow<List<MessageModel>> = flow {
+        messageDao.getDrafts(currentUserId).map { it.toDomain() }
     }
 
     override suspend fun deleteDrafts() {

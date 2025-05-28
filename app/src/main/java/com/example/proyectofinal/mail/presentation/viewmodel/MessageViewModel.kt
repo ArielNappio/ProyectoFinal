@@ -1,18 +1,24 @@
 package com.example.proyectofinal.mail.presentation.viewmodel
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.proyectofinal.core.network.NetworkResponse
 import com.example.proyectofinal.mail.domain.model.MessageModel
+import com.example.proyectofinal.mail.domain.usecase.SaveDraftUseCase
 import com.example.proyectofinal.mail.domain.usecase.SendMessageUseCase
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
+import java.time.LocalDateTime
 
-class MessageViewModel(private val sendMessageUseCase: SendMessageUseCase) : ViewModel() {
-
-    private val _sendMessageState = MutableStateFlow<NetworkResponse<MessageModel>?>(null)
-    val sendMessageState: StateFlow<NetworkResponse<MessageModel>?> = _sendMessageState
+class MessageViewModel(
+    private val sendMessageUseCase: SendMessageUseCase,
+    private val saveDraftUseCase: SaveDraftUseCase
+) : ViewModel() {
 
     private val _to = MutableStateFlow("")
     val to: StateFlow<String> = _to
@@ -22,6 +28,12 @@ class MessageViewModel(private val sendMessageUseCase: SendMessageUseCase) : Vie
 
     private val _message = MutableStateFlow("")
     val message: StateFlow<String> = _message
+
+    private val _sendMessageState = MutableStateFlow<NetworkResponse<Unit>>(NetworkResponse.Loading())
+    val sendMessageState: StateFlow<NetworkResponse<Unit>> = _sendMessageState
+
+    private val _draftSavedEvent = MutableSharedFlow<Unit>()
+    val draftSavedEvent = _draftSavedEvent.asSharedFlow()
 
     fun updateTo(value: String) {
         _to.value = value
@@ -35,26 +47,27 @@ class MessageViewModel(private val sendMessageUseCase: SendMessageUseCase) : Vie
         _message.value = value
     }
 
-    fun sendMessage(message: MessageModel) {
+    fun sendMessage(messageModel: MessageModel) {
         viewModelScope.launch {
-            sendMessageUseCase(message).collect { response ->
+            _sendMessageState.value = NetworkResponse.Loading()
+            sendMessageUseCase(messageModel).collect { response ->
                 _sendMessageState.value = response
             }
         }
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     fun saveDraft() {
-        // Guardar en local/db/memoria según quieras
-        println("Guardando borrador de: $to")
-    }
-
-    fun discardMessage() {
-        clearFields()
-    }
-
-    private fun clearFields() {
-        _to.value = ""
-        _subject.value = ""
-        _message.value = ""
+        viewModelScope.launch {
+            val draftMessage = MessageModel(
+                sender = to.value,
+                subject = subject.value,
+                content = message.value,
+                date = LocalDateTime.now().toString()
+            )
+            saveDraftUseCase(draftMessage)
+            _draftSavedEvent.emit(Unit)
+        }
     }
 }
+
