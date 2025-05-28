@@ -6,6 +6,9 @@ import org.koin.dsl.module
 
 
 val appTaskModule = module {
-    viewModel { createOrderViewModel() }
+    viewModel { createOrderViewModel(
+        getOrdersUseCase = TODO(),
+        createOrderUseCase = TODO()
+    ) }
 
 }
