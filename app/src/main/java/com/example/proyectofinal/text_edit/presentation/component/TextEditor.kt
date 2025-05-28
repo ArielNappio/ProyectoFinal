@@ -9,6 +9,7 @@ import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
@@ -19,7 +20,7 @@ import org.koin.androidx.compose.koinViewModel
 @Composable
 fun TextEditor() {
     val viewModel = koinViewModel<TextEditorViewModel>()
-    val textState = viewModel.textState.collectAsState().value
+    val textState by viewModel.textState.collectAsState()
     val focusRequester = remember { FocusRequester() }
     val keyboardController = LocalSoftwareKeyboardController.current
 
