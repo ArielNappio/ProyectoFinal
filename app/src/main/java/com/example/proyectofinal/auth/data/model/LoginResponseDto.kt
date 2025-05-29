@@ -1,9 +1,9 @@
-package com.example.proyectofinal.auth.data.remoteData.model
+package com.example.proyectofinal.auth.data.model
 
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class LoginResponse(
+data class LoginResponseDto(
     val token: String,
     val expiration: String,
     val userId: String

@@ -102,4 +102,12 @@ class CommentsViewModel(
             _comments.value = _comments.value.filterNot { it.filePath == filePath }
         }
     }
+
+    fun seekTo(position: Long, playAfterSeek: Boolean = false, path: String) {
+        audioPlayerManager.seekTo(position)
+        _currentPosition.value = position
+        if (playAfterSeek && !_isPlaying.value) {
+            playAudio(path)
+        }
+    }
 }

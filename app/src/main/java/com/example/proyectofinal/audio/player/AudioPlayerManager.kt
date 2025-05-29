@@ -54,6 +54,10 @@ class AudioPlayerManager {
         mediaPlayer?.takeIf { !it.isPlaying }?.start()
     }
 
+    fun seekTo(positionMs: Long) {
+        mediaPlayer?.seekTo(positionMs.toInt()) // MediaPlayer usa milisegundos en Int
+    }
+
     fun getCurrentPath(): String? = currentPath
 
     fun getCurrentPosition(): Long {

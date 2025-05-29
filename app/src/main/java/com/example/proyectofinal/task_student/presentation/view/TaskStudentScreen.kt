@@ -300,11 +300,15 @@ fun TaskStudent(navController: NavHostController) {
                             val comment = filteredComments[index]
                             CommentAudioCard(
                                 comment = comment,
-                                isPlaying = currentlyPlayingPath == comment.filePath,
-                                currentPosition = if (currentlyPlayingPath== comment.filePath) currentPosition else 0L,
+                                isPlaying = isPlaying && comment.filePath == currentlyPlayingPath,
+                                currentPosition = if (currentlyPlayingPath == comment.filePath) currentPosition else 0L,
                                 onPlayClick = {
+                                    println("Reproduciendo ${comment.filePath}")
                                     viewModel.playAudio(comment.filePath)
-                                    viewModel.isPlaying()
+                                },
+                                onPauseClick = { viewModel.playAudio(comment.filePath) },
+                                onSeek = { position, playAfterSeek, path ->
+                                    viewModel.seekTo(position, playAfterSeek, path)
                                 },
                                 onDeleteClick = {
                                     viewModel.deleteComment(comment.filePath)

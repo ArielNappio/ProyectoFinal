@@ -194,6 +194,14 @@ class TaskStudentViewModel(
         }
     }
 
+    fun seekTo(position: Long, playAfterSeek: Boolean = false, path: String) {
+        audioPlayerManager.seekTo(position)
+        _currentPosition.value = position
+        if (playAfterSeek && !_isPlaying.value) {
+            playAudio(path)
+        }
+    }
+
     fun isPlaying(){
         _isPlaying.value = !_isPlaying.value
     }

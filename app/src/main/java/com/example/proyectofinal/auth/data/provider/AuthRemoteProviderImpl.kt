@@ -1,8 +1,9 @@
-package com.example.proyectofinal.auth.data.remoteData.repository
+package com.example.proyectofinal.auth.data.provider
 
-import com.example.proyectofinal.auth.data.remoteData.model.LoginRequest
-import com.example.proyectofinal.auth.data.remoteData.model.LoginResponse
-import com.example.proyectofinal.auth.data.remoteData.model.UserResponse
+import com.example.proyectofinal.auth.data.model.LoginRequestDto
+import com.example.proyectofinal.auth.data.model.LoginResponseDto
+import com.example.proyectofinal.auth.data.model.UserResponseDto
+import com.example.proyectofinal.auth.domain.provider.AuthRemoteProvider
 import com.example.proyectofinal.core.network.ApiUrls
 import com.example.proyectofinal.core.network.NetworkResponse
 import io.ktor.client.HttpClient
@@ -17,20 +18,20 @@ import io.ktor.http.contentType
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 
-class AuthRemoteRepoImpl (
+class AuthRemoteProviderImpl (
    private val ktorClient: HttpClient
-): AuthRemoteRepository {
-   override fun postLogin(loginRequest: LoginRequest): Flow<NetworkResponse<LoginResponse>> = flow {
+): AuthRemoteProvider {
+   override fun postLogin(loginRequestDto: LoginRequestDto): Flow<NetworkResponse<LoginResponseDto>> = flow {
        try {
            emit(NetworkResponse.Loading())
 
            val response = ktorClient.post(ApiUrls.LOGIN) {
                contentType(ContentType.Application.Json)
-               setBody(loginRequest)
+               setBody(loginRequestDto)
            }
 
            if (response.status == HttpStatusCode.Companion.OK) {
-               val responseBody = response.body<LoginResponse>()
+               val responseBody = response.body<LoginResponseDto>()
                emit(NetworkResponse.Success(data = responseBody))
            } else {
                emit(NetworkResponse.Failure(error = "Error: ${response.status}"))
@@ -40,14 +41,14 @@ class AuthRemoteRepoImpl (
        }
    }
 
-   override fun getMe(token: String): Flow<NetworkResponse<UserResponse>> = flow {
+   override fun getMe(token: String): Flow<NetworkResponse<UserResponseDto>> = flow {
 
        try {
            val response = ktorClient.get(ApiUrls.AUTH_ME) {
                header("Authorization", "Bearer $token")
            }
            if (response.status == HttpStatusCode.Companion.OK) {
-               val user = response.body<UserResponse>()
+               val user = response.body<UserResponseDto>()
                emit(NetworkResponse.Success(user))
            } else {
                emit(NetworkResponse.Failure("Error: ${response.status.description}"))

@@ -1,7 +1,5 @@
 package com.example.proyectofinal.student.presentation.component
 
-import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -17,19 +15,18 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Slider
+import androidx.compose.material3.SliderDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
 import com.example.proyectofinal.audio.domain.model.RecordedAudio
 import com.example.proyectofinal.audio.util.formatDuration
-
 
 @Composable
 fun CommentAudioCard(
@@ -37,34 +34,26 @@ fun CommentAudioCard(
     isPlaying: Boolean,
     currentPosition: Long,
     onPlayClick: () -> Unit,
-    onDeleteClick: () -> Unit
+    onPauseClick: () -> Unit,
+    onDeleteClick: () -> Unit,
+    onSeek: (Long, Boolean, String) -> Unit,
+    modifier: Modifier = Modifier
 ) {
     val totalDuration = comment.duration.coerceAtLeast(1L)
-    val currentProgress = (currentPosition / totalDuration.toFloat()).coerceIn(0f, 1f)
+    val formattedRemainingTime = formatDuration(comment.duration - currentPosition)
+    val sliderPosition = remember(currentPosition) { mutableStateOf(currentPosition.toFloat()) }
 
-    val remainingTime = remember(currentPosition, isPlaying) {
-        (comment.duration - currentPosition).coerceAtLeast(0L)
-    }
-
-    val formattedRemainingTime = formatDuration(remainingTime)
-
-    val animatedProgress by animateFloatAsState(
-        targetValue = currentProgress,
-        animationSpec = tween(durationMillis = 500),
-        label = "AudioProgress"
-    )
 
     Card(
         shape = RoundedCornerShape(12.dp),
-        modifier = Modifier.fillMaxWidth(),
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(8.dp),
         elevation = CardDefaults.cardElevation(4.dp)
     ) {
-        Column(
-            modifier = Modifier
-                .padding(16.dp)
-        ) {
-            Text(text = comment.title, style = MaterialTheme.typography.titleMedium)
-            Spacer(modifier = Modifier.height(4.dp))
+        Column(Modifier.padding(16.dp)) {
+            Text(comment.title, style = MaterialTheme.typography.titleMedium)
+            Spacer(Modifier.height(4.dp))
 
             Text(
                 text = formattedRemainingTime,
@@ -72,30 +61,41 @@ fun CommentAudioCard(
                 color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
             )
 
-            Row(
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                IconButton(onClick = onPlayClick) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                IconButton(onClick = {
+                    if (isPlaying) onPauseClick() else onPlayClick()
+                }) {
                     Icon(
                         imageVector = if (isPlaying) Icons.Default.Pause else Icons.Default.PlayArrow,
                         contentDescription = if (isPlaying) "Pausar" else "Reproducir"
                     )
                 }
 
-                LinearProgressIndicator(
-                    progress = animatedProgress,
+                Slider(
+                    value = sliderPosition.value,
+                    onValueChange = { newValue ->
+                        sliderPosition.value = newValue
+                    },
+                    onValueChangeFinished = {
+                        onSeek(sliderPosition.value.toLong(), true, comment.filePath)
+                    },
+                    valueRange = 0f..totalDuration.toFloat(),
                     modifier = Modifier
                         .weight(1f)
-                        .height(6.dp)
-                        .clip(RoundedCornerShape(3.dp)),
-                    color = MaterialTheme.colorScheme.primary,
-                    trackColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.1f)
+                        .padding(horizontal = 8.dp),
+                    colors = SliderDefaults.colors(
+                        thumbColor = MaterialTheme.colorScheme.primary,
+                        activeTrackColor = MaterialTheme.colorScheme.primary,
+                        inactiveTrackColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.3f)
+                    )
                 )
 
-                IconButton(onClick = onDeleteClick) {
+                IconButton(onClick = {
+                    onDeleteClick
+                }) {
                     Icon(
                         imageVector = Icons.Default.Delete,
-                        contentDescription = "Eliminar"
+                        contentDescription = "Borrar"
                     )
                 }
             }

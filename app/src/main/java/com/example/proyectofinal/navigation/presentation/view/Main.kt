@@ -58,7 +58,7 @@ fun Main(
 
         is MainScreenUiState.Unauthenticated -> {
             LaunchedEffect(Unit) {
-                navController.navigate(ScreensRoute.Home.route) {
+                navController.navigate(ScreensRoute.Login.route) {
                     popUpTo(ScreensRoute.Login.route) { inclusive = true }
                 }
             }
