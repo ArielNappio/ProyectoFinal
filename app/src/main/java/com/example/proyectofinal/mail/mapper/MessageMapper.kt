@@ -5,6 +5,7 @@ import com.example.proyectofinal.mail.domain.model.MessageModel
 
 fun MessageEntity.toDomain(): MessageModel {
     return MessageModel(
+        id = id,
         sender = sender,
         subject = subject,
         date = date,
@@ -14,7 +15,6 @@ fun MessageEntity.toDomain(): MessageModel {
 }
 
 fun MessageModel.toEntity(
-    id: Int = 0,
     userFromId: Int = 0,
     userToID: Int = 0,
     isDraft: Boolean = true,

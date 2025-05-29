@@ -6,7 +6,8 @@ import com.example.proyectofinal.mail.data.provider.MailProviderImpl
 import com.example.proyectofinal.mail.data.repository.MailRepoImpl
 import com.example.proyectofinal.mail.domain.provider.MailProvider
 import com.example.proyectofinal.mail.domain.repository.MailRepository
-import com.example.proyectofinal.mail.domain.usecase.DeleteMessageUseCase
+import com.example.proyectofinal.mail.domain.usecase.DeleteMessageByIdUseCase
+import com.example.proyectofinal.mail.domain.usecase.GetDraftByIdUseCase
 import com.example.proyectofinal.mail.domain.usecase.GetDraftMessagesUseCase
 import com.example.proyectofinal.mail.domain.usecase.GetInboxMessagesUseCase
 import com.example.proyectofinal.mail.domain.usecase.GetOutboxMessagesUseCase
@@ -41,8 +42,9 @@ val mailModule = module {
     factory { GetInboxMessagesUseCase(get()) }
     factory { GetOutboxMessagesUseCase(get()) }
     factory { SaveDraftUseCase(get()) }
-    factory { DeleteMessageUseCase(get()) }
+    factory { DeleteMessageByIdUseCase(get()) }
     factory { GetDraftMessagesUseCase(get()) }
-    viewModel { InboxViewModel(get(), get(), get()) }
-    viewModel { MessageViewModel(get(), get()) }
+    factory { GetDraftByIdUseCase(get()) }
+    viewModel { InboxViewModel(get(), get(), get(), get()) }
+    viewModel { MessageViewModel(get(), get(), get()) }
 }

@@ -1,5 +1,7 @@
 package com.example.proyectofinal.mail.data.repository
 
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import com.example.proyectofinal.core.network.NetworkResponse
 import com.example.proyectofinal.mail.data.local.MessageDao
 import com.example.proyectofinal.mail.domain.model.MessageModel
@@ -57,14 +59,26 @@ class MailRepoImpl(
     }
 
     override suspend fun saveDraft(message: MessageModel) {
-        messageDao.saveDraft(message.toEntity(isDraft = true))
+        withContext(Dispatchers.IO) {
+            val draftEntity = message.toEntity()
+            val existingDraft = messageDao.getDraftById(message.id)
+            if (existingDraft != null) {
+                messageDao.updateDraft(draftEntity)
+            } else {
+                messageDao.saveDraft(draftEntity)
+            }
+        }
     }
 
     override suspend fun getDrafts(): List<MessageModel> {
         return messageDao.getDrafts().map { it.toDomain() }
     }
 
-    override suspend fun deleteDrafts() {
-        messageDao.deleteDrafts()
+    override suspend fun deleteDraftById(idMessage: Int) {
+        messageDao.deleteDraftById(idMessage)
+    }
+
+    override suspend fun getDraftById(idMessage: Int): MessageModel {
+        return messageDao.getDraftById(idMessage).toDomain()
     }
 }

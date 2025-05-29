@@ -42,6 +42,7 @@ import com.example.proyectofinal.R
 import com.example.proyectofinal.core.theme.LocalTheme
 import com.example.proyectofinal.mail.domain.model.MailboxType
 import com.example.proyectofinal.mail.domain.model.MessageModel
+import com.example.proyectofinal.mail.domain.model.OutboxMessageModel
 import com.example.proyectofinal.mail.presentation.component.MessageItem
 import com.example.proyectofinal.mail.presentation.viewmodel.InboxViewModel
 import com.example.proyectofinal.navigation.ScreensRoute
@@ -136,19 +137,39 @@ fun InboxScreen(
             Text(text = "Redactar")
         }
 
-        MessageList(messages, onMessageClick)
+        MessageList(
+            messages = messages,
+            type = mailboxType,
+            onMessageClick = onMessageClick,
+            onReply = if (mailboxType == MailboxType.INBOX) { { message ->
+                navController.navigate("reply/${message.id}")
+            } } else null,
+            onMarkStatus = if (mailboxType == MailboxType.OUTBOX) { { message, status ->
+                viewModel.updateMessageStatus(message.id, OutboxMessageModel.MessageStatus.valueOf(status))
+            } } else null,
+            onDelete = if (mailboxType == MailboxType.DRAFT) { { id ->
+                viewModel.discardDraft(id.toInt())
+            } } else null,
+            onContinueEditing = if (mailboxType == MailboxType.DRAFT) { { message ->
+                navController.navigate("${ScreensRoute.Message.route}?draftId=${message.id}")
+            } } else null
+        )
     }
 }
 
 
 
 @Composable
-private fun MessageList(
+fun MessageList(
     messages: List<MessageModel>,
-    onMessageClick: (MessageModel) -> Unit
+    type: MailboxType,
+    onMessageClick: (MessageModel) -> Unit,
+    onReply: ((MessageModel) -> Unit)? = null,
+    onMarkStatus: ((MessageModel, String) -> Unit)? = null,
+    onDelete: ((String) -> Unit)? = null,
+    onContinueEditing: ((MessageModel) -> Unit)? = null
 ) {
     if (messages.isEmpty()) {
-        // Si no hay mensajes, mostramos un texto amigable
         Box(
             modifier = Modifier
                 .fillMaxSize()
@@ -168,8 +189,17 @@ private fun MessageList(
             modifier = Modifier.fillMaxSize()
         ) {
             items(messages) { message ->
-                MessageItem(message, onClick = { onMessageClick(message) })
+                MessageItem(
+                    message = message,
+                    type = type,
+                    onClick = { onMessageClick(message) },
+                    onReply = onReply,
+                    onMarkStatus = onMarkStatus,
+                    onDelete = onDelete,
+                    onContinueEditing = onContinueEditing
+                )
             }
         }
     }
 }
+

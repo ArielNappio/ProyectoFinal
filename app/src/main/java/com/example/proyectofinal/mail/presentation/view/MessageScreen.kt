@@ -53,6 +53,7 @@ import java.time.LocalDateTime
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MessageScreen(
+    draftId:Int,
     onSendComplete: () -> Unit,
     onCancel: () -> Unit,
     onDraftSaved: () -> Unit
@@ -66,6 +67,11 @@ fun MessageScreen(
     val context = LocalContext.current
     var showDialog by remember { mutableStateOf(false) }
 
+    LaunchedEffect(draftId) {
+        if (draftId != -1) {
+            viewModel.loadDraft(draftId)
+        }
+    }
 
     LaunchedEffect(draftSavedEvent) {
         draftSavedEvent.collect {
@@ -101,6 +107,10 @@ fun MessageScreen(
                                 subject = subject,
                                 content = message,
                                 date = LocalDateTime.now().toString(),
+                                id = 0,
+//                                userFromId = 1.toString(),
+//                                userToID = 2.toString(),
+//                                isDraft = false,
                             )
                             viewModel.sendMessage(newMessage)
                         },

@@ -3,6 +3,8 @@ package com.example.proyectofinal.mail.presentation.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.proyectofinal.mail.domain.model.MessageModel
+import com.example.proyectofinal.mail.domain.model.OutboxMessageModel
+import com.example.proyectofinal.mail.domain.usecase.DeleteMessageByIdUseCase
 import com.example.proyectofinal.mail.domain.usecase.GetDraftMessagesUseCase
 import com.example.proyectofinal.mail.domain.usecase.GetInboxMessagesUseCase
 import com.example.proyectofinal.mail.domain.usecase.GetOutboxMessagesUseCase
@@ -14,7 +16,8 @@ import kotlinx.coroutines.launch
 class InboxViewModel(
     private val getInboxMessagesUseCase: GetInboxMessagesUseCase,
     private val getOutboxMessagesUseCase: GetOutboxMessagesUseCase,
-    private val getDraftMessagesUseCase: GetDraftMessagesUseCase
+    private val getDraftMessagesUseCase: GetDraftMessagesUseCase,
+    private val deleteDraftUseCase: DeleteMessageByIdUseCase,
 ) : ViewModel() {
 
     private val _inboxMessages = MutableStateFlow<List<MessageModel>>(emptyList())
@@ -56,10 +59,22 @@ class InboxViewModel(
         currentUserId?.let { id ->
             viewModelScope.launch {
                 val messages = getOutboxMessagesUseCase(id)
-                _outboxMessages.value = messages
+                val outboxMessages = messages.map { message ->
+                    OutboxMessageModel(
+                        message = message,
+                        status = OutboxMessageModel.MessageStatus.NO_LEIDO
+                    )
+                }
+                _outboxMessages.value = outboxMessages.map { it.message }
             }
         }
     }
+
+
+    fun updateMessageStatus(messageId: Int, newStatus: OutboxMessageModel.MessageStatus) {
+
+    }
+
 
     private fun loadDraftMessages() {
 
@@ -76,7 +91,12 @@ class InboxViewModel(
 
     }
 
-//    fun discardDraft(message: MessageModel) {
-//        _draftMessages.value = _draftMessages.value.filterNot { it.id == message.id }
-//    }
+    fun discardDraft(draftId: Int) {
+        viewModelScope.launch(Dispatchers.IO) {
+            deleteDraftUseCase(draftId)
+            loadDraftMessages()
+        }
+    }
+
+
 }

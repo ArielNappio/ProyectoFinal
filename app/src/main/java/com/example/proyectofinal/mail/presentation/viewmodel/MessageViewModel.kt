@@ -7,6 +7,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.proyectofinal.core.network.NetworkResponse
 import com.example.proyectofinal.mail.domain.model.MessageModel
+import com.example.proyectofinal.mail.domain.usecase.GetDraftByIdUseCase
 import com.example.proyectofinal.mail.domain.usecase.SaveDraftUseCase
 import com.example.proyectofinal.mail.domain.usecase.SendMessageUseCase
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -18,7 +19,8 @@ import java.time.LocalDateTime
 
 class MessageViewModel(
     private val sendMessageUseCase: SendMessageUseCase,
-    private val saveDraftUseCase: SaveDraftUseCase
+    private val saveDraftUseCase: SaveDraftUseCase,
+    private val getDraftByIdUseCase: GetDraftByIdUseCase
 ) : ViewModel() {
 
     private val _to = MutableStateFlow("")
@@ -35,6 +37,9 @@ class MessageViewModel(
 
     private val _draftSavedEvent = MutableSharedFlow<Unit>()
     val draftSavedEvent = _draftSavedEvent.asSharedFlow()
+
+    private val _draftId = MutableStateFlow(0)
+    private val draftId: StateFlow<Int> = _draftId
 
     fun updateTo(value: String) {
         _to.value = value
@@ -64,13 +69,26 @@ class MessageViewModel(
                 sender = to.value,
                 subject = subject.value,
                 content = message.value,
-                date = LocalDateTime.now().toString()
+                date = LocalDateTime.now().toString(),
+                id = draftId.value
             )
             saveDraftUseCase(draftMessage)
-            Log.d("Save draft", "${draftMessage.content}")
+            Log.d("Save draft", draftMessage.content)
             Log.d("Save draft","success")
             _draftSavedEvent.emit(Unit)
         }
     }
-}
 
+    fun loadDraft(id: Int) {
+        viewModelScope.launch {
+            val draft = getDraftByIdUseCase(id)
+            draft.let {
+                _to.value = it.sender
+                _subject.value = it.subject
+                _message.value = it.content
+                _draftId.value = it.id
+            }
+        }
+    }
+
+}

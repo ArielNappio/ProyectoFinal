@@ -84,8 +84,25 @@ fun NavigationComponent(
                 onMessageClick = { }
             )
         }
-        composable(route = ScreensRoute.Message.route) {
-            MessageScreen ({},{navController.popBackStack()}, {navController.navigate("mail/drafts")})
+        composable(
+            route = "${ScreensRoute.Message.route}?draftId={draftId}",
+            arguments = listOf(
+                navArgument("draftId") {
+                    type = NavType.IntType
+                    defaultValue = -1
+                }
+            )
+        ) { backStackEntry ->
+            val draftId = backStackEntry.arguments?.getInt("draftId") ?: -1
+
+            MessageScreen(
+                draftId = draftId,
+                onCancel = { navController.popBackStack() },
+                onDraftSaved = { navController.navigate("mail/drafts") },
+                onSendComplete = { navController.navigate("mail/outbox") }
+            )
         }
+
+
     }
 }

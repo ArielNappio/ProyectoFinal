@@ -8,7 +8,8 @@ interface MailRepository {
     suspend fun receiveLastMessage(): NetworkResponse<MessageModel>
     suspend fun saveDraft(message: MessageModel)
     suspend fun getDrafts(): List<MessageModel>
-    suspend fun deleteDrafts()
+    suspend fun deleteDraftById(idMessage: Int)
     suspend fun getInboxMessages(currentUserId: Int): List<MessageModel>
     suspend fun getOutboxMessages(currentUserId: Int): List<MessageModel>
+    suspend fun getDraftById(idMessage: Int): MessageModel
 }
