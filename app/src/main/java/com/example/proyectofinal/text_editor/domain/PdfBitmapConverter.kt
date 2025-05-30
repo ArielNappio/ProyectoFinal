@@ -1,29 +1,26 @@
 package com.example.proyectofinal.text_editor.domain
 
-import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.pdf.PdfRenderer
-import android.net.Uri
+import android.os.ParcelFileDescriptor
 import androidx.core.graphics.createBitmap
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.withContext
+import java.io.File
 
-class PdfBitmapConverter(
-    private val context: Context
-) {
+class PdfBitmapConverter() {
     private var renderer: PdfRenderer? = null
 
-    suspend fun pdfToBitmaps(contentUri: Uri): List<Bitmap> {
+    suspend fun pdfToBitmaps(pdfFile: File): List<Bitmap> {
         return withContext(Dispatchers.IO) {
             renderer?.close()
 
-            context
-                .contentResolver
-                .openFileDescriptor(contentUri, "r")
+            ParcelFileDescriptor
+                .open(pdfFile, ParcelFileDescriptor.MODE_READ_ONLY)
                 ?.use { descriptor ->
                     with(PdfRenderer(descriptor)) {
                         renderer = this

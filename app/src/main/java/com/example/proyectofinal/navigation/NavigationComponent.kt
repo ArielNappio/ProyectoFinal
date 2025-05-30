@@ -15,6 +15,7 @@ import com.example.proyectofinal.student.presentation.view.HomeScreen
 import com.example.proyectofinal.student.presentation.view.StudentProfileScreen
 import com.example.proyectofinal.student.presentation.view.TaskDetailScreen
 import com.example.proyectofinal.task_student.presentation.view.TaskStudent
+import com.example.proyectofinal.text_editor.presentation.view.TextEditorScreen
 
 @Composable
 fun NavigationComponent(
@@ -70,7 +71,7 @@ fun NavigationComponent(
             ChatScreen(modifier, navController)
         }
         composable(route = ScreensRoute.TextEdit.route) {
-            TextEditScreen()
+            TextEditorScreen(navController)
         }
     }
 }
