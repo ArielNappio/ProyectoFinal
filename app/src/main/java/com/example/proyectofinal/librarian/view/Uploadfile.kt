@@ -144,7 +144,9 @@ fun UploadfileScreen(
                 contentAlignment = Alignment.BottomEnd
             ) {
                 FloatingActionButton(
-                    onClick = { /* acción cámara */ },
+                    onClick = {
+                        //camara
+                    },
                     containerColor = Color(0xFF1976D2),
                     contentColor = Color.White
                 ) {

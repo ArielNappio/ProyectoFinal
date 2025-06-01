@@ -1,7 +1,9 @@
 package com.example.proyectofinal.librarian.view
 
 import android.app.DatePickerDialog
+import android.net.Uri
 import android.os.Build
+import android.provider.OpenableColumns
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -19,8 +21,8 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.ui.graphics.Color
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.ui.platform.LocalInspectionMode
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.proyectofinal.librarian.viewmodel.CreateOrderViewModel
@@ -44,6 +46,7 @@ fun CreateTaskScreen(
     val name by viewModel.name.collectAsState()
     val description by viewModel.description.collectAsState()
     val limitdate by viewModel.limitDate.collectAsState()
+    val fileUri by viewModel.fileUri.collectAsState()
 
     val alumnos = listOf("Juan Pérez", "María Gómez", "Carlos Ruiz")
     var expanded by remember { mutableStateOf(false) }
@@ -55,6 +58,13 @@ fun CreateTaskScreen(
 
     val formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy")
     val currentDate = LocalDate.now().format(formatter)
+
+    val isEmpty = name.isNotBlank() &&
+            description.isNotBlank() &&
+            limitdate != null &&
+            selectedAlumno != null &&
+            fileUri != null
+
 
     val context = LocalContext.current
     if (showDatePicker && !LocalInspectionMode.current) {
@@ -179,8 +189,7 @@ fun CreateTaskScreen(
                             ExposedDropdownMenu(
                                 expanded = expanded,
                                 onDismissRequest = { expanded = false },
-                                modifier = Modifier.background(Color.White) // ← Fondo blanco aquí
-
+                                modifier = Modifier.background(Color.White)
                             ) {
                                 alumnos.forEach { alumno ->
                                     DropdownMenuItem(
@@ -207,8 +216,18 @@ fun CreateTaskScreen(
                                 modifier = Modifier.size(48.dp)
                             )
                         }
+                    }
 
-                        Spacer(modifier = Modifier.height(12.dp))
+                        Text(fileUri.toString(),
+                            color = Color.LightGray,
+                            modifier = Modifier.fillMaxSize()
+                                .padding(horizontal = 30.dp),
+
+                        )
+
+
+
+                    Spacer(modifier = Modifier.height(12.dp))
 
                         Button(
                             onClick = {
@@ -218,7 +237,7 @@ fun CreateTaskScreen(
                                     status = "PENDIENTE",
                                     limitdate = limitdate,
                                     filePath = "",
-                                    file = TODO(),
+                                    file = fileUri,
                                     id = TODO(),
                                     creationdate = TODO(),
                                     createdbyuserid = TODO(),
@@ -230,7 +249,7 @@ fun CreateTaskScreen(
                                 )
                                 viewModel.createOrder(orderNew)
 
-                                      },
+                            },
                             modifier = Modifier.fillMaxWidth(),
                             colors = ButtonDefaults.buttonColors(
                                 containerColor = Color(0xFF4285F4),
@@ -244,4 +263,4 @@ fun CreateTaskScreen(
             }
         }
     }
-}
+

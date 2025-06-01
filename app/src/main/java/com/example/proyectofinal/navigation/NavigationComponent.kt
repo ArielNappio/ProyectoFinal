@@ -84,7 +84,6 @@ fun NavigationComponent(
             UploadfileScreen(navController)
         }
 
-
     }
 
 }
