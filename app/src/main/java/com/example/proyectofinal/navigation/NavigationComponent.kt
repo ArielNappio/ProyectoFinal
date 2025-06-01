@@ -1,5 +1,7 @@
 package com.example.proyectofinal.navigation
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
@@ -8,6 +10,8 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import com.example.proyectofinal.auth.presentation.view.LoginScreen
+import com.example.proyectofinal.librarian.view.CreateTaskScreen
+import com.example.proyectofinal.librarian.view.UploadfileScreen
 import com.example.proyectofinal.student.presentation.view.ChatScreen
 import com.example.proyectofinal.student.presentation.view.CommentsScreen
 import com.example.proyectofinal.student.presentation.view.FavoritesScreen
@@ -16,6 +20,7 @@ import com.example.proyectofinal.student.presentation.view.StudentProfileScreen
 import com.example.proyectofinal.student.presentation.view.TaskDetailScreen
 import com.example.proyectofinal.task_student.presentation.view.TaskStudent
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun NavigationComponent(
     navController: NavHostController,
@@ -69,5 +74,17 @@ fun NavigationComponent(
         composable(route = ScreensRoute.Chat.route) {
             ChatScreen(modifier, navController)
         }
+
+        composable(route = ScreensRoute.CreateOrder.route){
+            CreateTaskScreen(navController)
+        }
+
+
+        composable(route = ScreensRoute.Uploadfile.route){
+            UploadfileScreen(navController)
+        }
+
+
     }
+
 }
