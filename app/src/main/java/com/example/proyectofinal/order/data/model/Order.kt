@@ -1,5 +1,6 @@
 package com.example.proyectofinal.order.data.model
 
+import android.net.Uri
 import kotlinx.serialization.Serializable
 import java.io.File
 import java.util.Date
@@ -18,5 +19,5 @@ data class Order(
     val lastRead: String,
     val pageCount: Int,
     val hasComments: Boolean,
-    val file : File
+    val file : Uri
 )

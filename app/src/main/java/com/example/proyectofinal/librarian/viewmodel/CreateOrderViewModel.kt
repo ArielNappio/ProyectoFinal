@@ -1,5 +1,6 @@
 package com.example.proyectofinal.librarian.viewmodel
 
+import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.proyectofinal.order.data.model.Order
@@ -57,8 +58,8 @@ import java.util.Date
         private val _hasComments = MutableStateFlow(false)
         val hasComments: StateFlow<Boolean> = _hasComments.asStateFlow()
 
-        private val _file = MutableStateFlow(File(""))
-        val file: StateFlow<File> = _file.asStateFlow()
+        private val _fileUri = MutableStateFlow<Uri?>(null)
+        val fileUri: StateFlow<Uri?> = _fileUri.asStateFlow()
 
 
 
@@ -114,8 +115,8 @@ import java.util.Date
             _hasComments.value = has
         }
 
-        fun onFileChanged(newFile: File) {
-            _file.value = newFile
+        fun onFileChanged(newFile: Uri?) {
+            _fileUri.value = newFile
         }
 
 
