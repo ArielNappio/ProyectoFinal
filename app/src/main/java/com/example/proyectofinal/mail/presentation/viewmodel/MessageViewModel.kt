@@ -1,5 +1,6 @@
 package com.example.proyectofinal.mail.presentation.viewmodel
 
+import android.content.Context
 import android.os.Build
 import android.util.Log
 import androidx.annotation.RequiresApi
@@ -7,20 +8,24 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.proyectofinal.core.network.NetworkResponse
 import com.example.proyectofinal.mail.domain.model.MessageModel
+import com.example.proyectofinal.mail.domain.usecase.DeleteMessageByIdUseCase
 import com.example.proyectofinal.mail.domain.usecase.GetDraftByIdUseCase
 import com.example.proyectofinal.mail.domain.usecase.SaveDraftUseCase
 import com.example.proyectofinal.mail.domain.usecase.SendMessageUseCase
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
+import java.io.File
 import java.time.LocalDateTime
 
 class MessageViewModel(
     private val sendMessageUseCase: SendMessageUseCase,
     private val saveDraftUseCase: SaveDraftUseCase,
-    private val getDraftByIdUseCase: GetDraftByIdUseCase
+    private val getDraftByIdUseCase: GetDraftByIdUseCase,
+    private val deleteDraftUseCase: DeleteMessageByIdUseCase
 ) : ViewModel() {
 
     private val _to = MutableStateFlow("")
@@ -31,6 +36,9 @@ class MessageViewModel(
 
     private val _message = MutableStateFlow("")
     val message: StateFlow<String> = _message
+
+    private val _filePath = MutableStateFlow<String?>(null)
+    val filePath: StateFlow<String?> = _filePath
 
     private val _sendMessageState = MutableStateFlow<NetworkResponse<Unit>>(NetworkResponse.Loading())
     val sendMessageState: StateFlow<NetworkResponse<Unit>> = _sendMessageState
@@ -51,6 +59,10 @@ class MessageViewModel(
 
     fun updateMessage(value: String) {
         _message.value = value
+    }
+
+    fun updateFilePath(value: String?) {
+        _filePath.value = value
     }
 
     fun sendMessage(messageModel: MessageModel) {
@@ -91,4 +103,30 @@ class MessageViewModel(
         }
     }
 
+    fun discardDraft(draftId: Int) {
+        viewModelScope.launch(Dispatchers.IO) {
+            deleteDraftUseCase(draftId)
+        }
+    }
+
+    fun saveFormToFile(
+        context: Context,
+        title: String,
+        author: String,
+        career: String,
+        signature: String,
+        date: String
+    ): File {
+        val file = File(context.cacheDir, "formulario_${System.currentTimeMillis()}.txt")
+        file.writeText(
+            """
+        Título: $title
+        Autor: $author
+        Carrera: $career
+        Firma: $signature
+        Fecha: $date
+        """.trimIndent()
+        )
+        return file
+    }
 }

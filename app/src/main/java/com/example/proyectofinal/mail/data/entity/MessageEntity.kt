@@ -13,5 +13,6 @@ data class MessageEntity(
     val sender: String,
     val subject: String,
     val date: String,
-    val content: String
+    val content: String,
+    val filePath: String? = null
 )

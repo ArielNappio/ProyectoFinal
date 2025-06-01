@@ -1,5 +1,7 @@
 package com.example.proyectofinal.navigation.presentation.view
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -25,6 +27,7 @@ import com.example.proyectofinal.navigation.util.showsBottomBar
 import com.example.proyectofinal.navigation.util.showsTopBar
 import org.koin.androidx.compose.koinViewModel
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun Main(
     modifier: Modifier,

@@ -46,5 +46,5 @@ val mailModule = module {
     factory { GetDraftMessagesUseCase(get()) }
     factory { GetDraftByIdUseCase(get()) }
     viewModel { InboxViewModel(get(), get(), get(), get()) }
-    viewModel { MessageViewModel(get(), get(), get()) }
+    viewModel { MessageViewModel(get(), get(), get(), get()) }
 }

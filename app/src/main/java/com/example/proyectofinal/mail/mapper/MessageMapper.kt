@@ -9,8 +9,9 @@ fun MessageEntity.toDomain(): MessageModel {
         sender = sender,
         subject = subject,
         date = date,
-        content = content
-        // faltaria el id, userFromId, userToID ?
+        content = content,
+        filePath = filePath
+        // faltaria el userFromId, userToID ?
     )
 }
 
@@ -26,6 +27,7 @@ fun MessageModel.toEntity(
         subject = subject,
         date = date,
         content = content,
+        filePath = filePath,
         userFromId = userFromId.toString(),
         userToID = userToID.toString(),
         isDraft = isDraft,
