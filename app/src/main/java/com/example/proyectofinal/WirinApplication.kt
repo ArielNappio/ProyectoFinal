@@ -7,6 +7,7 @@ import com.example.proyectofinal.core.di.networkModule
 import com.example.proyectofinal.core.di.useCaseModule
 import com.example.proyectofinal.core.di.viewModelModule
 import com.example.proyectofinal.student.data.di.CommentsRepositoryModule
+import com.example.proyectofinal.student.data.di.taskProviderModule
 import com.example.proyectofinal.student.data.di.taskRepositoryModule
 import com.example.proyectofinal.task_student.di.ttsModule
 import com.example.proyectofinal.text_editor.di.pdfBitmapConverterModule
@@ -28,6 +29,7 @@ class WirinApplication: Application() {
                 useCaseModule,
                 tokenManagerModule,
                 taskRepositoryModule,
+                taskProviderModule,
                 ttsModule,
                 pdfBitmapConverterModule,
                 pdfRemoteRepositoryModule,

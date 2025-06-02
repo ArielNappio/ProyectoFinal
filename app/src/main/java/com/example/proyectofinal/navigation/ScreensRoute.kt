@@ -13,5 +13,5 @@ enum class ScreensRoute(
     Task("task", false, false),
     Comments("comments", showsTopBar = false, showsBottomBar = false),
     Chat("chat"),
-    TextEdit("text_edit", showsTopBar = false, showsBottomBar = false)
+    TextEdit("text_edit/{taskId}", showsTopBar = false, showsBottomBar = false)
 }

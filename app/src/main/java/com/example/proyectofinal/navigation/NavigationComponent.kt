@@ -70,8 +70,14 @@ fun NavigationComponent(
         composable(route = ScreensRoute.Chat.route) {
             ChatScreen(modifier, navController)
         }
-        composable(route = ScreensRoute.TextEdit.route) {
-            TextEditorScreen(navController)
+        composable(
+            route = ScreensRoute.TextEdit.route,
+            arguments = listOf(
+                navArgument("taskId") { type = NavType.IntType }
+            )
+        ) {
+            val taskId = it.arguments?.getInt("taskId") ?: 0
+            TextEditorScreen(navController, taskId)
         }
     }
 }
