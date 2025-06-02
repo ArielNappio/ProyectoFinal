@@ -1,5 +1,8 @@
 package com.example.proyectofinal.student.presentation.view
 
+import android.util.Log
+import android.widget.Toast
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -12,13 +15,15 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.FilterAlt
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Mic
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -26,8 +31,10 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import com.example.proyectofinal.audio.speechrecognizer.SpeechRecognizerManager
 import com.example.proyectofinal.student.presentation.component.TaskCard
 import com.example.proyectofinal.student.presentation.viewmodel.HomeScreenViewModel
 import org.koin.androidx.compose.koinViewModel
@@ -36,6 +43,30 @@ import org.koin.androidx.compose.koinViewModel
 fun HomeScreen(navController: NavController, modifier: Modifier = Modifier) {
     val viewModel = koinViewModel<HomeScreenViewModel>()
     val tasks by viewModel.tasks.collectAsState()
+
+    val context = LocalContext.current
+
+    //speech recognizer
+    val searchText by viewModel.searchText.collectAsState()
+
+    val speechRecognizerManager = remember {
+        SpeechRecognizerManager(
+            context = context,
+            onResult = { result ->
+                viewModel.updateSearchText(result)
+            },
+            onError = { error ->
+                Log.e("SpeechRecognizer", error)
+            }
+        )
+    }
+
+    DisposableEffect(Unit) {
+        onDispose {
+            speechRecognizerManager.stopListening()
+        }
+    }
+
 
     Box(modifier = modifier.fillMaxSize()) {
         Column(
@@ -47,11 +78,10 @@ fun HomeScreen(navController: NavController, modifier: Modifier = Modifier) {
                 modifier = Modifier.fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                var searchText by remember { mutableStateOf("") }
 
                 TextField(
                     value = searchText,
-                    onValueChange = { searchText = it },
+                    onValueChange = { viewModel.updateSearchText(it) },
                     label = { Text("Buscar") },
                     modifier = Modifier
                         .weight(1f)
@@ -64,10 +94,10 @@ fun HomeScreen(navController: NavController, modifier: Modifier = Modifier) {
                     }
                 )
                 Spacer(modifier = Modifier.width(8.dp))
-                IconButton(onClick = { }) {
+                IconButton(onClick = { speechRecognizerManager.startListening() }) {
                     Icon(
-                        imageVector = Icons.Default.FilterAlt,
-                        contentDescription = "Filtrar",
+                        imageVector = Icons.Default.Mic,
+                        contentDescription = "Busqueda por voz",
                     )
                 }
             }

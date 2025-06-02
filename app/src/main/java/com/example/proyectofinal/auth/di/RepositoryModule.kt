@@ -1,12 +1,12 @@
 package com.example.proyectofinal.auth.di
 
-import com.example.proyectofinal.auth.data.remoteData.repository.AuthRemoteRepoImpl
-import com.example.proyectofinal.auth.data.remoteData.repository.AuthRemoteRepository
+import com.example.proyectofinal.auth.data.provider.AuthRemoteProviderImpl
+import com.example.proyectofinal.auth.domain.provider.AuthRemoteProvider
 import org.koin.dsl.module
 
 val repositoryModule = module {
-    single<AuthRemoteRepository> {
-        AuthRemoteRepoImpl(get())
-        AuthRemoteRepoImpl(get())
+    single<AuthRemoteProvider> {
+        AuthRemoteProviderImpl(get())
+        AuthRemoteProviderImpl(get())
     }
 }

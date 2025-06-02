@@ -1,4 +1,4 @@
-package com.example.proyectofinal.auth.data.local
+package com.example.proyectofinal.auth.data.tokenmanager
 
 
 import android.content.Context
@@ -7,6 +7,7 @@ import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 
 private val Context.dataStore by preferencesDataStore("auth")
@@ -15,6 +16,7 @@ class TokenManager(private val context: Context) {
     private val TOKEN_KEY = stringPreferencesKey("jwt_token")
 
     val token: Flow<String?> = context.dataStore.data
+        .distinctUntilChanged()
         .map {
             Log.d("TokenManager", "Token leído: ${it[TOKEN_KEY]}")
             it[TOKEN_KEY]

@@ -1,9 +1,9 @@
-package com.example.proyectofinal.auth.data.remoteData.model
+package com.example.proyectofinal.auth.data.model
 
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class UserResponse(
+data class UserResponseDto(
     val userName: String,
     val email: String,
     val fullName: String,

@@ -2,9 +2,9 @@ package com.example.proyectofinal.navigation.presentation.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.proyectofinal.auth.data.local.TokenManager
-import com.example.proyectofinal.auth.data.remoteData.model.UserResponse
-import com.example.proyectofinal.auth.data.remoteData.repository.AuthRemoteRepository
+import com.example.proyectofinal.auth.data.model.UserResponseDto
+import com.example.proyectofinal.auth.data.tokenmanager.TokenManager
+import com.example.proyectofinal.auth.domain.provider.AuthRemoteProvider
 import com.example.proyectofinal.core.network.NetworkResponse
 import com.example.proyectofinal.core.util.UiState
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -17,12 +17,12 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 class MainViewModel(
-    val authRemoteRepository: AuthRemoteRepository,
+    val authRemoteRepository: AuthRemoteProvider,
     val tokenManager: TokenManager
 ) : ViewModel() {
 
-    private val _userState = MutableStateFlow<UiState<UserResponse>>(UiState.Loading)
-    val userState: StateFlow<UiState<UserResponse>> = _userState
+    private val _userState = MutableStateFlow<UiState<UserResponseDto>>(UiState.Loading)
+    val userState: StateFlow<UiState<UserResponseDto>> = _userState
 
     private val _isLoggedIn = MutableStateFlow(false)
     val isLoggedIn: StateFlow<Boolean> = _isLoggedIn
@@ -35,6 +35,7 @@ class MainViewModel(
             tokenManager.token
                 .distinctUntilChanged()
                 .collectLatest { token ->
+                    println("TokenManager emitted token: $token - hash: ${token.hashCode()} at ${System.currentTimeMillis()}")
                     println("MainViewModel: Token retrieved from TokenManager: $token") // Add this log
                     if (!token.isNullOrEmpty()) {
                         _mainScreenUiState.update { MainScreenUiState.Loading }
@@ -65,7 +66,7 @@ class MainViewModel(
                 println("MainViewModel: getUserData response received: $response")
                 when (response) {
                     is NetworkResponse.Success -> {
-                        _userState.update { UiState.Success(response.data) as UiState<UserResponse> }
+                        _userState.update { UiState.Success(response.data) as UiState<UserResponseDto> }
                         _mainScreenUiState.update { MainScreenUiState.Authenticated }
                         println("MainViewModel: getUserData success, userState updated, MainScreenUiState set to Authenticated")
                     }
@@ -81,6 +82,8 @@ class MainViewModel(
                     }
                 }
             }
+        println("TokenManager emitted token fun: $token - hash: ${token.hashCode()} at ${System.currentTimeMillis()}")
+
     }
 
 

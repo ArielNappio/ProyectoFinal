@@ -10,6 +10,8 @@ import com.example.proyectofinal.audio.domain.repository.AudioRepository
 import com.example.proyectofinal.audio.player.AudioPlayerManager
 import com.example.proyectofinal.audio.recorder.AudioRecorderManager
 import com.example.proyectofinal.task_student.presentation.tts.TextToSpeechManager
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -37,6 +39,8 @@ class TaskStudentViewModel(
 
     private var currentAudioFile: File? = null
 
+    private val _currentPosition = MutableStateFlow(0L)
+    val currentPosition: StateFlow<Long> = _currentPosition
 
     // Texto que se muestra y se lee - hay que cambiar y que traiga texto de la api
     private val rawText = """
@@ -144,20 +148,34 @@ class TaskStudentViewModel(
 
     // audio
 
+    private var positionJob: Job? = null
+
     fun playAudio(filePath: String){
         if (audioPlayerManager.isPlaying(filePath)) {
             stopAudio()
         } else {
             audioPlayerManager.play(filePath = filePath) {
-                _currentlyPlayingPath.value = "" // Cuando termina de sonar
+                _currentlyPlayingPath.value = ""
+                _currentPosition.value = 0L
+                positionJob?.cancel()
             }
             _currentlyPlayingPath.value = filePath
+
+            positionJob?.cancel()
+            positionJob = viewModelScope.launch {
+                while (_currentlyPlayingPath.value == filePath) {
+                    _currentPosition.value = audioPlayerManager.getCurrentPosition()
+                    delay(200L)
+                }
+            }
         }
     }
 
     fun stopAudio(){
         audioPlayerManager.stop()
         _currentlyPlayingPath.value = ""
+        _currentPosition.value = 0L
+        positionJob?.cancel()
     }
 
     fun deleteComment(filePath: String) {
@@ -173,6 +191,14 @@ class TaskStudentViewModel(
 
             // 3. Actualizar lista en memoria
             _comments.value = _comments.value.filterNot { it.filePath == filePath }
+        }
+    }
+
+    fun seekTo(position: Long, playAfterSeek: Boolean = false, path: String) {
+        audioPlayerManager.seekTo(position)
+        _currentPosition.value = position
+        if (playAfterSeek && !_isPlaying.value) {
+            playAudio(path)
         }
     }
 

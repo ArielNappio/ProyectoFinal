@@ -70,11 +70,14 @@ fun CommentsScreen(
                     CommentAudioCard(
                         comment = comment,
                         isPlaying = isPlaying && comment.filePath == currentlyPlayingPath,
-                        currentPosition = if (currentlyPlayingPath== comment.filePath) currentPosition else 0L,
+                        currentPosition = if (currentlyPlayingPath == comment.filePath) currentPosition else 0L,
                         onPlayClick = {
                             println("Reproduciendo ${comment.filePath}")
                             viewModel.playAudio(comment.filePath)
-                            viewModel.isPlaying()
+                        },
+                        onPauseClick = { viewModel.playAudio(comment.filePath) },
+                        onSeek = { position, playAfterSeek, path ->
+                            viewModel.seekTo(position, playAfterSeek, path)
                         },
                         onDeleteClick = {
                             viewModel.deleteComment(comment.filePath)
@@ -87,6 +90,7 @@ fun CommentsScreen(
                     Row(
                         horizontalArrangement = Arrangement.SpaceBetween,
                         modifier = Modifier.fillMaxWidth()
+
                     ) {
                         Text(
                             text = "📄 Página: ${comment.page}",
