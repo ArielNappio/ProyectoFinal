@@ -1,12 +1,14 @@
 package com.example.proyectofinal.mail.presentation.view
 
 import android.os.Build
+import android.util.Log
 import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -18,6 +20,7 @@ import androidx.compose.material.icons.automirrored.filled.NoteAdd
 import androidx.compose.material.icons.automirrored.filled.Send
 import androidx.compose.material.icons.filled.AttachFile
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Mic
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -33,6 +36,7 @@ import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -46,6 +50,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
+import com.example.proyectofinal.audio.speechrecognizer.SpeechRecognizerManager
 import com.example.proyectofinal.core.network.NetworkResponse
 import com.example.proyectofinal.core.theme.BlueDark
 import com.example.proyectofinal.core.theme.CustomGreen
@@ -77,8 +82,28 @@ fun MessageScreen(
     val context = LocalContext.current
 
     var isDialogOpen by remember { mutableStateOf(false) }
-
     var showDialog by remember { mutableStateOf(false) }
+
+    // Speech recognizer setup
+    val voiceToText by viewModel.voiceToText.collectAsState()
+
+    val speechRecognizerManager = remember {
+        SpeechRecognizerManager(
+            context = context,
+            onResult = { result ->
+                viewModel.appendToMessage(result)
+            },
+            onError = { error ->
+                Log.e("SpeechRecognizer", error)
+            }
+        )
+    }
+
+    DisposableEffect(Unit) {
+        onDispose {
+            speechRecognizerManager.stopListening()
+        }
+    }
 
     LaunchedEffect(draftId) {
         if (draftId != -1) {
@@ -251,98 +276,131 @@ fun MessageScreen(
 
             Spacer(Modifier.height(8.dp))
 
-            // Cuerpo del mensaje
-            TextField(
-                value = message,
-                onValueChange = { viewModel.updateMessage(it) },
-                placeholder = { Text("Redactar mensaje...", color = Color.Gray) },
+            // Campo para redactar mensaje
+            Row(
                 modifier = Modifier
                     .fillMaxWidth()
                     .weight(1f),
-                colors = TextFieldDefaults.colors(
-                    focusedContainerColor = Color.Transparent,
-                    unfocusedContainerColor = Color.Transparent,
-                    disabledContainerColor = Color.Transparent,
-                    focusedIndicatorColor = Color.Transparent,
-                    unfocusedIndicatorColor = Color.Transparent,
-                    disabledIndicatorColor = Color.Transparent,
-                    focusedTextColor = Color.White,
-                    unfocusedTextColor = Color.White,
-                    disabledTextColor = Color.LightGray
-                ),
-                singleLine = false
-            )
+                verticalAlignment = Alignment.Top
+            ) {
+                TextField(
+                    value = message,
+                    onValueChange = { viewModel.updateMessage(it) },
+                    placeholder = { Text("Redactar mensaje...", color = Color.Gray) },
+                    modifier = Modifier
+                        .weight(1f)
+                        .fillMaxHeight(),
+                    colors = TextFieldDefaults.colors(
+                        focusedContainerColor = Color.Transparent,
+                        unfocusedContainerColor = Color.Transparent,
+                        disabledContainerColor = Color.Transparent,
+                        focusedIndicatorColor = Color.Transparent,
+                        unfocusedIndicatorColor = Color.Transparent,
+                        disabledIndicatorColor = Color.Transparent,
+                        focusedTextColor = Color.White,
+                        unfocusedTextColor = Color.White,
+                        disabledTextColor = Color.LightGray
+                    ),
+                    singleLine = false
+                )
+
+                Spacer(modifier = Modifier.width(8.dp))
+
+                // Mic con texto abajo
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    IconButton(
+                        onClick = {
+                            speechRecognizerManager.startListening()
+                        }
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Mic,
+                            contentDescription = "Dictado por voz",
+                            tint = GreenLight
+                        )
+                    }
+                    Text(
+                        text = "Dictar",
+                        color = Color.White,
+                        fontSize = 12.sp,
+                        fontWeight = FontWeight.Bold
+                    )
+                }
+            }
+
+            // Diálogo para confirmar salir
+            if (showDialog) {
+                AlertDialog(
+                    onDismissRequest = { showDialog = false },
+                    confirmButton = {
+                        Column {
+                            TextButton(
+                                onClick = {
+                                    viewModel.saveDraft()
+                                    showDialog = false
+                                    onCancel()
+                                },
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(vertical = 4.dp)
+                            ) {
+                                Text(
+                                    "Guardar borrador",
+                                    color = GreenLight,
+                                    fontSize = 18.sp,
+                                    fontWeight = FontWeight.Bold
+                                )
+                            }
+                            HorizontalDivider(color = Color.Gray)
+                            TextButton(
+                                onClick = {
+                                    viewModel.discardDraft(draftId)
+                                    showDialog = false
+                                    onCancel()
+                                },
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(vertical = 4.dp)
+                            ) {
+                                Text(
+                                    "Salir sin guardar",
+                                    color = GreenLight,
+                                    fontSize = 18.sp,
+                                    fontWeight = FontWeight.Bold
+                                )
+                            }
+                        }
+                    },
+                    title = {
+                        Text(
+                            "¿Querés salir de la redacción?",
+                            color = Color.White,
+                            fontSize = 22.sp,
+                            fontWeight = FontWeight.Bold
+                        )
+                    },
+                    text = {
+                        Text(
+                            "Podés guardar este mensaje como borrador para retomarlo más tarde.",
+                            color = Color.White,
+                            fontSize = 18.sp
+                        )
+                    },
+                    containerColor = BlueDark,
+                    titleContentColor = Color.White,
+                    textContentColor = Color.White
+                )
+            }
+
+            // FormScreen para nuevo mensaje
+            if (isDialogOpen) {
+                FormScreen(
+                    viewModel,
+                    onDismiss = { isDialogOpen = false },
+                    onMessageSent = { isDialogOpen = false })
+            }
         }
     }
-
-    if (showDialog) {
-        AlertDialog(
-            onDismissRequest = { showDialog = false },
-            confirmButton = {
-                Column {
-                    TextButton(
-                        onClick = {
-                            viewModel.saveDraft()
-                            showDialog = false
-                            onCancel()
-                        },
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(vertical = 4.dp)
-                    ) {
-                        Text(
-                            "Guardar borrador",
-                            color = GreenLight,
-                            fontSize = 18.sp,
-                            fontWeight = FontWeight.Bold
-                        )
-                    }
-                    HorizontalDivider(color = Color.Gray)
-                    TextButton(
-                        onClick = {
-                            viewModel.discardDraft(draftId)
-                            showDialog = false
-                            onCancel()
-                        },
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(vertical = 4.dp)
-                    ) {
-                        Text(
-                            "Salir sin guardar",
-                            color = GreenLight,
-                            fontSize = 18.sp,
-                            fontWeight = FontWeight.Bold
-                        )
-                    }
-                }
-            },
-            title = {
-                Text(
-                    "¿Querés salir de la redacción?",
-                    color = Color.White,
-                    fontSize = 22.sp,
-                    fontWeight = FontWeight.Bold
-                )
-            },
-            text = {
-                Text(
-                    "Podés guardar este mensaje como borrador para retomarlo más tarde.",
-                    color = Color.White,
-                    fontSize = 18.sp
-                )
-            },
-            containerColor = BlueDark,
-            titleContentColor = Color.White,
-            textContentColor = Color.White
-        )
-    }
-
-    if (isDialogOpen) {
-        FormScreen(
-            viewModel,
-            onDismiss = { isDialogOpen = false },
-            onMessageSent = { isDialogOpen = false })
-    }
-
 }

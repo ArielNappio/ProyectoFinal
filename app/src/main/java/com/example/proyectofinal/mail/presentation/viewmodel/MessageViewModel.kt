@@ -17,6 +17,7 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import java.io.File
 import java.time.LocalDateTime
@@ -49,6 +50,9 @@ class MessageViewModel(
     private val _draftId = MutableStateFlow(0)
     private val draftId: StateFlow<Int> = _draftId
 
+    private val _voiceToText = MutableStateFlow("")
+    val voiceToText = _voiceToText.asStateFlow()
+
     fun updateTo(value: String) {
         _to.value = value
     }
@@ -63,6 +67,10 @@ class MessageViewModel(
 
     fun updateFilePath(value: String?) {
         _filePath.value = value
+    }
+
+    fun appendToMessage(newText: String) {
+        _message.value += " $newText"
     }
 
     fun sendMessage(messageModel: MessageModel) {
