@@ -10,8 +10,10 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -25,6 +27,8 @@ import com.example.proyectofinal.navigation.presentation.viewmodel.MainScreenUiS
 import com.example.proyectofinal.navigation.presentation.viewmodel.MainViewModel
 import com.example.proyectofinal.navigation.util.showsBottomBar
 import com.example.proyectofinal.navigation.util.showsTopBar
+import com.example.proyectofinal.userpreferences.domain.model.UserPreferences
+import com.example.proyectofinal.userpreferences.presentation.viewmodel.PreferencesViewModel
 import org.koin.androidx.compose.koinViewModel
 
 @RequiresApi(Build.VERSION_CODES.O)
@@ -34,9 +38,14 @@ fun Main(
     navController: NavHostController,
 ) {
     val viewModel = koinViewModel<MainViewModel>()
+    val prefsViewModel = koinViewModel<PreferencesViewModel>()
+    val userPrefs by prefsViewModel.preferences.collectAsState()
+
+    val localUserPreferences = compositionLocalOf { UserPreferences(16f, "Default") }
+
     val mainScreenUiState by viewModel.mainScreenUiState.collectAsState()
     val navBackStackEntry by navController.currentBackStackEntryAsState()
-    val currentRoute = navBackStackEntry?.destination?.route
+//    val currentRoute = navBackStackEntry?.destination?.route
 
     when (mainScreenUiState) {
         is MainScreenUiState.Loading -> {
@@ -68,16 +77,19 @@ fun Main(
         }
     }
 
-    Scaffold(
-        topBar = { if (navBackStackEntry?.showsTopBar() == true) TopBar(navController) },
-        bottomBar = { if (navBackStackEntry?.showsBottomBar() == true) BottomBar(navController) },
-        modifier = modifier.fillMaxSize()
-    ) { innerPadding ->
-        NavigationComponent(
-            navController = navController,
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(innerPadding)
-        )
+    CompositionLocalProvider(localUserPreferences provides userPrefs) {
+        Scaffold(
+            topBar = { if (navBackStackEntry?.showsTopBar() == true) TopBar(navController) },
+            bottomBar = { if (navBackStackEntry?.showsBottomBar() == true) BottomBar(navController) },
+            modifier = modifier.fillMaxSize()
+        ) { innerPadding ->
+            NavigationComponent(
+                navController = navController,
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(innerPadding)
+            )
+        }
     }
 }
+

@@ -297,6 +297,7 @@ fun MessageScreen(
                             fontWeight = FontWeight.Bold
                         )
                     }
+                    HorizontalDivider(color = Color.Gray)
                     TextButton(
                         onClick = {
                             viewModel.discardDraft(draftId)

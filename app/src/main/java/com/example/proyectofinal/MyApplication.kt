@@ -13,6 +13,7 @@ import com.example.proyectofinal.mail.di.mailModule
 import com.example.proyectofinal.student.data.di.CommentsRepositoryModule
 import com.example.proyectofinal.student.data.di.taskRepositoryModule
 import com.example.proyectofinal.task_student.di.ttsModule
+import com.example.proyectofinal.userpreferences.di.preferencesModule
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.context.GlobalContext.startKoin
 
@@ -35,7 +36,8 @@ class MyApplication: Application() {
                 ttsModule,
                 CommentsRepositoryModule,
                 mailDatabaseModule,
-                mailModule
+                mailModule,
+                preferencesModule
             )
         }
 
