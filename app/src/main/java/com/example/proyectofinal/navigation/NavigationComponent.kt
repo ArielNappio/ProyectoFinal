@@ -19,6 +19,7 @@ import com.example.proyectofinal.student.presentation.view.HomeScreen
 import com.example.proyectofinal.student.presentation.view.StudentProfileScreen
 import com.example.proyectofinal.student.presentation.view.TaskDetailScreen
 import com.example.proyectofinal.task_student.presentation.view.TaskStudent
+import com.example.proyectofinal.userpreferences.presentation.view.FontPreferencesScreen
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
@@ -102,7 +103,9 @@ fun NavigationComponent(
                 onSendComplete = { navController.navigate("mail/outbox") }
             )
         }
-
+        composable(route = ScreensRoute.Preferences.route) {
+            FontPreferencesScreen { navController.navigate(ScreensRoute.Home.route) }
+        }
 
     }
 }

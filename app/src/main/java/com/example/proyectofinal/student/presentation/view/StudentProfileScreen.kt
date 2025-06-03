@@ -47,6 +47,7 @@ import com.example.proyectofinal.R
 import com.example.proyectofinal.core.theme.LocalTheme
 import com.example.proyectofinal.core.ui.ThemeViewModel
 import com.example.proyectofinal.navigation.ScreensRoute
+import com.example.proyectofinal.userpreferences.presentation.theme.LocalUserPreferences
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
@@ -80,7 +81,7 @@ fun StudentProfileScreen(modifier: Modifier = Modifier, navController: NavContro
 
             // Placeholder for user info
             Column {
-                Text("Información de usuario", fontSize = 20.sp, fontWeight = FontWeight.Bold)
+                Text("Información de usuario", fontSize = LocalUserPreferences.current.fontSize.sp, fontWeight = FontWeight.Bold)
                 Spacer(modifier = Modifier.height(4.dp))
                 Text("Nombre y Apellido", fontSize = 16.sp, fontWeight = FontWeight.Bold)
                 Spacer(modifier = Modifier.height(4.dp))
