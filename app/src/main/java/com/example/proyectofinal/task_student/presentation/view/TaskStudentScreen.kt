@@ -498,7 +498,7 @@ fun TaskStudent(navController: NavHostController) {
                         modifier = Modifier.fillMaxWidth(),
                         colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF3B6EF6))
                     ) {
-                        Text(text = "Cancelar", color = Color.White)
+                        Text(text = "Cancelar", color = Color.White, style = MaterialTheme.typography.titleMedium)
                     }
                 }
             }
@@ -569,8 +569,6 @@ fun TaskStudent(navController: NavHostController) {
 
                     Spacer(modifier = Modifier.height(20.dp))
 
-
-
                     MicControl(
                         isRecording = isRecording,
                         hasRecording = hasRecording,
@@ -622,7 +620,7 @@ fun TaskStudent(navController: NavHostController) {
                             viewModel.showFeedback()
                         },
                         modifier = Modifier.fillMaxWidth(),
-                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF3B6EF6))
+                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF4CAF50))
                     ) {
                         Text(text = "Enviar opinión", color = Color.White)
                     }

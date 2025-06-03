@@ -80,14 +80,12 @@ fun CommentAudioCard(
                         onSeek(sliderPosition.value.toLong(), true, comment.filePath)
                     },
                     valueRange = 0f..totalDuration.toFloat(),
-                    modifier = Modifier
-                        .weight(1f)
-                        .padding(horizontal = 8.dp),
                     colors = SliderDefaults.colors(
                         thumbColor = MaterialTheme.colorScheme.primary,
                         activeTrackColor = MaterialTheme.colorScheme.primary,
                         inactiveTrackColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.3f)
                     )
+
                 )
 
                 IconButton(onClick = {
@@ -102,3 +100,4 @@ fun CommentAudioCard(
         }
     }
 }
+

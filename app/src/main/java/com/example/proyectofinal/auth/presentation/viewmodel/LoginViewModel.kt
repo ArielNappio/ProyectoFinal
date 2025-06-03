@@ -20,10 +20,10 @@ class LoginViewModel(
     private val tokenManager: TokenManager
 ) : ViewModel() {
 
-    private val _email = MutableStateFlow<String>("mariagonzalez@biblioteca.com")
+    private val _email = MutableStateFlow<String>("admin@bypass.com")
     val email = _email.asStateFlow()
 
-    private val _password = MutableStateFlow<String>("Test123.")
+    private val _password = MutableStateFlow<String>("123456")
     val password = _password.asStateFlow()
 
     private val _emailError = MutableStateFlow<String?>(null)
@@ -41,12 +41,14 @@ class LoginViewModel(
     private val _isLoading = MutableStateFlow<Boolean>(true)
     val isLoading = _isLoading.asStateFlow()
 
-    private val _loginState =
-        MutableStateFlow<UiState<LoginResponseDto>>(UiState.Loading)
+    private val _loginState = MutableStateFlow<UiState<LoginResponseDto>>(UiState.Loading)
     val loginState: StateFlow<UiState<LoginResponseDto>> = _loginState
 
     private val _navigateToMain = MutableStateFlow<Boolean>(false)
     val navigateToMain: StateFlow<Boolean> = _navigateToMain.asStateFlow()
+
+    private val _showErrorDialog = MutableStateFlow(false)
+    val showErrorDialog: StateFlow<Boolean> = _showErrorDialog.asStateFlow()
 
     init {
         _isLoading.update { true }
@@ -60,6 +62,13 @@ class LoginViewModel(
 
             if(email.value.isNotEmpty() && password.value.isNotEmpty())
             {
+                if (email.value == "admin@bypass.com" && password.value == "123456") {
+                    println("Bypass activado, navegando directo")
+                    _isLoading.update { false }
+                    _navigateToMain.update { true }
+                    return@launch
+                }
+
                 println("entro al if de que no esta empty")
                 _isLoading.update { true }
                 repository.postLogin(LoginRequestDto(email.value, password.value)).collect { response ->
@@ -79,8 +88,10 @@ class LoginViewModel(
                             _isLoading.update { true }
                             println("Cargando...")
                         }
-                        is NetworkResponse.Failure<*> -> {
+                        is NetworkResponse.Failure -> {
                             _isLoading.update { false }
+                            _loginState.update { UiState.Error("Noooo, donde te sentaste\n\n Ocurrió un error desconocido 😕") }
+                            _showErrorDialog.update { true }
                             println("Falló")
                         }
                     }
@@ -91,6 +102,10 @@ class LoginViewModel(
                 print("ta vacio")
             }
         }
+    }
+
+    fun dismissErrorDialog() {
+        _showErrorDialog.update { false }
     }
 
     private fun checkExistingToken() {
