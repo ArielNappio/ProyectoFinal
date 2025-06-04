@@ -12,8 +12,8 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
 class UserViewModel (
-    private val GetUserUserCase : GetUserUseCase,
-    private val DeleteUserUseCase:DeleteUserUseCase
+    private val getUserUserCase : GetUserUseCase,
+    private val deleteUserUseCase:DeleteUserUseCase
 ) : ViewModel() {
 
 
@@ -27,7 +27,7 @@ class UserViewModel (
 
     internal fun fetchUsers() {
         viewModelScope.launch {
-            GetUserUserCase().collect {
+            getUserUserCase().collect {
                 when (it) {
                     is NetworkResponse.Failure<*> -> _users.value = it.data ?: emptyList()
                     is NetworkResponse.Loading<*> -> Log.e("OrderViewModel", "Error: ${it.error}")
@@ -41,7 +41,7 @@ class UserViewModel (
 
     fun deleteOrder(id: Int) {
         viewModelScope.launch {
-            DeleteUserUseCase(id).collect {
+            deleteUserUseCase(id).collect {
                 fetchUsers()
             }
         }

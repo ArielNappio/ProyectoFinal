@@ -30,9 +30,8 @@ class MyApplication: Application() {
                 ttsModule,
                 CommentsRepositoryModule,
                 repositoryModule,
-                useCaseModule,
                 userModule
-            )
+                )
         }
 
     }
