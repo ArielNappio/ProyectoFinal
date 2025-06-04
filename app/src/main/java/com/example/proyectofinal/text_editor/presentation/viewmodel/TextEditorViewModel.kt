@@ -2,13 +2,12 @@ package com.example.proyectofinal.text_editor.presentation.viewmodel
 
 import android.content.Context
 import android.graphics.Bitmap
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.proyectofinal.core.network.ApiUrls
 import com.example.proyectofinal.core.network.NetworkResponse
 import com.example.proyectofinal.student.domain.usecase.GetTaskById
-import com.example.proyectofinal.text_editor.data.repository.PdfRemoteRepositoryImpl
+import com.example.proyectofinal.text_editor.data.repository.PdfProviderImpl
 import com.example.proyectofinal.text_editor.domain.PdfBitmapConverter
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
@@ -19,7 +18,7 @@ import kotlinx.coroutines.launch
 
 class TextEditorViewModel(
     private val pdfBitmapConverter: PdfBitmapConverter,
-    private val pdfRemoteRepository: PdfRemoteRepositoryImpl,
+    private val pdfRemoteRepository: PdfProviderImpl,
     private val getTaskById: GetTaskById,
     private val dispatcher: CoroutineDispatcher = Dispatchers.IO
 ): ViewModel() {
@@ -68,11 +67,9 @@ class TextEditorViewModel(
     val renderedPages: StateFlow<List<Bitmap>> = _renderedPages.asStateFlow()
 
     suspend fun downloadPdf(context: Context) {
-        Log.d("TextEditorViewModel", "downloading PDF")
         pdfRemoteRepository
             .downloadPdf(context, ApiUrls.EXAMPLE_PDF_URL)
             ?.let { _renderedPages.value = pdfBitmapConverter.pdfToBitmaps(it) }
-
     }
 
     private val _pdfViewScale = MutableStateFlow(1f)

@@ -1,7 +1,9 @@
 package com.example.proyectofinal.text_editor
 
+import android.content.Context
 import android.graphics.Bitmap
-import android.net.Uri
+import com.example.proyectofinal.student.domain.usecase.GetTaskById
+import com.example.proyectofinal.text_editor.data.repository.PdfProviderImpl
 import com.example.proyectofinal.text_editor.domain.PdfBitmapConverter
 import com.example.proyectofinal.text_editor.presentation.viewmodel.TextEditorViewModel
 import io.mockk.coEvery
@@ -14,40 +16,53 @@ import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
+import java.io.File
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class TextEditorViewModelTest {
 
     private lateinit var viewModel: TextEditorViewModel
     private lateinit var mockPdfBitmapConverter: PdfBitmapConverter
-    private lateinit var mockUri: Uri
+    private lateinit var mockContext: Context
+    private lateinit var mockFile: File
     private lateinit var mockBitmapList: List<Bitmap>
+    private lateinit var mockPdfRemoteRepository: PdfProviderImpl
+    private lateinit var mockGetTaskById: GetTaskById
     private val testDispatcher = StandardTestDispatcher()
     private val testScope = TestScope(testDispatcher)
 
     @Before
     fun setUp() {
-        mockUri = mockk<Uri>()
-        mockBitmapList = listOf(mockk<Bitmap>())
+        mockContext = mockk()
+        mockFile = mockk()
+        mockBitmapList = listOf(mockk())
         mockPdfBitmapConverter = mockk()
-        coEvery { mockPdfBitmapConverter.pdfToBitmaps(mockUri) } returns mockBitmapList
-        viewModel = TextEditorViewModel(mockPdfBitmapConverter, testDispatcher)
+        mockPdfRemoteRepository = mockk()
+        mockGetTaskById = mockk()
+        coEvery { mockPdfBitmapConverter.pdfToBitmaps(mockFile) } returns mockBitmapList
+        coEvery { mockPdfRemoteRepository.downloadPdf(mockContext, any()) } returns mockFile
+        viewModel = TextEditorViewModel(mockPdfBitmapConverter, mockPdfRemoteRepository, mockGetTaskById, testDispatcher)
+    }
+
+    @Test
+    fun `test updateViewsWeights updates top and bottom view weights`() = testScope.runTest {
+        viewModel.updateViewsWeights(0.7f, 0.3f)
+        assertEquals(0.7f, viewModel.topViewWeight.first())
+        assertEquals(0.3f, viewModel.bottomViewWeight.first())
+    }
+
+    @Test
+    fun `test downloadPdf updates renderedPages`() = testScope.runTest {
+        viewModel.downloadPdf(mockContext)
+        testDispatcher.scheduler.advanceUntilIdle()
+        assertEquals(mockBitmapList, viewModel.renderedPages.first())
     }
 
     @Test
     fun `test updateString updates textState`() = testScope.runTest {
-        val newText = "New text content"
+        val newText = "Updated text"
         viewModel.updateString(newText)
         assertEquals(newText, viewModel.textState.first())
-    }
-
-    @Test
-    fun `test setPdfUri updates pdfUri and renderedPages`() = testScope.runTest {
-        viewModel.setPdfUri(mockUri)
-        testDispatcher.scheduler.advanceUntilIdle()
-
-        assertEquals(mockUri, viewModel.pdfUri.first())
-        assertEquals(mockBitmapList, viewModel.renderedPages.first())
     }
 
     @Test
