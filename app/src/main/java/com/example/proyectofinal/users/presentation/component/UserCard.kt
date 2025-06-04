@@ -1,6 +1,7 @@
 package com.example.proyectofinal.users.presentation.component
 
 import android.R
+import android.R.attr.onClick
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
@@ -21,6 +22,7 @@ import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -49,15 +51,24 @@ fun PreviewUserCard() {
         userName = "ArielN",
         email = "edunappio@gmail.com",
         fullName = "Ariel Nappio",
-        roles = listOf("Administrativo")
+        roles = listOf("Administrativo"),
+        id = "1",
+        password = "a",
+        phoneNumber = "1",
+        dni = "43238883"
     )
     val navController = rememberNavController()
-    UserCard(user = UserAriel, navController = navController)
+    UserCard(
+        user = UserAriel, navController = navController,
+        onClickEliminar = {
+
+        }
+    )
 }
 
 
  @Composable
-    fun UserCard(user : User , navController: NavController) {
+ fun UserCard(user : User , navController: NavController , onClickEliminar:() -> Unit)  {
             var expanded by remember { mutableStateOf(false) }
 
         Card(
@@ -91,17 +102,17 @@ fun PreviewUserCard() {
                     Column(
                         modifier = Modifier.weight(1f)
                     ) {
-                        Text(text = "Ariel Nappio", fontWeight = FontWeight.Bold)
-                        Text(text = "Dni: 43238883")
+                        Text(text = user.fullName, fontWeight = FontWeight.Bold)
+                        Text(text = user.dni)
 
                         AnimatedVisibility(visible = expanded) {
                             Column {
-                                Text(text = "E-mail: edunappio@gmail.com")
-                                Text(text = "Teléfono: 1126546532")
+                                Text(text =user.email)
+                                Text(text = "Teléfono: ${user.phoneNumber}")
                             }
                         }
 
-                        Text(text = "Rol: Voluntario Administrativo")
+                        Text(text = "Rol: ${user.roles}")
                     }
 
                      Column(
@@ -116,13 +127,15 @@ fun PreviewUserCard() {
                                 .size(24.dp)
                                 .padding(bottom = 8.dp)
                         )
-                        Icon(
+                         IconButton (onClick = onClickEliminar) {
+                         Icon(
                             imageVector = Icons.Default.Delete,
                             contentDescription = "Eliminar",
                             tint = Color(0xFFFF5722),
                             modifier = Modifier.size(24.dp)
                         )
                     }
+                     }
                 }
             }
         }

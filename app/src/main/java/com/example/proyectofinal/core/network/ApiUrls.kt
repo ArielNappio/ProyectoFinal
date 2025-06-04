@@ -1,7 +1,7 @@
 package com.example.proyectofinal.core.network
 
 object ApiUrls {
-    const val BASE_URL =  "http://192.168.71.3:5072/"
+    const val BASE_URL =  "http://localhost:5072/"
     const val BASE_URL_LOCAL = "http://localhost:5072/"
     const val AUTH_ME = "${BASE_URL}api/User/me"
     const val LOGIN = "${BASE_URL}api/Auth/login"
@@ -10,4 +10,5 @@ object ApiUrls {
     const val ORDER = "${BASE_URL}api/Order/{id}"
     const val TASKS = "${BASE_URL}api/Task"
     const val TASK = "${BASE_URL}api/Task/{id}"
+    const val USER = "${BASE_URL}api/User"
 }

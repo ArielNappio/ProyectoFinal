@@ -19,7 +19,6 @@ val useCaseModule = module {
     factory { CreateOrderUseCase(get()) }
     factory { UpdateOrderUseCase(get()) }
     factory { DeleteOrderUseCase(get()) }
-
     factory { GetProcessedTasksUseCase(get()) }
     factory { GetTaskById(get()) }
 }
