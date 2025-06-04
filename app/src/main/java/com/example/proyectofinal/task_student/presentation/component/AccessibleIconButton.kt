@@ -8,7 +8,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
@@ -17,7 +16,6 @@ import androidx.compose.ui.unit.sp
 
 @Composable
 fun AccessibleIconButton(
-    modifier: Modifier = Modifier,
     icon: ImageVector,
     label: String,
     onClick: () -> Unit,
@@ -31,12 +29,10 @@ fun AccessibleIconButton(
         Icon(
             imageVector = icon,
             contentDescription = label,
-            modifier = Modifier.size(iconSize),
-            tint = Color.White
+            modifier = Modifier.size(iconSize)
         )
         Text(
             text = label,
-            color = Color.White,
             fontSize = 14.sp,
             textAlign = TextAlign.Center
         )

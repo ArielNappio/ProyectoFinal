@@ -21,7 +21,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -37,8 +36,6 @@ import androidx.compose.material.icons.filled.Feedback
 import androidx.compose.material.icons.filled.FileDownload
 import androidx.compose.material.icons.filled.FontDownload
 import androidx.compose.material.icons.filled.MenuBook
-import androidx.compose.material.icons.filled.Pause
-import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.filled.Stop
 import androidx.compose.material.icons.filled.TextDecrease
@@ -119,7 +116,6 @@ fun TaskStudent(navController: NavHostController) {
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color.Black)
     ) {
         // ----- HEADER FIJO -----
         Row(
@@ -184,7 +180,6 @@ fun TaskStudent(navController: NavHostController) {
             ) {
                 Text(
                     text = text,
-                    color = Color.White,
                     fontSize = fontSize,
                     lineHeight = fontSize * 1.5f,
                 )
@@ -627,78 +622,6 @@ fun TaskStudent(navController: NavHostController) {
 
                 }
             }
-        }
-    }
-}
-
-
-
-@Composable
-fun CenteredAudioBar(
-    isPlaying: Boolean,
-    onPlayPauseClick: () -> Unit,
-    elapsedTime: String = "00:35" // podés cambiarlo por un valor real luego
-) {
-    Box(
-        modifier = Modifier
-            .fillMaxWidth(),
-        contentAlignment = Alignment.Center
-    ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth(0.9f)
-                .height(60.dp)
-                .clip(RoundedCornerShape(30.dp))
-                .background(MaterialTheme.colorScheme.primaryContainer)
-                .padding(horizontal = 16.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            // ▶️ Play/Pause
-            IconButton(onClick = onPlayPauseClick) {
-                Icon(
-                    imageVector = if (isPlaying) Icons.Default.Pause else Icons.Default.PlayArrow,
-                    contentDescription = if (isPlaying) "Pausar" else "Reproducir",
-                    tint = MaterialTheme.colorScheme.onPrimaryContainer,
-                    modifier = Modifier.size(32.dp)
-                )
-            }
-
-            Spacer(modifier = Modifier.width(12.dp))
-
-            // 📈 Barra de audio que ocupa el espacio restante
-            AudioVisualizer(
-                modifier = Modifier
-                    .weight(1f)
-                    .height(30.dp)
-            )
-
-            Spacer(modifier = Modifier.width(12.dp))
-
-            // ⏱️ Timer
-            Text(
-                text = elapsedTime,
-                color = MaterialTheme.colorScheme.onPrimaryContainer,
-                style = MaterialTheme.typography.bodyMedium
-            )
-        }
-    }
-}
-
-@Composable
-fun AudioVisualizer(modifier: Modifier = Modifier) {
-    Row(
-        modifier = modifier,
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        val barHeights = listOf(10, 20, 30, 20, 10, 25, 15, 30, 18, 12)
-        barHeights.forEach { height ->
-            Box(
-                modifier = Modifier
-                    .width(4.dp)
-                    .height(height.dp)
-                    .padding(horizontal = 1.dp)
-                    .background(MaterialTheme.colorScheme.onPrimaryContainer, RoundedCornerShape(2.dp))
-            )
         }
     }
 }
