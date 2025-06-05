@@ -43,7 +43,6 @@ fun CommentAudioCard(
     val formattedRemainingTime = formatDuration(comment.duration - currentPosition)
     val sliderPosition = remember(currentPosition) { mutableStateOf(currentPosition.toFloat()) }
 
-
     Card(
         shape = RoundedCornerShape(12.dp),
         modifier = modifier

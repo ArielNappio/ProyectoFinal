@@ -193,28 +193,24 @@ fun TaskStudent(navController: NavHostController) {
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            IconButton(
-                onClick = { viewModel.previousPage() },
-                enabled = currentPageIndex > 0,
-                modifier = Modifier
-                    .background(
-                        if (isFirstPage) {
-                            Color.Black
-                        } else {
-                            Color(0xFFFFA500)
-                        }, shape = RoundedCornerShape(8.dp)
-                    )
-                    .padding(8.dp)
-            ) {
-                Icon(Icons.Default.ArrowBack, contentDescription = "Anterior", tint =
-                    if(isFirstPage){
-                        Color.Black
-                    }
-                    else {
-                        Color.White
-                    })
+            if(!isFirstPage){
+                IconButton(
+                    onClick = { viewModel.previousPage() },
+                    enabled = currentPageIndex > 0,
+                    modifier = Modifier
+                        .background(Color(0xFFFFA500)
+                             ,shape = RoundedCornerShape(8.dp)
+                        )
+                        .padding(8.dp)
+                ) {
+                    Icon(Icons.Default.ArrowBack, contentDescription = "Anterior", tint = Color.White)
+                }
             }
-
+            else {
+                Spacer(modifier = Modifier
+                    .size(52.dp)
+                )
+            }
             Text(
                 text = "${currentPageIndex + 1} / ${viewModel.totalPages}",
                 color = Color.Black,
