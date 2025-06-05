@@ -23,6 +23,7 @@ roomVersion = "2.6.1"
 ksp = "2.0.0-1.0.24"
 roomCommonJvm = "2.7.1"
 uiTestJunit4Android = "1.8.2"
+coilCompose = "2.7.0"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -42,7 +43,6 @@ androidx-material3 = { group = "androidx.compose.material3", name = "material3" 
 androidx-material-icons-extended = { module = "androidx.compose.material:material-icons-extended" }
 
 kotlinx-coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", version.ref = "kotlinxCoroutinesTest" }
-kotlinx-serialization-json = { module = "org.jetbrains.kotlinx: kotlinx-serialization-json", version.ref = "kotlinSerialization"}
 
 #datastore
 datastore-preferences = { module = "androidx.datastore:datastore-preferences", version.ref = "datastore" }
@@ -84,6 +84,8 @@ androidx-room-runtime = { module = "androidx.room:room-runtime", version.ref = "
 androidx-room-common-jvm = { group = "androidx.room", name = "room-common-jvm", version.ref = "roomCommonJvm" }
 androidx-ui-test-junit4-android = { group = "androidx.compose.ui", name = "ui-test-junit4-android", version.ref = "uiTestJunit4Android" }
 
+#Coil
+coil-compose = { module = "io.coil-kt:coil-compose", version.ref = "coilCompose" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

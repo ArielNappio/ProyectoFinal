@@ -6,5 +6,5 @@ import com.example.proyectofinal.student.domain.provider.ProcessedDocumentProvid
 import kotlinx.coroutines.flow.Flow
 
 class PostTask(private val processedDocument: ProcessedDocumentProvider) {
-    fun execute(task: Task): Flow<NetworkResponse<Task>> = processedDocument.postTask(task)
+    operator fun invoke(task: Task): Flow<NetworkResponse<Task>> = processedDocument.postTask(task)
 }

@@ -62,7 +62,7 @@ class MainViewModel(
                 _mainScreenUiState.update { MainScreenUiState.Unauthenticated }
                 println("MainViewModel: getUserData failed with error: ${e.message}")
             }
-            .collect() { response ->
+            .collect { response ->
                 println("MainViewModel: getUserData response received: $response")
                 when (response) {
                     is NetworkResponse.Success -> {

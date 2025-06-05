@@ -162,7 +162,7 @@ fun StudentProfileScreen(modifier: Modifier = Modifier, navController: NavContro
         Spacer(modifier = Modifier.weight(1f))
 
         // Blue buttons
-        val buttonLabels = listOf("Aviso legal", "Sección Tutorial?")
+        val buttonLabels = listOf("Aviso legal", "Sección Tutorial")
         buttonLabels.forEach { label ->
             Button(
                 onClick = {},

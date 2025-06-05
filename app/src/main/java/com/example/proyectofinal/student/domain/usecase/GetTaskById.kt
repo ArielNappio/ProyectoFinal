@@ -6,5 +6,5 @@ import com.example.proyectofinal.student.domain.provider.ProcessedDocumentProvid
 import kotlinx.coroutines.flow.Flow
 
 class GetTaskById (private val processedDocument: ProcessedDocumentProvider) {
-    fun execute(taskId: Int): Flow<NetworkResponse<Task>> = processedDocument.getTaskById(taskId)
+    operator fun invoke(taskId: Int): Flow<NetworkResponse<Task>> = processedDocument.getTaskById(taskId)
 }

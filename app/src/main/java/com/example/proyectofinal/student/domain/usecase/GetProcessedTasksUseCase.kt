@@ -6,5 +6,5 @@ import com.example.proyectofinal.student.domain.provider.ProcessedDocumentProvid
 import kotlinx.coroutines.flow.Flow
 
 class GetProcessedTasksUseCase(private val processedDocument: ProcessedDocumentProvider) {
-    fun execute(): Flow<NetworkResponse<List<Task>>> = processedDocument.getAllTasks()
+    operator fun invoke(): Flow<NetworkResponse<List<Task>>> = processedDocument.getAllTasks()
 }

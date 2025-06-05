@@ -20,6 +20,7 @@ import com.example.proyectofinal.student.presentation.view.StudentProfileScreen
 import com.example.proyectofinal.student.presentation.view.TaskDetailScreen
 import com.example.proyectofinal.task_student.presentation.view.TaskStudent
 import com.example.proyectofinal.userpreferences.presentation.view.FontPreferencesScreen
+import com.example.proyectofinal.text_editor.presentation.view.TextEditorScreen
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
@@ -107,5 +108,14 @@ fun NavigationComponent(
             FontPreferencesScreen { navController.navigate(ScreensRoute.Home.route) }
         }
 
+        composable(
+            route = ScreensRoute.TextEdit.route,
+            arguments = listOf(
+                navArgument("taskId") { type = NavType.IntType }
+            )
+        ) {
+            val taskId = it.arguments?.getInt("taskId") ?: 0
+            TextEditorScreen(navController, taskId)
+        }
     }
 }

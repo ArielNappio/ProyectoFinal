@@ -90,6 +90,9 @@ dependencies {
     implementation(libs.androidx.room.ktx)
     ksp(libs.androidx.room.compiler)
 
+    // Coil
+    implementation(libs.coil.compose)
+
     //mockito
     testImplementation(libs.mockk)
     testImplementation(libs.kotlinx.coroutines.test)
@@ -101,9 +104,6 @@ dependencies {
     androidTestImplementation(libs.androidx.ui.test.junit4)
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
-
-
-
 
     implementation(platform("com.google.firebase:firebase-bom:33.12.0"))
 
