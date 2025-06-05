@@ -191,21 +191,20 @@ fun InboxScreenTopBar(
         ) {
             // Botón volver
             Column(
-                horizontalAlignment = Alignment.CenterHorizontally
+                horizontalAlignment = Alignment.CenterHorizontally,
+                modifier = Modifier
+                    .clickable { navController.navigate(ScreensRoute.Home.route) }
             ) {
-                IconButton(onClick = { navController.navigate(ScreensRoute.Home.route) }) {
-                    Icon(
+                Icon(
                         imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                         contentDescription = "Volver",
-                        modifier = Modifier.size(24.dp)
-                    )
-                }
+                        modifier = Modifier.size(36.dp)
+                )
                 Text(
                     text = "Volver",
-                    fontSize = 12.sp,
+                    fontSize = 14.sp,
                     modifier = Modifier
                         .clickable { navController.navigate(ScreensRoute.Home.route) }
-                        .padding(top = 1.dp)
                 )
             }
 
