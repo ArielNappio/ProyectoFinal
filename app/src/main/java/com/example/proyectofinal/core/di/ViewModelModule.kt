@@ -21,6 +21,6 @@ val viewModelModule = module {
     viewModel { DetailsViewModel(get()) }
     viewModel { TaskStudentViewModel(get(), get(), get(), get()) }
     viewModel { CommentsViewModel(get(),get())}
-    single { ThemeViewModel() }
+    single { ThemeViewModel(get()) }
     viewModel { TextEditorViewModel(get(), get(), get()) }
 }
