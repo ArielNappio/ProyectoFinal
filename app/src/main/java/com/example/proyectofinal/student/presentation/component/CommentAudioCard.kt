@@ -79,6 +79,7 @@ fun CommentAudioCard(
                         onSeek(sliderPosition.value.toLong(), true, comment.filePath)
                     },
                     valueRange = 0f..totalDuration.toFloat(),
+                    modifier = Modifier.weight(1f),
                     colors = SliderDefaults.colors(
                         thumbColor = MaterialTheme.colorScheme.primary,
                         activeTrackColor = MaterialTheme.colorScheme.primary,
@@ -86,9 +87,8 @@ fun CommentAudioCard(
                     )
 
                 )
-
                 IconButton(onClick = {
-                    onDeleteClick
+                    onDeleteClick()
                 }) {
                     Icon(
                         imageVector = Icons.Default.Delete,

@@ -186,6 +186,9 @@ fun TaskStudent(navController: NavHostController) {
             }
         }
         // ----- FOOTER FIJO -----
+
+        val iconButtonSize = 56.dp
+
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -198,8 +201,9 @@ fun TaskStudent(navController: NavHostController) {
                     onClick = { viewModel.previousPage() },
                     enabled = currentPageIndex > 0,
                     modifier = Modifier
+                        .size(iconButtonSize)
                         .background(Color(0xFFFFA500)
-                             ,shape = RoundedCornerShape(8.dp)
+                             ,shape = RoundedCornerShape(32.dp)
                         )
                         .padding(8.dp)
                 ) {
@@ -208,7 +212,7 @@ fun TaskStudent(navController: NavHostController) {
             }
             else {
                 Spacer(modifier = Modifier
-                    .size(52.dp)
+                    .size(iconButtonSize)
                 )
             }
             Text(
@@ -216,7 +220,7 @@ fun TaskStudent(navController: NavHostController) {
                 color = Color.Black,
                 fontSize = 24.sp,
                 modifier = Modifier
-                    .background(Color.White, shape = RoundedCornerShape(8.dp))
+                    .background(Color.White, shape = RoundedCornerShape(16.dp))
                     .padding(horizontal = 16.dp, vertical = 8.dp),
                 textAlign = TextAlign.Center
             )
@@ -232,7 +236,8 @@ fun TaskStudent(navController: NavHostController) {
                     }
                           },
                 modifier = Modifier
-                    .background(Color(0xFFFFA500), shape = RoundedCornerShape(8.dp))
+                    .size(iconButtonSize)
+                    .background(Color(0xFFFFA500), shape = RoundedCornerShape(32.dp))
                     .padding(8.dp)
             ) {
                 Icon(if(isLastPage){
@@ -256,13 +261,13 @@ fun TaskStudent(navController: NavHostController) {
                 .clickable(
                     indication = null,
                     interactionSource = remember { MutableInteractionSource() }
-                ) {
+                )
+                {
                     viewModel.showAnnotations()
                 }
         ) {
             Column(
                 modifier = Modifier
-                    .align(Alignment.Center)
                     .clip(RoundedCornerShape(16.dp))
                     .background(MaterialTheme.colorScheme.surface)
                     .border(1.dp, Color.Gray, RoundedCornerShape(16.dp))
@@ -270,7 +275,8 @@ fun TaskStudent(navController: NavHostController) {
                     .clickable(
                         indication = null,
                         interactionSource = remember { MutableInteractionSource() }
-                    ) {} // evita cierre si se toca adentro
+                    )
+                    {} // evita cierre si se toca adentro
             ) {
                 Text(
                     text = "Tus anotaciones",
@@ -280,11 +286,21 @@ fun TaskStudent(navController: NavHostController) {
                 )
 
                 if (filteredComments.isEmpty()) {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxSize(),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ){
                     Text(
                         text = "No hay anotaciones para esta página",
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
                     )
+                    Text(
+                        text = "😢",
+                        fontSize = 48.sp
+                    )
+                    }
                 } else {
                     LazyColumn {
                         items(filteredComments.size) { index ->

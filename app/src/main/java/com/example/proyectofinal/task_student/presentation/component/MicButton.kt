@@ -80,7 +80,7 @@ fun MicControl(
         modifier = Modifier
             .height(56.dp)
             .fillMaxWidth()
-            .clip(RoundedCornerShape(8.dp))
+            .clip(RoundedCornerShape(32.dp))
             .background(
                 when {
                     isRecording -> Color.Red
