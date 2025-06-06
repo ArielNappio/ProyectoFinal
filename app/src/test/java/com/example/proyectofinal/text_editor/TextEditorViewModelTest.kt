@@ -8,7 +8,6 @@ import com.example.proyectofinal.text_editor.domain.PdfBitmapConverter
 import com.example.proyectofinal.text_editor.presentation.viewmodel.TextEditorViewModel
 import io.mockk.coEvery
 import io.mockk.mockk
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.TestScope
@@ -18,7 +17,6 @@ import org.junit.Before
 import org.junit.Test
 import java.io.File
 
-@OptIn(ExperimentalCoroutinesApi::class)
 class TextEditorViewModelTest {
 
     private lateinit var viewModel: TextEditorViewModel

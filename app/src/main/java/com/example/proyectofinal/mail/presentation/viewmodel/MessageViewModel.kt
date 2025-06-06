@@ -128,12 +128,12 @@ class MessageViewModel(
         val file = File(context.cacheDir, "formulario_${System.currentTimeMillis()}.txt")
         file.writeText(
             """
-        Título: $title
-        Autor: $author
-        Carrera: $career
-        Firma: $signature
-        Fecha: $date
-        """.trimIndent()
+            Título: $title
+            Autor: $author
+            Carrera: $career
+            Firma: $signature
+            Fecha: $date
+            """.trimIndent()
         )
         return file
     }
