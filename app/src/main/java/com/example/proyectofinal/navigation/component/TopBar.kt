@@ -21,6 +21,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
@@ -51,20 +52,22 @@ fun TopBar(navController: NavController) {
                 BackTextButton(navController)
                 Image(
                     painter = painterResource(
-                        id = if (LocalTheme.current.isDark) R.drawable.wirin_50 else R.drawable.wirin_25
+                        id = R.drawable.wirin_25
                     ),
                     contentDescription = "Logo de Wirin",
-                    modifier = Modifier.size(56.dp)
+                    modifier = Modifier.size(56.dp),
+                    colorFilter = if (LocalTheme.current.isDark) ColorFilter.tint(Color.White) else ColorFilter.tint(Color.Black)
                 )
                 Spacer(modifier = Modifier.size(56.dp)) // espacio placeholder para mantener simetría
             }
         } else {
             Image(
                 painter = painterResource(
-                    id = if (LocalTheme.current.isDark) R.drawable.wirin_50 else R.drawable.wirin_25
+                    id = R.drawable.wirin_25
                 ),
                 contentDescription = "Logo de Wirin",
-                modifier = Modifier.size(56.dp)
+                modifier = Modifier.size(56.dp),
+                colorFilter = if (LocalTheme.current.isDark) ColorFilter.tint(Color.White) else ColorFilter.tint(Color.Black)
             )
 
             Row(
