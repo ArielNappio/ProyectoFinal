@@ -2,9 +2,12 @@ package com.example.proyectofinal.navigation.component
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
@@ -18,12 +21,9 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.semantics.contentDescription
-import androidx.compose.ui.semantics.semantics
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import com.example.proyectofinal.R
@@ -35,43 +35,56 @@ import com.example.proyectofinal.navigation.util.showBackButton
 fun TopBar(navController: NavController) {
     val navBackStackEntry by navController.currentBackStackEntryAsState()
 
-    Row(
+    Box(
         modifier = Modifier
             .fillMaxWidth()
             .padding(top = 30.dp)
-            .padding(horizontal = 16.dp),
-        horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.CenterVertically
+            .padding(horizontal = 16.dp)
+            .height(56.dp),
+        contentAlignment = Alignment.Center
     ) {
         if (navBackStackEntry?.showBackButton() == true) {
-            BackTextButton(navController)
-            Image(
-                painter = painterResource(
-                    id = if (LocalTheme.current.isDark) R.drawable.wirin_logo_dark else R.drawable.wirin_logo_light
-                ),
-                contentDescription = "Logo de Wirin",
-                modifier = Modifier.size(56.dp)
-            )
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                BackTextButton(navController)
+                Image(
+                    painter = painterResource(
+                        id = R.drawable.wirin_25
+                    ),
+                    contentDescription = "Logo de Wirin",
+                    modifier = Modifier.size(56.dp),
+                    colorFilter = if (LocalTheme.current.isDark) ColorFilter.tint(Color.White) else ColorFilter.tint(Color.Black)
+                )
+                Spacer(modifier = Modifier.size(56.dp)) // espacio placeholder para mantener simetría
+            }
         } else {
             Image(
                 painter = painterResource(
-                    id = if (LocalTheme.current.isDark) R.drawable.wirin_logo_dark else R.drawable.wirin_logo_light
+                    id = R.drawable.wirin_25
                 ),
                 contentDescription = "Logo de Wirin",
-                modifier = Modifier.size(56.dp)
+                modifier = Modifier.size(56.dp),
+                colorFilter = if (LocalTheme.current.isDark) ColorFilter.tint(Color.White) else ColorFilter.tint(Color.Black)
             )
-            Text(
-                text = "¡Bienvenido!",
-                fontSize = 24.sp,
-                fontWeight = FontWeight.Bold,
-                modifier = Modifier.semantics { contentDescription = "Bienvenido" }
-            )
-            ChatButton(onClick = {
-                navController.navigate(ScreensRoute.Mail.route)
-            })
+
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 0.dp),
+                horizontalArrangement = Arrangement.End,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                ChatButton(onClick = {
+                    navController.navigate(ScreensRoute.Mail.route)
+                })
+            }
         }
     }
 }
+
 
 @Composable
 fun BackTextButton(navController: NavController) {
