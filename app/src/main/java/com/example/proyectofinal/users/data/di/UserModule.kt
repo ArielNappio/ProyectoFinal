@@ -12,17 +12,16 @@ import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.dsl.module
 
 val userModule = module {
-    // Definimos HttpClient como singleton para que se reutilice
-    single { HttpClient() }
 
-    viewModel {
+    single{ UserProviderImpl(get()) } // El get() aquí obtiene el HttpClient
+
+        viewModel {
         UserViewModel(
             getUserUserCase = get(),
             deleteUserUseCase = get()
         )
     }
 
-    single<UserProvider> { UserProviderImpl(get()) } // El get() aquí obtiene el HttpClient
 
     factory { GetUserUseCase(get()) }
     factory { DeleteUserUseCase(get()) }

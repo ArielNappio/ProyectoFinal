@@ -100,10 +100,11 @@ class UserViewModel (
 
     init {
         fetchUsers()
-    }
+    //    println(_users.value[0])
+}
 
 
-    internal fun fetchUsers() {
+     fun fetchUsers() {
         viewModelScope.launch {
             getUserUserCase().collect {
                 when (it) {

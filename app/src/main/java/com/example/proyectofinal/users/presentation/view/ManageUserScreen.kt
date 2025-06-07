@@ -44,7 +44,7 @@ import org.koin.androidx.compose.koinViewModel
 @Composable
 fun ManageUserScreen() {
     val viewModel: UserViewModel = koinViewModel()
-    val usuarios by viewModel.users.collectAsState(emptyList())
+    val usuarios by viewModel.users.collectAsState()
 
     LaunchedEffect(Unit) {
         viewModel.fetchUsers()
