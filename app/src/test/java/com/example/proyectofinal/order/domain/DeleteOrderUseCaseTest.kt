@@ -1,4 +1,4 @@
-package com.example.proyectofinal
+package com.example.proyectofinal.order.domain
 
 import com.example.proyectofinal.core.network.NetworkResponse
 import com.example.proyectofinal.order.domain.provider.OrderProvider
