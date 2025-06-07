@@ -55,7 +55,6 @@ fun PreviewUserCard() {
         id = "1",
         password = "a",
         phoneNumber = "1",
-        dni = "43238883"
     )
     val navController = rememberNavController()
     UserCard(
@@ -103,7 +102,6 @@ fun PreviewUserCard() {
                         modifier = Modifier.weight(1f)
                     ) {
                         Text(text = user.fullName, fontWeight = FontWeight.Bold)
-                        Text(text = user.dni)
 
                         AnimatedVisibility(visible = expanded) {
                             Column {

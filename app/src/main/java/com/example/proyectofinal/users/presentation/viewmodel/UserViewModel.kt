@@ -100,21 +100,32 @@ class UserViewModel (
 
     init {
         fetchUsers()
-    //    println(_users.value[0])
 }
 
 
-     fun fetchUsers() {
+    fun fetchUsers() {
         viewModelScope.launch {
-            getUserUserCase().collect {
-                when (it) {
-                    is NetworkResponse.Failure<*> -> _users.value = it.data ?: emptyList()
-                    is NetworkResponse.Loading<*> -> Log.e("OrderViewModel", "Error: ${it.error}")
-                    is NetworkResponse.Success<*> -> Log.d("OrderViewModel", "Cargando...")
+            getUserUserCase().collect { response ->
+                when (response) {
+                    is NetworkResponse.Loading -> {
+                        Log.d("UserViewModel", "Cargando usuarios...")
+                        // Opcional: podrías manejar un estado loading para la UI
+                    }
+                    is NetworkResponse.Success -> {
+                        val usersList = response.data ?: emptyList()
+                        _users.value = usersList
+                        Log.d("UserViewModel", "Usuarios cargados: ${usersList.size}")
+                    }
+                    is NetworkResponse.Failure -> {
+                        Log.e("UserViewModel", "Error al cargar usuarios: ${response.error}")
+                        _users.value = emptyList() // Opcional: limpiar lista si hubo error
+                        // También podrías manejar un estado de error para mostrar mensaje en UI
+                    }
                 }
             }
         }
     }
+
 
 
 

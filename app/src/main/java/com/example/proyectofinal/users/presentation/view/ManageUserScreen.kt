@@ -1,5 +1,6 @@
 package com.example.proyectofinal.users.presentation.view
 
+import android.util.Log
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -49,15 +50,13 @@ fun ManageUserScreen() {
     LaunchedEffect(Unit) {
         viewModel.fetchUsers()
     }
-
     ManageUserContent(
         usuarios = usuarios,
         onClickEliminar = { user ->
-            null
-            // Aquí la lógica para eliminar un usuario o manejar evento
-            // Por ejemplo: viewModel.deleteUser(user)
+            Log.d("ManageUserScreen", "Eliminar usuario: ${user.userName}")
         }
     )
+
 }
 
 @Composable
