@@ -186,7 +186,10 @@ fun StudentProfileScreen(modifier: Modifier = Modifier, navController: NavContro
         Button(
             onClick = {
                 themeViewModel.logout()
-                navController.navigate(ScreensRoute.Login.route)
+                navController.navigate(ScreensRoute.Login.route) {
+                    popUpTo(0) { inclusive = true }
+                    launchSingleTop = true
+                }
                       },
             modifier = Modifier
                 .fillMaxWidth()

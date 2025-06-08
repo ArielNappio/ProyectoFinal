@@ -43,7 +43,6 @@ fun CommentAudioCard(
     val formattedRemainingTime = formatDuration(comment.duration - currentPosition)
     val sliderPosition = remember(currentPosition) { mutableStateOf(currentPosition.toFloat()) }
 
-
     Card(
         shape = RoundedCornerShape(12.dp),
         modifier = modifier
@@ -80,18 +79,16 @@ fun CommentAudioCard(
                         onSeek(sliderPosition.value.toLong(), true, comment.filePath)
                     },
                     valueRange = 0f..totalDuration.toFloat(),
-                    modifier = Modifier
-                        .weight(1f)
-                        .padding(horizontal = 8.dp),
+                    modifier = Modifier.weight(1f),
                     colors = SliderDefaults.colors(
                         thumbColor = MaterialTheme.colorScheme.primary,
                         activeTrackColor = MaterialTheme.colorScheme.primary,
                         inactiveTrackColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.3f)
                     )
-                )
 
+                )
                 IconButton(onClick = {
-                    onDeleteClick
+                    onDeleteClick()
                 }) {
                     Icon(
                         imageVector = Icons.Default.Delete,
@@ -102,3 +99,4 @@ fun CommentAudioCard(
         }
     }
 }
+

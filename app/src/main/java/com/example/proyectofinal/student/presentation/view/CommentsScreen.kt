@@ -54,10 +54,20 @@ fun CommentsScreen(
         Spacer(modifier = Modifier.height(12.dp))
 
         if (comments.isEmpty()) {
-            Text(
-                "No hay comentarios aún.",
-                modifier = Modifier.padding(16.dp)
-            )
+            Column(
+                modifier = Modifier
+                    .fillMaxSize(),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Text(
+                    "No hay comentarios",
+                    modifier = Modifier.padding(16.dp)
+                )
+                Text(
+                    text = "😢",
+                    fontSize = 48.sp
+                )
+            }
         } else {
             LazyColumn(
                 modifier = Modifier

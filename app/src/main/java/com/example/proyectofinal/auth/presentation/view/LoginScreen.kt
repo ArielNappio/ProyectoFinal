@@ -37,6 +37,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.proyectofinal.R
 import com.example.proyectofinal.auth.presentation.viewmodel.LoginViewModel
+import com.example.proyectofinal.core.util.UiState
 import com.example.proyectofinal.navigation.ScreensRoute
 import kotlinx.coroutines.delay
 import org.koin.androidx.compose.koinViewModel
@@ -53,6 +54,26 @@ fun LoginScreen(
     val loginState by viewmodel.loginState.collectAsState()
     val navigateToMain by viewmodel.navigateToMain.collectAsState()
     val isLoading by viewmodel.isLoading.collectAsState()
+
+    val showErrorDialog by viewmodel.showErrorDialog.collectAsState()
+
+    if (showErrorDialog) {
+        androidx.compose.material3.AlertDialog(
+            onDismissRequest = { viewmodel.dismissErrorDialog() },
+            confirmButton = {
+                Button(onClick = { viewmodel.dismissErrorDialog() }) {
+                    Text("Aceptar")
+                }
+            },
+            title = {
+                Text("Error de inicio de sesión")
+            },
+            text = {
+                val errorMsg = (loginState as? UiState.Error)?.message
+                Text(errorMsg ?: "Ocurrió un error desconocido 😕")
+            }
+        )
+    }
 
     if (navigateToMain) {
         LaunchedEffect(Unit) {

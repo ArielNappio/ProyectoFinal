@@ -4,6 +4,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -17,11 +18,11 @@ import androidx.compose.ui.unit.sp
 
 @Composable
 fun AccessibleIconButton(
-    modifier: Modifier = Modifier,
     icon: ImageVector,
     label: String,
     onClick: () -> Unit,
-    iconSize: Dp = 36.dp
+    iconSize: Dp = 36.dp,
+    tint: Color = MaterialTheme.colorScheme.onSurface
 ) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -32,11 +33,10 @@ fun AccessibleIconButton(
             imageVector = icon,
             contentDescription = label,
             modifier = Modifier.size(iconSize),
-            tint = Color.White
+            tint = tint
         )
         Text(
             text = label,
-            color = Color.White,
             fontSize = 14.sp,
             textAlign = TextAlign.Center
         )

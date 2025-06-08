@@ -21,6 +21,7 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import java.io.File
 
+
 class TaskStudentViewModel(
     private val ttsManager: TextToSpeechManager,
     private val audioRecorderManager: AudioRecorderManager,
@@ -33,6 +34,9 @@ class TaskStudentViewModel(
 
     private val _currentlyPlayingPath = MutableStateFlow<String>("")
     val currentlyPlayingPath : StateFlow<String> = _currentlyPlayingPath
+
+    private val _recordedFeedbackFilePath = MutableStateFlow<String?>(null)
+    val recordedFeedbackFilePath: StateFlow<String?> = _recordedFeedbackFilePath.asStateFlow()
 
     private val _isPlaying = MutableStateFlow(false)
     val isPlaying: StateFlow<Boolean> = _isPlaying
@@ -202,10 +206,6 @@ class TaskStudentViewModel(
         }
     }
 
-    fun isPlaying(){
-        _isPlaying.value = !_isPlaying.value
-    }
-
     fun fontSizeIncrease(){
         if (_fontSize.value < MAX_FONT_SIZE) _fontSize.value = (_fontSize.value.value + FONT_SIZE_CHANGER_VALUE).sp
     }
@@ -318,6 +318,26 @@ class TaskStudentViewModel(
                 _comments.value = audioRepositoryImpl.getAllAudios()
             }
         }
+    }
+
+    fun startFeedbackRecording() {
+        currentAudioFile = audioRecorderManager.startRecording()
+    }
+
+    fun stopFeedbackRecording() {
+        val recordedFile = audioRecorderManager.stopRecording()
+        currentAudioFile = recordedFile
+        _recordedFeedbackFilePath.value = recordedFile?.absolutePath
+    }
+
+    fun deleteFeedbackRecording() {
+        currentAudioFile?.let { file ->
+            if (file.exists()) {
+                file.delete()
+            }
+        }
+        currentAudioFile = null
+        _recordedFeedbackFilePath.value = null
     }
 
     companion object {
