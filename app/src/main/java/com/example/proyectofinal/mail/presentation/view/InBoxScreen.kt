@@ -37,6 +37,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -129,10 +130,11 @@ fun InboxScreenTopBar(
         ) {
             Image(
                 painter = painterResource(
-                    id = if (LocalTheme.current.isDark) R.drawable.wirin_50 else R.drawable.wirin_25
+                    id = R.drawable.wirin_25
                 ),
                 contentDescription = "Logo de Wirin",
-                modifier = Modifier.size(48.dp)
+                modifier = Modifier.size(48.dp),
+                colorFilter = if (LocalTheme.current.isDark) ColorFilter.tint(Color.White) else ColorFilter.tint(Color.Black)
             )
         }
 
