@@ -14,6 +14,7 @@ import io.mockk.every
 import io.mockk.just
 import io.mockk.mockk
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.StandardTestDispatcher
@@ -28,6 +29,7 @@ import org.junit.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
+@OptIn(ExperimentalCoroutinesApi::class)
 class LoginViewModelTest {
 
     private lateinit var viewModel: LoginViewModel
@@ -97,6 +99,7 @@ class LoginViewModelTest {
         // Arrange
         val token = "validToken"
         coEvery { tokenManager.token } returns flowOf(token)
+        viewModel = LoginViewModel(repository, tokenManager)
 
         testDispatcher.scheduler.advanceUntilIdle()
 

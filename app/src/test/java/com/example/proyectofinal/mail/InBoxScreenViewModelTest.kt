@@ -20,6 +20,7 @@ import kotlinx.coroutines.test.setMain
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
+import java.util.Date
 import kotlin.test.assertEquals
 
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -34,9 +35,24 @@ class InBoxScreenViewModelTest {
     private val testDispatcher = StandardTestDispatcher()
     private val testScope = TestScope(testDispatcher)
 
-    private val inboxMessagesStub = listOf(MessageModel(1, "Inbox Message", "Subject", "2023-01-01", "Content of the inbox message"))
-    private val outboxMessagesStub = listOf(MessageModel(2, "Outbox Message", "Subject", "2023-01-02", "Content of the outbox message"))
-    private val draftMessagesStub = listOf(MessageModel(3, "Draft Message", "Subject", "2023-01-03", "Content of the draft message"))
+    private val inboxMessagesStub = listOf(
+        MessageModel(
+            1, "userFromId", "studentId", false, "sender", "Subject",
+            Date(), "Content of the inbox message", isResponse = false
+        )
+    )
+    private val outboxMessagesStub = listOf(
+        MessageModel(
+            2, "userFromId", "studentId", false, "sender", "Subject",
+            Date(), "Content of the outbox message", isResponse = false
+        )
+    )
+    private val draftMessagesStub = listOf(
+        MessageModel(
+            3, "userFromId", "studentId", true, "sender", "Subject",
+            Date(), "Content of the draft message", isResponse = false
+        )
+    )
 
     @Before
     fun setup() {

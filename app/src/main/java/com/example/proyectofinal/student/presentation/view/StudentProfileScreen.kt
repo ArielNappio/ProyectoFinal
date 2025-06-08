@@ -83,7 +83,7 @@ fun StudentProfileScreen(modifier: Modifier = Modifier, navController: NavContro
             Column {
                 Text("Información de usuario", fontSize = LocalUserPreferences.current.fontSize.sp, fontWeight = FontWeight.Bold)
                 Spacer(modifier = Modifier.height(4.dp))
-                Text("Nombre y Apellido", fontSize = 16.sp, fontWeight = FontWeight.Bold)
+                Text("Ana Fernández", fontSize = 16.sp, fontWeight = FontWeight.Bold)
                 Spacer(modifier = Modifier.height(4.dp))
                 Text("Carrera: Abogacia", fontSize = 16.sp, fontWeight = FontWeight.Bold)
             }
