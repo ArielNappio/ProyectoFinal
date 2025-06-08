@@ -41,6 +41,8 @@ import androidx.compose.material3.OutlinedTextField
  import androidx.compose.material3.Text
 import androidx.compose.runtime.*
  import androidx.compose.ui.graphics.Color
+import com.example.proyectofinal.users.presentation.viewmodel.UserViewModel
+import org.koin.androidx.compose.koinViewModel
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Preview(showBackground = true, showSystemUi = true)
@@ -150,7 +152,10 @@ fun CreateUserScreen() {
                 Spacer(modifier = Modifier.height(16.dp))
 
                 Button(
-                    onClick = { /* Acción para crear voluntario */ },
+                    onClick = {
+
+
+                    },
                     modifier = Modifier.fillMaxWidth(),
                     colors = ButtonDefaults.buttonColors(
                         containerColor = Color(0xFF007AFF),

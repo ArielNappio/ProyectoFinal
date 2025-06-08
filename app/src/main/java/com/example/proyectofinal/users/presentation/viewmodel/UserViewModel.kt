@@ -129,11 +129,9 @@ class UserViewModel (
 
 
 
-    fun deleteOrder(id: Int) {
+    fun deleteUser(id: String) {
         viewModelScope.launch {
-            deleteUserUseCase(id).collect {
-                fetchUsers()
-            }
+            deleteUserUseCase(id)
         }
     }
 

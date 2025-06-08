@@ -54,6 +54,7 @@ fun ManageUserScreen() {
         usuarios = usuarios,
         onClickEliminar = { user ->
             Log.d("ManageUserScreen", "Eliminar usuario: ${user.userName}")
+//           viewModel.deleteUser(id = user.id)
         }
     )
 
@@ -136,7 +137,10 @@ fun ManageUserContent(
                     UserCard(
                         user = user,
                         navController = navController,
-                        onClickEliminar = { onClickEliminar(user) }
+                        onClickEliminar = { onClickEliminar(user) },
+                        onClickModificar = {
+
+                        }
                     )
                 }
             }

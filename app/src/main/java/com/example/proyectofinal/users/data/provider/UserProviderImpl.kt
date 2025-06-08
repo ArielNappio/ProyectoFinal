@@ -31,7 +31,9 @@ class UserProviderImpl(
         }
     }
 
-    override fun deleteUser(id: Int): Flow<NetworkResponse<Unit>> = flow{
+
+
+    override fun deleteUser(id: String): Flow<NetworkResponse<Unit>> = flow{
             try {
                 emit(NetworkResponse.Loading())
                 val response = ktorClient.delete("${ApiUrls.USER}/$id")

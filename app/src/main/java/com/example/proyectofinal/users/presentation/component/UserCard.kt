@@ -61,13 +61,22 @@ fun PreviewUserCard() {
         user = UserAriel, navController = navController,
         onClickEliminar = {
 
+        },
+        onClickModificar = {
+
         }
+
     )
 }
 
 
  @Composable
- fun UserCard(user : User , navController: NavController , onClickEliminar:() -> Unit)  {
+ fun UserCard(user : User ,
+              navController:
+              NavController ,
+              onClickEliminar:() -> Unit,
+              onClickModificar:() -> Unit
+              )  {
             var expanded by remember { mutableStateOf(false) }
 
         Card(
@@ -117,14 +126,16 @@ fun PreviewUserCard() {
                         verticalArrangement = Arrangement.SpaceBetween,
                         horizontalAlignment = Alignment.End
                     ) {
-                        Icon(
-                            imageVector = Icons.Default.Edit,
-                            contentDescription = "Editar",
-                            tint = Color(0xFF1976D2),
-                            modifier = Modifier
-                                .size(24.dp)
-                                .padding(bottom = 8.dp)
-                        )
+                         IconButton (onClick = onClickModificar) {
+                             Icon(
+                                 imageVector = Icons.Default.Edit,
+                                 contentDescription = "Editar",
+                                 tint = Color(0xFF1976D2),
+                                 modifier = Modifier
+                                     .size(24.dp)
+                                     .padding(bottom = 8.dp)
+                             )
+                         }
                          IconButton (onClick = onClickEliminar) {
                          Icon(
                             imageVector = Icons.Default.Delete,
