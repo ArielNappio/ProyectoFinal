@@ -3,6 +3,11 @@ package com.example.proyectofinal.task_student.presentation.view
 
 import android.util.Log
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.animateColor
+import androidx.compose.animation.core.RepeatMode
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.rememberInfiniteTransition
+import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.scaleIn
@@ -16,12 +21,12 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
@@ -31,11 +36,14 @@ import androidx.compose.material.icons.automirrored.filled.VolumeUp
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.ArrowForward
 import androidx.compose.material.icons.filled.Create
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Description
 import androidx.compose.material.icons.filled.Feedback
 import androidx.compose.material.icons.filled.FileDownload
 import androidx.compose.material.icons.filled.FontDownload
 import androidx.compose.material.icons.filled.MenuBook
+import androidx.compose.material.icons.filled.Pause
+import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.filled.Stop
 import androidx.compose.material.icons.filled.TextDecrease
@@ -43,6 +51,8 @@ import androidx.compose.material.icons.filled.TextIncrease
 import androidx.compose.material.icons.filled.VolumeUp
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -69,8 +79,6 @@ import com.example.proyectofinal.task_student.presentation.component.MicControl
 import com.example.proyectofinal.task_student.presentation.component.MicPermissionWrapper
 import com.example.proyectofinal.task_student.presentation.viewmodel.TaskStudentViewModel
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 
 
@@ -101,12 +109,13 @@ fun TaskStudent(navController: NavHostController) {
 
     var rating by remember { mutableStateOf(0) }
 
-    val coroutineScope = rememberCoroutineScope()
+
 
     var isRecording by remember { mutableStateOf(false) }
     var hasRecording by remember { mutableStateOf(false) }
     var isPlaying by remember { mutableStateOf(false) }
-    var recordingDuration by remember { mutableStateOf(0L) }
+    val recordedFilePath by viewModel.recordedFeedbackFilePath.collectAsState()
+
 
     // Simula el tiempo grabado
     val timer = rememberCoroutineScope()
@@ -118,6 +127,19 @@ fun TaskStudent(navController: NavHostController) {
             .fillMaxSize()
     ) {
         // ----- HEADER FIJO -----
+
+        val infiniteTransition = rememberInfiniteTransition(label = "colorTransition")
+        val animatedColor by infiniteTransition.animateColor(
+            initialValue = Color.Red,
+            targetValue = Color.White,
+            animationSpec = infiniteRepeatable(
+                animation = tween(durationMillis = 500), // velocidad del parpadeo
+                repeatMode = RepeatMode.Reverse
+            ), label = "colorAnim"
+        )
+
+        val iconTint = if (isSpeaking) animatedColor else MaterialTheme.colorScheme.onSurface
+
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -165,7 +187,8 @@ fun TaskStudent(navController: NavHostController) {
                             viewModel.stopSpeech()
                         }
                         viewModel.showExtraButton()
-                    }
+                    },
+                    tint = iconTint
                 )
             }
         }
@@ -253,7 +276,7 @@ fun TaskStudent(navController: NavHostController) {
 
     // dialog anotaciones
 
-    if(showAnnotations){
+    if (showAnnotations) {
         Box(
             modifier = Modifier
                 .fillMaxSize()
@@ -261,145 +284,121 @@ fun TaskStudent(navController: NavHostController) {
                 .clickable(
                     indication = null,
                     interactionSource = remember { MutableInteractionSource() }
-                )
-                {
+                ) {
                     viewModel.showAnnotations()
-                }
+                },
+            contentAlignment = Alignment.Center
         ) {
-            Column(
+            Box(
                 modifier = Modifier
+                    .fillMaxWidth(0.9f)
+                    .fillMaxHeight(0.85f)
                     .clip(RoundedCornerShape(16.dp))
                     .background(MaterialTheme.colorScheme.surface)
                     .border(1.dp, Color.Gray, RoundedCornerShape(16.dp))
-                    .padding(24.dp)
                     .clickable(
                         indication = null,
                         interactionSource = remember { MutableInteractionSource() }
-                    )
-                    {} // evita cierre si se toca adentro
+                    ) {} // evita cierre si se toca adentro
             ) {
-                Text(
-                    text = "Tus anotaciones",
-                    style = MaterialTheme.typography.titleMedium,
-                    color = MaterialTheme.colorScheme.onSurface,
-                    modifier = Modifier.padding(bottom = 16.dp)
-                )
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(24.dp)
+                ) {
+                    // Título fijo
+                    Text(
+                        text = "Tus anotaciones",
+                        style = MaterialTheme.typography.titleMedium,
+                        color = MaterialTheme.colorScheme.onSurface,
+                        modifier = Modifier.padding(bottom = 16.dp)
+                    )
 
-                if (filteredComments.isEmpty()) {
-                    Column(
+                    // Anotaciones scrolleables
+                    Box(
                         modifier = Modifier
-                            .fillMaxSize(),
-                        horizontalAlignment = Alignment.CenterHorizontally
-                    ){
-                    Text(
-                        text = "No hay anotaciones para esta página",
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
-                    )
-                    Text(
-                        text = "😢",
-                        fontSize = 48.sp
-                    )
-                    }
-                } else {
-                    LazyColumn {
-                        items(filteredComments.size) { index ->
-                            val comment = filteredComments[index]
-                            CommentAudioCard(
-                                comment = comment,
-                                isPlaying = isPlaying && comment.filePath == currentlyPlayingPath,
-                                currentPosition = if (currentlyPlayingPath == comment.filePath) currentPosition else 0L,
-                                onPlayClick = {
-                                    println("Reproduciendo ${comment.filePath}")
-                                    viewModel.playAudio(comment.filePath)
-                                },
-                                onPauseClick = { viewModel.playAudio(comment.filePath) },
-                                onSeek = { position, playAfterSeek, path ->
-                                    viewModel.seekTo(position, playAfterSeek, path)
-                                },
-                                onDeleteClick = {
-                                    viewModel.deleteComment(comment.filePath)
+                            .weight(1f) // ocupa todo el espacio disponible verticalmente
+                            .fillMaxWidth()
+                            .verticalScroll(rememberScrollState())
+                    ) {
+                        Column {
+                            if (filteredComments.isEmpty()) {
+                                Column(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    horizontalAlignment = Alignment.CenterHorizontally
+                                ) {
+                                    Text(
+                                        text = "No hay anotaciones para esta página",
+                                        style = MaterialTheme.typography.bodyMedium,
+                                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
+                                    )
+                                    Text(
+                                        text = "😢",
+                                        fontSize = 48.sp
+                                    )
                                 }
-                            )
-                            Spacer(modifier = Modifier.height(8.dp))
-                        }
-                    }
-                }
-
-                Spacer(modifier = Modifier.height(24.dp))
-
-                MicPermissionWrapper(
-                    content = {
-                        Column(
-                            modifier = Modifier
-                                .padding(16.dp),
-                            verticalArrangement = Arrangement.Center,
-                            horizontalAlignment = Alignment.CenterHorizontally
-                        ) {
-
-                            MicControl(
-                                isRecording = isRecording,
-                                hasRecording = hasRecording,
-                                isPlaying = isPlaying,
-                                recordingDuration = recordingDuration,
-                                onStartRecording = {
-                                    isRecording = true
-                                    hasRecording = false
-                                    recordingDuration = 0L
-                                    viewModel.startRecording()
-
-                                    coroutineScope.launch {
-                                        while (isRecording) {
-                                            kotlinx.coroutines.delay(1000)
-                                            recordingDuration += 1000
+                            } else {
+                                filteredComments.forEach { comment ->
+                                    CommentAudioCard(
+                                        comment = comment,
+                                        isPlaying = isPlaying && comment.filePath == currentlyPlayingPath,
+                                        currentPosition = if (currentlyPlayingPath == comment.filePath) currentPosition else 0L,
+                                        onPlayClick = {
+                                            viewModel.playAudio(comment.filePath)
+                                        },
+                                        onPauseClick = { viewModel.playAudio(comment.filePath) },
+                                        onSeek = { position, playAfterSeek, path ->
+                                            viewModel.seekTo(position, playAfterSeek, path)
+                                        },
+                                        onDeleteClick = {
+                                            viewModel.deleteComment(comment.filePath)
                                         }
-                                    }
-                                },
-                                onStopRecording = {
-                                    isRecording = false
-                                    hasRecording = true
-                                    viewModel.stopRecording()
-                                },
-                                onPlay = {
-                                    isPlaying = true
-                                    playbackTimeLeft = recordingDuration
-
-                                    coroutineScope.launch {
-                                        while (playbackTimeLeft > 0 && isPlaying) {
-                                            kotlinx.coroutines.delay(1000)
-                                            playbackTimeLeft -= 1000
-                                        }
-                                        isPlaying = false
-                                        playbackTimeLeft = recordingDuration
-                                    }
-                                },
-                                onStop = {
-                                    isPlaying = false
-                                },
-                                onDiscard = {
-                                    hasRecording = false
-                                    isPlaying = false
-                                    recordingDuration = 0L
-                                    playbackTimeLeft = 0L
+                                    )
+                                    Spacer(modifier = Modifier.height(8.dp))
                                 }
-                            )
-
-                            Spacer(modifier = Modifier.height(24.dp))
-
-                            Button(
-                                onClick = { viewModel.showAnnotations() }, // tu función
-                                modifier = Modifier.align(Alignment.End),
-                                colors = androidx.compose.material3.ButtonDefaults.buttonColors(
-                                    containerColor = MaterialTheme.colorScheme.primary
-                                )
-                            ) {
-                                Text("Cerrar", color = MaterialTheme.colorScheme.onPrimary)
                             }
                         }
-                    },
-                    onPermissionDenied = {}
-                )
+                    }
 
+                    Spacer(modifier = Modifier.height(24.dp))
+
+                    // Sección fija: grabación y botón cerrar
+                    MicPermissionWrapper(
+                        content = {
+                            Column(
+                                modifier = Modifier.fillMaxWidth(),
+                                verticalArrangement = Arrangement.Center,
+                                horizontalAlignment = Alignment.CenterHorizontally
+                            ) {
+                                MicControl(
+                                    isRecording = isRecording,
+                                    onStartRecording = {
+                                        isRecording = true
+                                        viewModel.startRecording()
+                                    },
+                                    onStopRecording = {
+                                        isRecording = false
+                                        hasRecording = true
+                                        viewModel.stopRecording()
+                                    }
+                                )
+
+                                Spacer(modifier = Modifier.height(24.dp))
+
+                                Button(
+                                    onClick = { viewModel.showAnnotations() },
+                                    modifier = Modifier.align(Alignment.End),
+                                    colors = ButtonDefaults.buttonColors(
+                                        containerColor = MaterialTheme.colorScheme.primary
+                                    )
+                                ) {
+                                    Text("Cerrar", color = MaterialTheme.colorScheme.onPrimary)
+                                }
+                            }
+                        },
+                        onPermissionDenied = {}
+                    )
+                }
             }
         }
     }
@@ -513,9 +512,8 @@ fun TaskStudent(navController: NavHostController) {
     }
 
     // Dialog de feedback
-    
-    if(showFeedback){
 
+    if (showFeedback) {
         Box(
             modifier = Modifier
                 .fillMaxSize()
@@ -533,14 +531,13 @@ fun TaskStudent(navController: NavHostController) {
                         .padding(24.dp)
                         .clip(RoundedCornerShape(12.dp))
                         .border(1.dp, Color(0xFFB6C7D1), RoundedCornerShape(12.dp))
-                        .background(Color.White)
+                        .background(MaterialTheme.colorScheme.background)
                         .padding(24.dp)
                 ) {
                     Text(
                         text = "¿Qué tal te pareció el apunte?",
                         style = MaterialTheme.typography.titleMedium,
                         textAlign = TextAlign.Center,
-                        color = Color.Black,
                         modifier = Modifier.fillMaxWidth()
                     )
 
@@ -570,55 +567,81 @@ fun TaskStudent(navController: NavHostController) {
                         text = "Mandanos un audio con tu opinión!",
                         style = MaterialTheme.typography.titleMedium,
                         textAlign = TextAlign.Center,
-                        color = Color.Black,
                         modifier = Modifier.fillMaxWidth()
                     )
 
                     Spacer(modifier = Modifier.height(20.dp))
 
+                    // MicControl para grabar
                     MicControl(
                         isRecording = isRecording,
-                        hasRecording = hasRecording,
-                        isPlaying = isPlaying,
-                        recordingDuration = recordingDuration,
                         onStartRecording = {
                             isRecording = true
-                            hasRecording = false
-                            recordingDuration = 0L
-                            timer.launch {
-                                while (isRecording) {
-                                    delay(1000)
-                                    recordingDuration += 1000
-                                }
-                            }
+                            viewModel.startFeedbackRecording()
                         },
                         onStopRecording = {
                             isRecording = false
-                            hasRecording = true
-                        },
-                        onPlay = {
-                            isPlaying = true
-                            playbackTimeLeft = recordingDuration
-                            timer.launch {
-                                while (playbackTimeLeft > 0 && isPlaying) {
-                                    delay(1000)
-                                    playbackTimeLeft -= 1000
-                                }
-                                isPlaying = false
-                                playbackTimeLeft = recordingDuration
-                            }
-                        },
-                        onStop = {
-                            isPlaying = false
-                        },
-                        onDiscard = {
-                            hasRecording = false
-                            isPlaying = false
-                            recordingDuration = 0L
-                            playbackTimeLeft = 0L
-                            //poner pa borrar archivo
+                            viewModel.stopFeedbackRecording()
                         }
                     )
+
+                    Spacer(modifier = Modifier.height(16.dp))
+
+                    recordedFilePath?.let { path ->
+                        Card(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(vertical = 8.dp),
+                            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
+                        ) {
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.SpaceBetween,
+                                modifier = Modifier.padding(16.dp)
+                            ) {
+                                Row(
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    horizontalArrangement = Arrangement.SpaceBetween,
+                                    modifier = Modifier.fillMaxWidth()
+                                ) {
+
+                                    IconButton(onClick = {
+                                        if (currentlyPlayingPath == path && isPlaying) {
+                                            viewModel.stopAudio()
+                                        } else {
+                                            viewModel.playAudio(path)
+                                        }
+                                    },
+                                        modifier = Modifier.weight(1f)
+                                    ) {
+                                        Icon(
+                                            imageVector = if (currentlyPlayingPath == path) Icons.Default.Pause else Icons.Default.PlayArrow,
+                                            contentDescription = "Play/Pause"
+                                        )
+                                    }
+
+                                    Text(
+                                        text = "Opinión grabada",
+                                        modifier = Modifier
+                                            .padding(start = 8.dp)
+                                            .weight(1f)
+                                    )
+
+                                    IconButton(onClick = {
+                                        viewModel.deleteFeedbackRecording()
+                                    },
+                                        modifier = Modifier.weight(1f)
+                                    ) {
+                                        Icon(
+                                            imageVector = Icons.Default.Delete,
+                                            contentDescription = "Eliminar grabación"
+                                        )
+                                    }
+
+                                }
+                            }
+                        }
+                    }
 
                     Spacer(modifier = Modifier.height(20.dp))
 
@@ -631,7 +654,6 @@ fun TaskStudent(navController: NavHostController) {
                     ) {
                         Text(text = "Enviar opinión", color = Color.White)
                     }
-
                 }
             }
         }
