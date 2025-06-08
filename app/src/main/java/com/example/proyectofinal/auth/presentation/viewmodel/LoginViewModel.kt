@@ -1,5 +1,6 @@
 package com.example.proyectofinal.auth.presentation.viewmodel
 
+import android.util.Patterns
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.proyectofinal.auth.data.model.LoginRequestDto
@@ -122,8 +123,8 @@ class LoginViewModel(
         }
     }
 
-    fun validateEmail(email: String): Boolean {
-        return android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()
+    private fun validateEmail(email: String): Boolean {
+        return Patterns.EMAIL_ADDRESS.matcher(email).matches()
     }
 
     fun onEmailChange(newEmail: String) {

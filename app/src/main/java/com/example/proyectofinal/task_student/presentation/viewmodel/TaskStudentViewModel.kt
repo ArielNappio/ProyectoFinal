@@ -185,7 +185,7 @@ class TaskStudentViewModel(
     fun deleteComment(filePath: String) {
         viewModelScope.launch {
             // 1. Eliminar archivo físicamente (si existe)
-            val file = java.io.File(filePath)
+            val file = File(filePath)
             if (file.exists()) {
                 file.delete()
             }

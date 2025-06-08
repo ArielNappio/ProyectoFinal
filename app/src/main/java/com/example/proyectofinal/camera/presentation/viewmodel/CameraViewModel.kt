@@ -28,7 +28,7 @@ class CameraViewModel(
         _state.value = _state.value.copy(capturedImage = updatedPhoto)
     }
 
-    override fun onCleared() {
+    public override fun onCleared() {
         _state.value.capturedImage?.recycle()
         super.onCleared()
     }

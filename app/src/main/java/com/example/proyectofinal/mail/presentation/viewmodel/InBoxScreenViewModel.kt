@@ -32,8 +32,6 @@ class InboxViewModel(
     private var currentUserId: Int? = null
 
     init {
-        println("asdasdasdsa")
-
         viewModelScope.launch {
             loadDraftMessages()
         }

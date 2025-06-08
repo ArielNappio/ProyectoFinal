@@ -11,19 +11,22 @@ import com.example.proyectofinal.core.di.viewModelModule
 import com.example.proyectofinal.mail.di.mailDatabaseModule
 import com.example.proyectofinal.mail.di.mailModule
 import com.example.proyectofinal.student.data.di.CommentsRepositoryModule
+import com.example.proyectofinal.student.data.di.taskProviderModule
 import com.example.proyectofinal.student.data.di.taskRepositoryModule
 import com.example.proyectofinal.task_student.di.ttsModule
 import com.example.proyectofinal.userpreferences.di.preferencesModule
+import com.example.proyectofinal.text_editor.di.pdfBitmapConverterModule
+import com.example.proyectofinal.text_editor.di.pdfRemoteRepositoryModule
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.context.GlobalContext.startKoin
 
-class MyApplication: Application() {
+class WirinApplication: Application() {
 
     override fun onCreate() {
         super.onCreate()
 
         startKoin {
-            androidContext(this@MyApplication)
+            androidContext(this@WirinApplication)
             modules(
                 audioModule,
                 databaseModule,
@@ -33,11 +36,14 @@ class MyApplication: Application() {
                 useCaseModule,
                 tokenManagerModule,
                 taskRepositoryModule,
+                taskProviderModule,
                 ttsModule,
                 CommentsRepositoryModule,
                 mailDatabaseModule,
                 mailModule,
-                preferencesModule
+                preferencesModule,
+                pdfBitmapConverterModule,
+                pdfRemoteRepositoryModule
             )
         }
 
