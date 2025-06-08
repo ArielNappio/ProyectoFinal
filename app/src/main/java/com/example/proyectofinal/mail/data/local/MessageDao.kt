@@ -14,15 +14,15 @@ interface MessageDao {
     fun insertMessage(message: MessageEntity)
 
     // Último mensaje enviado (que no sea borrador)
-    @Query("SELECT * FROM message WHERE isDraft = 0 ORDER BY timestamp DESC LIMIT 1")
+    @Query("SELECT * FROM message WHERE isDraft = 0 ORDER BY date DESC LIMIT 1")
     fun getLastMessage(): MessageEntity?
 
     // Mensajes en bandeja de entrada
-    @Query("SELECT * FROM message WHERE userToID = :currentUserId ORDER BY timestamp DESC")
+    @Query("SELECT * FROM message WHERE userToID = :currentUserId ORDER BY date DESC")
     fun getInboxMessages(currentUserId: Int): List<MessageEntity>
 
     // Mensajes en bandeja de salida
-    @Query("SELECT * FROM message WHERE userFromId = :currentUserId ORDER BY timestamp DESC")
+    @Query("SELECT * FROM message WHERE userFromId = :currentUserId ORDER BY date DESC")
     fun getOutboxMessages(currentUserId: Int): List<MessageEntity>
 
     // Guardar borrador
@@ -34,7 +34,7 @@ interface MessageDao {
     suspend fun updateDraft(draft: MessageEntity)
 
     // Traer todos los borradores
-    @Query("SELECT * FROM message WHERE isDraft = 1 ORDER BY timestamp DESC")
+    @Query("SELECT * FROM message WHERE isDraft = 1 ORDER BY date DESC")
     fun getDrafts(): List<MessageEntity>
 
     //Traer borrador por ID

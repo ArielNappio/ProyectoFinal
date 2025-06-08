@@ -21,6 +21,8 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import java.io.File
 import java.time.LocalDateTime
+import java.time.ZoneId
+import java.util.Date
 
 class MessageViewModel(
     private val sendMessageUseCase: SendMessageUseCase,
@@ -38,11 +40,21 @@ class MessageViewModel(
     private val _message = MutableStateFlow("")
     val message: StateFlow<String> = _message
 
-    private val _filePath = MutableStateFlow<String?>(null)
-    val filePath: StateFlow<String?> = _filePath
+    private val _formPath = MutableStateFlow<String?>(null)
+    val formPath: StateFlow<String?> = _formPath
 
-    private val _sendMessageState = MutableStateFlow<NetworkResponse<Unit>>(NetworkResponse.Loading())
+    private val _attachments = MutableStateFlow<List<String>>(emptyList())
+    val attachments: StateFlow<List<String>> = _attachments
+
+    private val _sendMessageState =
+        MutableStateFlow<NetworkResponse<Unit>>(NetworkResponse.Loading())
     val sendMessageState: StateFlow<NetworkResponse<Unit>> = _sendMessageState
+
+    private val _messageErrorEvent = MutableSharedFlow<String>()
+    val messageErrorEvent = _messageErrorEvent.asSharedFlow()
+
+    private val _draftErrorEvent = MutableSharedFlow<String>()
+    val draftErrorEvent = _draftErrorEvent.asSharedFlow()
 
     private val _draftSavedEvent = MutableSharedFlow<Unit>()
     val draftSavedEvent = _draftSavedEvent.asSharedFlow()
@@ -65,8 +77,27 @@ class MessageViewModel(
         _message.value = value
     }
 
-    fun updateFilePath(value: String?) {
-        _filePath.value = value
+    fun updateFormPath(value: String?) {
+        _formPath.value = value
+    }
+
+    fun isFormValid(
+        career: String,
+        subject: String,
+        note: String,
+        chapter: String,
+        date: String
+    ): Boolean {
+        return career.isNotBlank() && subject.isNotBlank() && note.isNotBlank() &&
+                chapter.isNotBlank() && date.isNotBlank()
+    }
+
+    private fun isDraftValid(): Boolean {
+        return to.value.isNotBlank() || subject.value.isNotBlank() || message.value.isNotBlank() || formPath.value != null
+    }
+
+    private fun isMessageValid(): Boolean {
+        return to.value.isNotBlank() && subject.value.isNotBlank() && message.value.isNotBlank()
     }
 
     fun appendToMessage(newText: String) {
@@ -75,6 +106,11 @@ class MessageViewModel(
 
     fun sendMessage(messageModel: MessageModel) {
         viewModelScope.launch {
+            if (!isMessageValid()) {
+                _messageErrorEvent.emit("Por favor, completa todos los campos antes de enviar.")
+                return@launch
+            }
+
             _sendMessageState.value = NetworkResponse.Loading()
             sendMessageUseCase(messageModel).collect { response ->
                 _sendMessageState.value = response
@@ -89,13 +125,23 @@ class MessageViewModel(
                 sender = to.value,
                 subject = subject.value,
                 content = message.value,
-                date = LocalDateTime.now().toString(),
-                id = draftId.value
+                date = Date.from(LocalDateTime.now().atZone(ZoneId.systemDefault()).toInstant()),
+                id = draftId.value,
+                formPath = formPath.value,
+                isDraft = true,
+                isResponse = false,
+                studentId = "",
+                userFromId = ""
             )
-            saveDraftUseCase(draftMessage)
-            Log.d("Save draft", draftMessage.content)
-            Log.d("Save draft","success")
-            _draftSavedEvent.emit(Unit)
+            if (isDraftValid()) {
+                saveDraftUseCase(draftMessage)
+                Log.d("Save draft", draftMessage.content)
+                Log.d("Save draft", "success")
+                _draftSavedEvent.emit(Unit)
+            } else {
+                Log.e("SaveDraft", "Borrador vacío, no se guarda")
+                _draftErrorEvent.emit("No se pudo guardar el borrador: está vacío.")
+            }
         }
     }
 
@@ -119,22 +165,32 @@ class MessageViewModel(
 
     fun saveFormToFile(
         context: Context,
-        title: String,
-        author: String,
         career: String,
-        signature: String,
+        subject: String,
+        note: String,
+        chapter: String,
         date: String
     ): File {
-        val file = File(context.cacheDir, "formulario_${System.currentTimeMillis()}.txt")
-        file.writeText(
-            """
-        Título: $title
-        Autor: $author
-        Carrera: $career
-        Firma: $signature
-        Fecha: $date
-        """.trimIndent()
-        )
-        return file
+        viewModelScope.launch {
+            if (isFormValid(career, subject, note, chapter, date)) {
+                val file = saveFormToFile(context, career, subject, note, chapter, date)
+                Log.d("SaveFormDraft", "Archivo guardado en: ${file.absolutePath}")
+            } else {
+                Log.e("SaveFormDraft", "Formulario incompleto, no se guarda")
+            }
+        }
+        return File("")
     }
+
+    fun removeAttachment() {
+        _formPath.value = null
+        _attachments.value = emptyList()
+    }
+
+    fun addAttachment(filePath: String) {
+        val currentAttachments = _attachments.value.toMutableList()
+        currentAttachments.add(filePath)
+        _attachments.value = currentAttachments
+    }
+
 }

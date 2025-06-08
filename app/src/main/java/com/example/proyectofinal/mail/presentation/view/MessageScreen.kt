@@ -1,8 +1,11 @@
 package com.example.proyectofinal.mail.presentation.view
 
+import android.net.Uri
 import android.os.Build
 import android.util.Log
 import android.widget.Toast
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -54,13 +57,16 @@ import com.example.proyectofinal.audio.speechrecognizer.SpeechRecognizerManager
 import com.example.proyectofinal.core.network.NetworkResponse
 import com.example.proyectofinal.core.theme.BlueDark
 import com.example.proyectofinal.core.theme.CustomGreen
+import com.example.proyectofinal.core.theme.CustomRed
 import com.example.proyectofinal.core.theme.GreenLight
 import com.example.proyectofinal.mail.domain.model.MessageModel
 import com.example.proyectofinal.mail.presentation.component.FormScreen
 import com.example.proyectofinal.mail.presentation.viewmodel.MessageViewModel
 import org.koin.androidx.compose.koinViewModel
 import java.io.File
-import java.time.LocalDate
+import java.time.LocalDateTime
+import java.time.ZoneId
+import java.util.Date
 
 @RequiresApi(Build.VERSION_CODES.O)
 @OptIn(ExperimentalMaterial3Api::class)
@@ -76,13 +82,22 @@ fun MessageScreen(
     val to by viewModel.to.collectAsState()
     val subject by viewModel.subject.collectAsState()
     val message by viewModel.message.collectAsState()
-    val filePath by viewModel.filePath.collectAsState()
+    val formPath by viewModel.formPath.collectAsState()
+    val attachments by viewModel.attachments.collectAsState()
     val sendState by viewModel.sendMessageState.collectAsState()
     val draftSavedEvent = viewModel.draftSavedEvent
     val context = LocalContext.current
 
     var isDialogOpen by remember { mutableStateOf(false) }
     var showDialog by remember { mutableStateOf(false) }
+
+    val filePickerLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.GetContent()
+    ) { uri: Uri? ->
+        uri?.let {
+            viewModel.addAttachment(it.toString())
+        }
+    }
 
     // Speech recognizer setup
     val voiceToText by viewModel.voiceToText.collectAsState()
@@ -102,6 +117,18 @@ fun MessageScreen(
     DisposableEffect(Unit) {
         onDispose {
             speechRecognizerManager.stopListening()
+        }
+    }
+
+    LaunchedEffect(Unit) {
+        viewModel.draftErrorEvent.collect { errorMessage ->
+            Toast.makeText(context, errorMessage, Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    LaunchedEffect(Unit) {
+        viewModel.messageErrorEvent.collect { message ->
+            Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
         }
     }
 
@@ -145,11 +172,19 @@ fun MessageScreen(
                                 sender = to,
                                 subject = subject,
                                 content = message,
-                                filePath = filePath,
-                                date = LocalDate.now().toString(),
-                                id = 0
+                                formPath = formPath,
+                                attachments = attachments,
+                                date = Date.from(
+                                    LocalDateTime.now().atZone(ZoneId.systemDefault()).toInstant()
+                                ),
+                                id = 0,
+                                isDraft = false,
+                                isResponse = false,
+                                studentId = "",
+                                userFromId = ""
                             )
                             viewModel.sendMessage(newMessage)
+                            Log.d("MessageScreen", "Message sent: $newMessage")
                         },
                         enabled = to.isNotBlank() && message.isNotBlank(),
                         colors = ButtonDefaults.buttonColors(containerColor = CustomGreen)
@@ -237,7 +272,7 @@ fun MessageScreen(
                 horizontalArrangement = Arrangement.spacedBy(12.dp)
             ) {
                 Button(
-                    onClick = { /* Acción para adjuntar archivos */ },
+                    onClick = { filePickerLauncher.launch("*/*") },
                     colors = ButtonDefaults.buttonColors(containerColor = BlueDark),
                     shape = RoundedCornerShape(12.dp)
                 ) {
@@ -265,14 +300,46 @@ fun MessageScreen(
                 }
             }
 
-            filePath?.let {
+            // Mostrar archivo adjunto si existe
+            formPath?.let {
                 val fileName = File(it).name
-                Text(
-                    text = "Adjunto: $fileName",
-                    color = Color.Cyan,
-                    modifier = Modifier.padding(top = 8.dp)
-                )
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.padding(vertical = 8.dp)
+                ) {
+                    Icon(Icons.Default.AttachFile, contentDescription = null, tint = GreenLight)
+                    Text(
+                        text = fileName,
+                        color = GreenLight,
+                        modifier = Modifier.weight(1f)
+                    )
+                    IconButton(onClick = { viewModel.removeAttachment() }) {
+                        Icon(
+                            Icons.Default.Close,
+                            contentDescription = "Eliminar adjunto",
+                            tint = CustomRed
+                        )
+                    }
+                }
             }
+
+            if (attachments.isNotEmpty()) {
+                attachments.forEach { path ->
+                    val fileName = File(path).name
+                    Row(
+                        modifier = Modifier.fillMaxWidth().padding(8.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Icon(imageVector = Icons.Default.AttachFile, contentDescription = "Adjunto", tint = GreenLight)
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text(text = fileName, fontSize = 14.sp, color = Color.White, modifier = Modifier.weight(1f))
+                        IconButton(onClick = { viewModel.removeAttachment() }) {
+                            Icon(Icons.Default.Close, contentDescription = "Eliminar adjunto", tint = CustomRed)
+                        }
+                    }
+                }
+            }
+
 
             Spacer(Modifier.height(8.dp))
 
@@ -394,7 +461,7 @@ fun MessageScreen(
                 )
             }
 
-            // FormScreen para nuevo mensaje
+            // FormScreen para solictar apunte
             if (isDialogOpen) {
                 FormScreen(
                     viewModel,

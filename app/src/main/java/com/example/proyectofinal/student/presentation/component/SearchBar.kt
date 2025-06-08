@@ -13,6 +13,7 @@ import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.example.proyectofinal.userpreferences.presentation.component.AppText
 
@@ -26,7 +27,15 @@ fun SearchBar(
     TextField(
         value = searchText,
         onValueChange = onTextChange,
-        placeholder = { AppText("Busca  palabras claves", isTitle = false, color = Color.White) },
+        placeholder = {
+            AppText(
+                "Busca  palabras claves",
+                isTitle = false,
+                color = Color.White,
+                overflow = TextOverflow.Ellipsis,
+                modifier = Modifier.fillMaxWidth()
+            )
+        },
         leadingIcon = {
             Icon(
                 imageVector = Icons.Default.Search,

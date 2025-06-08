@@ -10,27 +10,27 @@ fun MessageEntity.toDomain(): MessageModel {
         subject = subject,
         date = date,
         content = content,
-        filePath = filePath
-        // faltaria el userFromId, userToID ?
+        formPath = filePath,
+        isDraft = isDraft,
+        isResponse = isResponse,
+        studentId = userToId,
+        userFromId = userFromId,
+        responseText = responseText
     )
 }
 
-fun MessageModel.toEntity(
-    userFromId: Int = 0,
-    userToID: Int = 0,
-    isDraft: Boolean = true,
-    timestamp: Long = System.currentTimeMillis()
-): MessageEntity {
+fun MessageModel.toEntity(): MessageEntity {
     return MessageEntity(
         id = id,
         sender = sender,
         subject = subject,
         date = date,
         content = content,
-        filePath = filePath,
-        userFromId = userFromId.toString(),
-        userToID = userToID.toString(),
+        filePath = formPath,
+        userFromId = userFromId,
         isDraft = isDraft,
-        timestamp = timestamp
+        isResponse = isResponse,
+        responseText = responseText,
+        userToId = studentId,
     )
 }

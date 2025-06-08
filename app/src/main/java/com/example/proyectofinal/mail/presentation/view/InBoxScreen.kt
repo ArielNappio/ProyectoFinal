@@ -61,66 +61,20 @@ fun InboxScreen(
     onMessageClick: (MessageModel) -> Unit
 ) {
     val viewModel = koinViewModel<InboxViewModel>()
-    val messagesState = when(mailboxType) {
+    val messagesState = when (mailboxType) {
         MailboxType.INBOX -> viewModel.inboxMessages
         MailboxType.OUTBOX -> viewModel.outboxMessages
         MailboxType.DRAFT -> viewModel.draftMessages
     }
     val messages by messagesState.collectAsState()
-    val menuExpanded = remember { mutableStateOf(false) }
 
     Column(modifier = Modifier.fillMaxSize()) {
         InboxScreenTopBar(
             navController = navController,
-            mailboxType = mailboxType,
-            onMenuClick = { menuExpanded.value = true }
+            mailboxType = mailboxType
         )
-        DropdownMenu(
-            expanded = menuExpanded.value,
-            onDismissRequest = { menuExpanded.value = false }
-        ) {
-            DropdownMenuItem(
-                text = { Text("Nuevo Mensaje", fontSize = 18.sp) },
-                onClick = {
-                    menuExpanded.value = false
-                    navController.navigate(ScreensRoute.Message.route)
-                },
-                leadingIcon = {
-                    Icon(Icons.Filled.Add, contentDescription = "Nuevo mensaje", modifier = Modifier.size(24.dp))
-                }
-            )
-            DropdownMenuItem(
-                text = { Text("Bandeja de Entrada", fontSize = 18.sp) },
-                onClick = {
-                    menuExpanded.value = false
-                    navController.navigate("mail/inbox")
-                },
-                leadingIcon = {
-                    Icon(Icons.Filled.Inbox, contentDescription = "Bandeja de Entrada", modifier = Modifier.size(24.dp))
-                }
-            )
-            DropdownMenuItem(
-                text = { Text("Bandeja de Salida", fontSize = 18.sp) },
-                onClick = {
-                    menuExpanded.value = false
-                    navController.navigate("mail/outbox")
-                },
-                leadingIcon = {
-                    Icon(Icons.AutoMirrored.Filled.Send, contentDescription = "Bandeja de Salida", modifier = Modifier.size(24.dp))
-                }
-            )
-            DropdownMenuItem(
-                text = { Text("Borradores", fontSize = 18.sp) },
-                onClick = {
-                    menuExpanded.value = false
-                    navController.navigate("mail/drafts")
-                },
-                leadingIcon = {
-                    Icon(Icons.Filled.Drafts, contentDescription = "Borradores", modifier = Modifier.size(24.dp))
-                }
-            )
-        }
 
+        // Botón de Redactar
         Button(
             onClick = { navController.navigate(ScreensRoute.Message.route) },
             modifier = Modifier
@@ -129,11 +83,11 @@ fun InboxScreen(
             colors = ButtonDefaults.buttonColors(containerColor = CustomGreen, contentColor = Color.White)
         ) {
             Icon(Icons.Filled.Add, contentDescription = "Redactar", tint = Color.White)
-            Spacer(modifier = Modifier.width(6.dp)) // antes 8dp
+            Spacer(modifier = Modifier.width(6.dp))
             Text("Redactar", color = Color.White, fontSize = 18.sp)
         }
 
-
+        // Lista de mensajes
         MessageList(
             messages = messages,
             type = mailboxType,
@@ -155,12 +109,14 @@ fun InboxScreen(
 }
 
 
+
 @Composable
 fun InboxScreenTopBar(
     navController: NavController,
-    mailboxType: MailboxType,
-    onMenuClick: () -> Unit
+    mailboxType: MailboxType
 ) {
+    val menuExpanded = remember { mutableStateOf(false) }
+
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -186,31 +142,30 @@ fun InboxScreenTopBar(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 12.dp), // antes 16dp
+                .padding(horizontal = 12.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            // Botón volver
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 modifier = Modifier
                     .clickable { navController.navigate(ScreensRoute.Home.route) }
             ) {
                 Icon(
-                        imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                        contentDescription = "Volver",
-                        modifier = Modifier.size(36.dp)
+                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                    contentDescription = "Volver",
+                    modifier = Modifier.size(36.dp)
                 )
                 Text(
                     text = "Volver",
                     fontSize = 14.sp,
-                    modifier = Modifier
-                        .clickable { navController.navigate(ScreensRoute.Home.route) }
+                    modifier = Modifier.clickable {
+                        navController.navigate(ScreensRoute.Home.route)
+                    }
                 )
             }
 
             Spacer(modifier = Modifier.width(8.dp))
 
-            // Título centrado
             Text(
                 text = when (mailboxType) {
                     MailboxType.INBOX -> "Bandeja de Entrada"
@@ -223,17 +178,65 @@ fun InboxScreenTopBar(
                 textAlign = TextAlign.Center
             )
 
-            // Botón menú
-            IconButton(onClick = { onMenuClick() }) {
-                Icon(
-                    imageVector = Icons.Default.Menu,
-                    contentDescription = "Menú",
-                    modifier = Modifier.size(26.dp)
-                )
+            Box {
+                IconButton(onClick = { menuExpanded.value = true }) {
+                    Icon(
+                        imageVector = Icons.Default.Menu,
+                        contentDescription = "Menú",
+                        modifier = Modifier.size(26.dp)
+                    )
+                }
+
+                DropdownMenu(
+                    expanded = menuExpanded.value,
+                    onDismissRequest = { menuExpanded.value = false }
+                ) {
+                    DropdownMenuItem(
+                        text = { Text("Nuevo Mensaje", fontSize = 18.sp) },
+                        onClick = {
+                            menuExpanded.value = false
+                            navController.navigate(ScreensRoute.Message.route)
+                        },
+                        leadingIcon = {
+                            Icon(Icons.Filled.Add, contentDescription = "Nuevo mensaje", modifier = Modifier.size(24.dp))
+                        }
+                    )
+                    DropdownMenuItem(
+                        text = { Text("Bandeja de Entrada", fontSize = 18.sp) },
+                        onClick = {
+                            menuExpanded.value = false
+                            navController.navigate("mail/inbox")
+                        },
+                        leadingIcon = {
+                            Icon(Icons.Filled.Inbox, contentDescription = "Bandeja de Entrada", modifier = Modifier.size(24.dp))
+                        }
+                    )
+                    DropdownMenuItem(
+                        text = { Text("Bandeja de Salida", fontSize = 18.sp) },
+                        onClick = {
+                            menuExpanded.value = false
+                            navController.navigate("mail/outbox")
+                        },
+                        leadingIcon = {
+                            Icon(Icons.AutoMirrored.Filled.Send, contentDescription = "Bandeja de Salida", modifier = Modifier.size(24.dp))
+                        }
+                    )
+                    DropdownMenuItem(
+                        text = { Text("Borradores", fontSize = 18.sp) },
+                        onClick = {
+                            menuExpanded.value = false
+                            navController.navigate("mail/drafts")
+                        },
+                        leadingIcon = {
+                            Icon(Icons.Filled.Drafts, contentDescription = "Borradores", modifier = Modifier.size(24.dp))
+                        }
+                    )
+                }
             }
         }
     }
 }
+
 
 
 @Composable

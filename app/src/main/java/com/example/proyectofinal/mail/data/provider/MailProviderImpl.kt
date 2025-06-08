@@ -9,6 +9,7 @@ import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.request.get
 import io.ktor.client.request.post
+import io.ktor.client.request.put
 import io.ktor.client.request.setBody
 import io.ktor.client.statement.HttpResponse
 import io.ktor.http.ContentType
@@ -17,10 +18,10 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 
 class MailProviderImpl(private val ktorClient: HttpClient) : MailProvider {
-    override fun sendMessage(message: MessageModel): Flow<NetworkResponse<MessageModel>> = flow{
+    override fun sendMessage(message: MessageModel): Flow<NetworkResponse<MessageModel>> = flow {
         try {
             emit(NetworkResponse.Loading())
-            val response = ktorClient.post(ApiUrls.MESSAGE) {
+            val response = ktorClient.post(ApiUrls.SEND_MESSAGE) {
                 contentType(ContentType.Application.Json)
                 setBody(message)
             }
@@ -32,14 +33,15 @@ class MailProviderImpl(private val ktorClient: HttpClient) : MailProvider {
         }
     }
 
-    override fun receiveMessage(): Flow<NetworkResponse<MessageModel>> = flow {
+    override fun receiveMessage(): Flow<NetworkResponse<List<MessageModel>>> = flow {
         try {
             emit(NetworkResponse.Loading())
-            val response: HttpResponse = ktorClient.get(ApiUrls.MESSAGE)
+
+            val response: HttpResponse = ktorClient.get(ApiUrls.MESSAGES)
 
             if (response.status == HttpStatusCode.OK) {
-                val message = response.body<MessageModel>()
-                emit(NetworkResponse.Success(message))
+                val messages = response.body<List<MessageModel>>()
+                emit(NetworkResponse.Success(messages))
             } else {
                 emit(NetworkResponse.Failure("Error ${response.status.value}"))
             }
@@ -47,4 +49,25 @@ class MailProviderImpl(private val ktorClient: HttpClient) : MailProvider {
             emit(NetworkResponse.Failure(error = e.toString()))
         }
     }
+
+    override fun updateMessage(message: MessageModel): Flow<NetworkResponse<Unit>> = flow {
+        try {
+            emit(NetworkResponse.Loading())
+
+            val response = ktorClient.put(ApiUrls.UPDATE_MESSAGE) {
+                contentType(ContentType.Application.Json)
+                setBody(message)
+            }
+
+            if (response.status == HttpStatusCode.OK) {
+                emit(NetworkResponse.Success(Unit))
+            } else {
+                emit(NetworkResponse.Failure("Error ${response.status.value}"))
+            }
+
+        } catch (e: Exception) {
+            emit(NetworkResponse.Failure(error = e.toString()))
+        }
+    }
+
 }

@@ -14,6 +14,7 @@ import com.example.proyectofinal.mail.domain.usecase.GetOutboxMessagesUseCase
 import com.example.proyectofinal.mail.domain.usecase.ReceiveMessageUseCase
 import com.example.proyectofinal.mail.domain.usecase.SaveDraftUseCase
 import com.example.proyectofinal.mail.domain.usecase.SendMessageUseCase
+import com.example.proyectofinal.mail.domain.usecase.UpdateMessageUseCase
 import com.example.proyectofinal.mail.presentation.viewmodel.InboxViewModel
 import com.example.proyectofinal.mail.presentation.viewmodel.MessageViewModel
 import org.koin.android.ext.koin.androidContext
@@ -39,6 +40,7 @@ val mailModule = module {
     single { get<MailDatabase>().messageDao() }
     factory { SendMessageUseCase(get()) }
     factory { ReceiveMessageUseCase(get()) }
+    factory { UpdateMessageUseCase(get()) }
     factory { GetInboxMessagesUseCase(get()) }
     factory { GetOutboxMessagesUseCase(get()) }
     factory { SaveDraftUseCase(get()) }

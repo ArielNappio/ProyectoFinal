@@ -44,12 +44,15 @@ fun TaskCard(task: Task, onToggleFavorite: (Int) -> Unit, navController: NavCont
                 AppText(
                     text = task.name,
                     isTitle = true,
+                    maxLines = 3,
+                    overflow = TextOverflow.Ellipsis,
                     //style = MaterialTheme.typography.titleMedium,
                     modifier = Modifier
                         .weight(1f)
                         .semantics {
                             contentDescription = task.name
-                        },
+                        }
+                        .fillMaxWidth(),
                     //fontSize = 26.sp
 
                 )
