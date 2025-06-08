@@ -572,21 +572,6 @@ fun TaskStudent(navController: NavHostController) {
 
                     Spacer(modifier = Modifier.height(20.dp))
 
-                    // MicControl para grabar
-                    MicControl(
-                        isRecording = isRecording,
-                        onStartRecording = {
-                            isRecording = true
-                            viewModel.startFeedbackRecording()
-                        },
-                        onStopRecording = {
-                            isRecording = false
-                            viewModel.stopFeedbackRecording()
-                        }
-                    )
-
-                    Spacer(modifier = Modifier.height(16.dp))
-
                     recordedFilePath?.let { path ->
                         Card(
                             modifier = Modifier
@@ -642,6 +627,21 @@ fun TaskStudent(navController: NavHostController) {
                             }
                         }
                     }
+
+                    Spacer(modifier = Modifier.height(20.dp))
+
+                    // MicControl para grabar
+                    MicControl(
+                        isRecording = isRecording,
+                        onStartRecording = {
+                            isRecording = true
+                            viewModel.startFeedbackRecording()
+                        },
+                        onStopRecording = {
+                            isRecording = false
+                            viewModel.stopFeedbackRecording()
+                        }
+                    )
 
                     Spacer(modifier = Modifier.height(20.dp))
 
