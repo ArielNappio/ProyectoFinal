@@ -28,12 +28,7 @@ fun AppText(
 
     val fontSize = if (isTitle) prefs.fontSize else (prefs.fontSize - 4).coerceAtLeast(12f)
 
-    val fontFamily = when (prefs.fontFamily) {
-        "Sans" -> FontFamily.SansSerif
-        "Serif" -> FontFamily.Serif
-        "Monospace" -> FontFamily.Monospace
-        else -> FontFamily.Default
-    }
+    val fontFamily = getFontFamilyFromString(prefs.fontFamily)
 
     Text(
         text = text,

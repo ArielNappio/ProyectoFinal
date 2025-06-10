@@ -20,6 +20,5 @@ fun NavBackStackEntry.showsTopBar(): Boolean {
 }
 
 fun NavBackStackEntry.showBackButton(): Boolean {
-    return destination.route?.startsWith(ScreensRoute.TaskDetails.route)
-        ?: false
+    return destination.route?.startsWith(ScreensRoute.TaskDetails.route) == true
 }

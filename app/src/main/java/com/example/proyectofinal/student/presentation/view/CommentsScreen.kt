@@ -38,7 +38,7 @@ fun CommentsScreen(
     modifier: Modifier = Modifier,
     taskId: Int
 ) {
-    val viewModel = koinViewModel< CommentsViewModel>()
+    val viewModel = koinViewModel<CommentsViewModel>()
 
     val comments by viewModel.comments.collectAsState()
     val currentlyPlayingPath by viewModel.currentlyPlayingPath.collectAsState()

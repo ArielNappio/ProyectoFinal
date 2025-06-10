@@ -12,12 +12,8 @@ import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 
-data class CurrentTheme(
-    val isDark: Boolean = false,
-    private val isCustomFontFamilySelected: Boolean = false // TODO: Change to enum with different font families
-) {
-    val font = atkinsonHyperlegibleFamily.takeIf { isCustomFontFamilySelected }
-}
+data class CurrentTheme(val isDark: Boolean = false)
+
 val LocalTheme = compositionLocalOf { CurrentTheme() }
 
 private val DarkColorScheme = darkColorScheme(
@@ -44,7 +40,6 @@ private val LightColorScheme = lightColorScheme(
 fun ProyectoFinalTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
     // Dynamic color is available on Android 12+
-    customTypographySelected: Boolean = false,
     dynamicColor: Boolean = true,
     content: @Composable () -> Unit
 ) {
@@ -60,7 +55,7 @@ fun ProyectoFinalTheme(
 
     MaterialTheme(
         colorScheme = colorScheme,
-        typography = getTypography(customTypographySelected),
+        typography = getTypography(),
         content = content
     )
 }

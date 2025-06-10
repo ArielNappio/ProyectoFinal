@@ -74,7 +74,7 @@ fun TaskCard(task: Task, onToggleFavorite: (Int) -> Unit, navController: NavCont
                 }
             }
             AppText(
-                text = "📅 Ultima vez leído: ${task.lastRead ?: "Sin leer"}",
+                text = "📅 Última vez leído: ${task.lastRead ?: "Sin leer"}",
                 maxLines = 2,
                 //style = MaterialTheme.typography.bodyMedium,
                 overflow = TextOverflow.Ellipsis,

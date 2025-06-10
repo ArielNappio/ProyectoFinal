@@ -29,13 +29,11 @@ class MainActivity : ComponentActivity() {
         setContent {
             val themeViewModel: ThemeViewModel = koinViewModel()
             val isDarkTheme by themeViewModel.isDarkTheme.collectAsState()
-            val isCustomFontFamilySelected by themeViewModel.fontFamilySelected.collectAsState()
 
-            val currentTheme = CurrentTheme(isDarkTheme, isCustomFontFamilySelected)
+            val currentTheme = CurrentTheme(isDarkTheme)
 
             ProyectoFinalTheme(
-                darkTheme = isDarkTheme,
-                customTypographySelected = isCustomFontFamilySelected
+                darkTheme = isDarkTheme
             ) {
                 CompositionLocalProvider(LocalTheme provides currentTheme) {
                     Surface(

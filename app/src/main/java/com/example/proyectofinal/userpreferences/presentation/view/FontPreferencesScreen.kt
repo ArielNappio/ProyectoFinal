@@ -27,13 +27,18 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.proyectofinal.core.theme.ATKINSON_HYPERLEGIBLE_FAMILY_NAME
 import com.example.proyectofinal.core.theme.BlueDark
 import com.example.proyectofinal.core.theme.BlueGray
 import com.example.proyectofinal.core.theme.CustomBlue
 import com.example.proyectofinal.core.theme.CustomGreen
+import com.example.proyectofinal.core.theme.AtkinsonHyperlegibleFamily
+import com.example.proyectofinal.core.theme.OPEN_DYSLEXIC_FAMILY_NAME
+import com.example.proyectofinal.core.theme.OpenDyslexicFamily
 import com.example.proyectofinal.userpreferences.presentation.viewmodel.PreferencesViewModel
 import org.koin.androidx.compose.koinViewModel
 
@@ -46,7 +51,8 @@ fun FontPreferencesScreen(onDone: () -> Unit) {
         modifier = Modifier
             .fillMaxSize()
             .background(Color(0xFF121212))
-            .padding(24.dp),
+            .padding(top = 50.dp, bottom = 36.dp)
+            .padding(horizontal = 24.dp),
         verticalArrangement = Arrangement.spacedBy(24.dp)
     ) {
         Text(
@@ -59,7 +65,7 @@ fun FontPreferencesScreen(onDone: () -> Unit) {
         HorizontalDivider(thickness = 1.dp, color = Color.DarkGray)
 
         Text(
-            text = "Tamaño de fuente",
+            text = "Tamaño:",
             color = Color.White,
             fontSize = prefs.fontSize.sp,
             fontWeight = FontWeight.SemiBold
@@ -95,26 +101,32 @@ fun FontPreferencesScreen(onDone: () -> Unit) {
         }
 
         Text(
-            text = "Fuente actual",
+            text = "Tipo:",
             color = Color.White,
             fontSize = prefs.fontSize.sp,
             fontWeight = FontWeight.SemiBold
         )
 
-        val fontOptions = listOf("Default", "Sans", "Serif", "Monospace")
+        val fontOptions = mapOf<String, FontFamily>(
+            ATKINSON_HYPERLEGIBLE_FAMILY_NAME to AtkinsonHyperlegibleFamily,
+            OPEN_DYSLEXIC_FAMILY_NAME to OpenDyslexicFamily,
+            "Default Serif" to FontFamily.Serif,
+            "Monospace" to FontFamily.Monospace
+        )
+
 
         Column(
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            fontOptions.forEach { font ->
+            fontOptions.map { font ->
                 Card(
                     colors = CardDefaults.cardColors(
-                        containerColor = if (prefs.fontFamily == font) CustomBlue else BlueGray
+                        containerColor = if (prefs.fontFamily == font.key) CustomBlue else BlueGray
                     ),
                     modifier = Modifier
                         .fillMaxWidth()
                         .semantics { contentDescription = "Botón fuente $font" },
-                    onClick = { viewModel.updateFontFamily(font) }
+                    onClick = { viewModel.updateFontFamily(font.key) }
                 ) {
                     Row(
                         modifier = Modifier
@@ -124,11 +136,13 @@ fun FontPreferencesScreen(onDone: () -> Unit) {
                         horizontalArrangement = Arrangement.SpaceBetween
                     ) {
                         Text(
-                            text = font,
+                            text = font.key,
+                            fontFamily = font.value,
                             color = Color.White,
-                            fontSize = prefs.fontSize.sp
+                            fontSize = prefs.fontSize.sp,
+                            lineHeight = (prefs.fontSize * 1.2).sp
                         )
-                        if (prefs.fontFamily == font) {
+                        if (prefs.fontFamily == font.key) {
                             Icon(
                                 imageVector = Icons.Default.Check,
                                 contentDescription = "Fuente seleccionada",
@@ -150,7 +164,7 @@ fun FontPreferencesScreen(onDone: () -> Unit) {
             colors = ButtonDefaults.buttonColors(containerColor = CustomGreen)
         ) {
             Text(
-                text = "Continuar",
+                text = "Aceptar",
                 fontSize = prefs.fontSize.sp,
                 color = Color.White
             )
