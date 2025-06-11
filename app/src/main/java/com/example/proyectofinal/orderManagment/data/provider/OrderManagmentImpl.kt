@@ -17,10 +17,11 @@ class OrderManagmentImpl(
     private val httpClient: HttpClient
 ) : OrderManagmentProvider {
 
-    override fun getOrdersManagment(): Flow<NetworkResponse<List<Task>>> = flow {
+    override fun getOrdersManagment(studentId: String): Flow<NetworkResponse<List<Task>>> = flow {
         emit(NetworkResponse.Loading())
         try {
-            val response = httpClient.get(ApiUrls.ORDER_MANAGMENT)
+            val url = ApiUrls.ORDER_MANAGMENT.replace("{studentId}", studentId)
+            val response = httpClient.get(url)
             if (response.status == HttpStatusCode.OK) {
                 val responseBody = response.body<List<OrderResponseDto>>()
                 val tasks = responseBody.map { it.toTask() }

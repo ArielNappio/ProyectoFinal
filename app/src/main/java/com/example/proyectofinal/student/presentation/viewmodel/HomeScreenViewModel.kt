@@ -16,8 +16,6 @@ class HomeScreenViewModel(
     private val getOrdersManagment: GetOrdersManagmentUseCase
 ) : ViewModel() {
 
-    //val tasks: StateFlow<List<Task>> = repository.getAllTasks()
-
     private val _searchText = MutableStateFlow("")
     val searchText = _searchText.asStateFlow()
 
@@ -25,22 +23,23 @@ class HomeScreenViewModel(
     val orderManagmentState: StateFlow<NetworkResponse<List<Task>>> = _orderManagmentState.asStateFlow()
 
     init {
-        getOrdersManagment()
+        getOrdersManagments("6fe4e631-769c-4019-b900-d61dda1689e9") // tu studentId real
     }
 
-    private fun getOrdersManagment() {
+    private fun getOrdersManagments(studentId: String) {
         viewModelScope.launch {
-            getOrdersManagment.invoke().collect { response ->
+            getOrdersManagment(studentId).collect { response ->
                 _orderManagmentState.value = response
             }
         }
     }
+
 
     fun updateSearchText(newText: String) {
         _searchText.value = newText
     }
 
     fun toggleFavorite(taskId: Int) {
-       // repository.toggleFavorite(taskId)
+        // repository.toggleFavorite(taskId)
     }
 }

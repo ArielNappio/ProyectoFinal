@@ -5,5 +5,5 @@ import com.example.proyectofinal.student.domain.model.Task
 import kotlinx.coroutines.flow.Flow
 
 interface OrderManagmentProvider {
-    fun getOrdersManagment(): Flow<NetworkResponse<List<Task>>>
+    fun getOrdersManagment(studentId: String): Flow<NetworkResponse<List<Task>>>
 }
