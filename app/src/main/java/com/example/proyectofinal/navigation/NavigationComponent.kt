@@ -9,6 +9,7 @@ import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
+import com.example.proyectofinal.auth.presentation.view.LoginScreen
 import com.example.proyectofinal.mail.domain.model.MailboxType
 //import com.example.proyectofinal.auth.presentation.view.LoginScreen
 import com.example.proyectofinal.mail.presentation.view.InboxScreen
@@ -32,9 +33,9 @@ fun NavigationComponent(
         navController = navController,
         startDestination = ScreensRoute.Home.route
     ) {
-//        composable(route = ScreensRoute.Login.route) {
-//            LoginScreen(navController)
-//        }
+        composable(route = ScreensRoute.Login.route) {
+            LoginScreen(navController)
+        }
         composable(route = ScreensRoute.Home.route) {
             HomeScreen(navController, modifier)
         }

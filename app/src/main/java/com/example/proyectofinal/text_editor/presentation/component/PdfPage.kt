@@ -6,19 +6,19 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawWithContent
-import coil.compose.AsyncImage
+//import coil.compose.AsyncImage
 
 @Composable
 fun PdfPage(
     page: Bitmap,
     modifier: Modifier = Modifier
 ) {
-    AsyncImage(
-        model = page,
-        contentDescription = null,
-        modifier = modifier
-            .fillMaxWidth()
-            .aspectRatio(page.width.toFloat() / page.height.toFloat())
-            .drawWithContent { drawContent() }
-    )
+//    AsyncImage(
+//        model = page,
+//        contentDescription = null,
+//        modifier = modifier
+//            .fillMaxWidth()
+//            .aspectRatio(page.width.toFloat() / page.height.toFloat())
+//            .drawWithContent { drawContent() }
+//    )
 }
