@@ -8,15 +8,19 @@ import com.example.proyectofinal.text_editor.domain.PdfBitmapConverter
 import com.example.proyectofinal.text_editor.presentation.viewmodel.TextEditorViewModel
 import io.mockk.coEvery
 import io.mockk.mockk
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.runTest
+import kotlinx.coroutines.test.setMain
 import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
 import java.io.File
 
+@OptIn(ExperimentalCoroutinesApi::class)
 class TextEditorViewModelTest {
 
     private lateinit var viewModel: TextEditorViewModel
@@ -31,6 +35,7 @@ class TextEditorViewModelTest {
 
     @Before
     fun setUp() {
+        Dispatchers.setMain(testDispatcher)
         mockContext = mockk()
         mockFile = mockk()
         mockBitmapList = listOf(mockk())
@@ -60,6 +65,8 @@ class TextEditorViewModelTest {
     fun `test updateString updates textState`() = testScope.runTest {
         val newText = "Updated text"
         viewModel.updateString(newText)
+
+        testDispatcher.scheduler.advanceUntilIdle()
         assertEquals(newText, viewModel.textState.first())
     }
 
