@@ -17,9 +17,9 @@ val viewModelModule = module {
     viewModelOf(::CameraViewModel)
     viewModel { LoginViewModel(get(), get()) }
     viewModel { MainViewModel(get(), get()) }
-    viewModel { HomeScreenViewModel(get()) }
+    viewModel { HomeScreenViewModel(get(), get()) }
     viewModel { DetailsViewModel(get()) }
-    viewModel { TaskStudentViewModel(get(), get(), get(), get()) }
+    viewModel { TaskStudentViewModel(get(), get(), get(), get(), get()) }
     viewModel { CommentsViewModel(get(),get())}
     single { ThemeViewModel(get()) }
     viewModel { TextEditorViewModel(get(), get(), get()) }

@@ -9,6 +9,9 @@ import com.example.proyectofinal.audio.domain.model.RecordedAudio
 import com.example.proyectofinal.audio.domain.repository.AudioRepository
 import com.example.proyectofinal.audio.player.AudioPlayerManager
 import com.example.proyectofinal.audio.recorder.AudioRecorderManager
+import com.example.proyectofinal.core.network.NetworkResponse
+import com.example.proyectofinal.orderManagment.domain.provider.OrderManagmentProvider
+import com.example.proyectofinal.orderManagment.domain.usecase.GetOrdersManagmentUseCase
 import com.example.proyectofinal.task_student.presentation.tts.TextToSpeechManager
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -16,17 +19,17 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import java.io.File
-
 
 class TaskStudentViewModel(
     private val ttsManager: TextToSpeechManager,
     private val audioRecorderManager: AudioRecorderManager,
     private val audioPlayerManager: AudioPlayerManager,
-    private val audioRepositoryImpl: AudioRepository
+    private val audioRepositoryImpl: AudioRepository,
+    private val getOrderManagment: GetOrdersManagmentUseCase
 ): ViewModel() {
 
     private val _comments = MutableStateFlow<List<RecordedAudio>>(emptyList())
@@ -80,19 +83,38 @@ class TaskStudentViewModel(
         D. Un paquete tiene un numero de puerto origen y destino
     """.trimIndent()
 
+    private val _orderManagment = MutableStateFlow<NetworkResponse<OrderManagmentProvider?>>(NetworkResponse.Loading())
+    val orderManagment = _orderManagment.asStateFlow()
+
+    private val _pages = MutableStateFlow<List<String>>(emptyList())
+    val pages = _pages.asStateFlow()
+
+    val totalPages: Int
+        get() = _pages.value.size
+
     // Manejo de texto y páginas
 
-    private val _pages = rawText.split("\n\n")
+//    private val _pages = rawText.split("\n\n")
     private val _currentPageIndex = MutableStateFlow(0)
     val currentPageIndex = _currentPageIndex.asStateFlow()
 
-    val totalPages = _pages.size
+//    val totalPages = _pages.size
 
-    val texto = currentPageIndex.map { index -> _pages[index] }.stateIn(
-        scope = viewModelScope,
-        started = SharingStarted.WhileSubscribed(5000),
-        initialValue = _pages[0]
-    )
+//    val texto = currentPageIndex.map { index -> _pages[index] }.stateIn(
+//        scope = viewModelScope,
+//        started = SharingStarted.WhileSubscribed(5000),
+//        initialValue = _pages[0]
+//    )
+
+    val texto = currentPageIndex
+        .combine(_pages) { index, pages ->
+            pages.getOrNull(index) ?: ""
+        }.stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000),
+            initialValue = ""
+        )
+
 
     private val _isFirstPage = MutableStateFlow(true)
     val isFirstPage = _isFirstPage.asStateFlow()
@@ -134,6 +156,7 @@ class TaskStudentViewModel(
 
     init {
         viewModelScope.launch {
+            loadOrderManagment()
             _comments.value = audioRepositoryImpl.getAllAudios()
             ttsManager.isStoped.collect { stopped ->
                 _isStopped.value = stopped
@@ -149,6 +172,27 @@ class TaskStudentViewModel(
             }
         }
     }
+
+    private fun loadOrderManagment() {
+//        viewModelScope.launch {
+//            when (val result = getOrderManagment.invoke()) {
+//                is NetworkResponse.Success<*> -> {
+//                    val paragraphs = result.data?.paragraphTexts.orEmpty()
+//                    _pages.value = paragraphs
+//
+//                    _currentPageIndex.value = 0
+//                    _isFirstPage.value = true
+//                    _isLastPage.value = _pages.value.size <= 1
+//                }
+//                is NetworkResponse.Failure<*> -> {
+//                    // manejar error
+//                }
+//            }
+//        }
+    }
+
+
+
 
     // audio
 
@@ -267,15 +311,15 @@ class TaskStudentViewModel(
     }
 
     fun nextPage() {
-        if (_currentPageIndex.value == _pages.lastIndex-1){
-            _isLastPage.value = true
-            Log.d("Status variable","lastpage true")
-        }
-        if (_currentPageIndex.value < _pages.lastIndex) {
-            _currentPageIndex.value++
-            _isFirstPage.value = false
-            Log.d("Status variable", "first page false")
-        }
+//        if (_currentPageIndex.value == _pages.lastIndex-1){
+//            _isLastPage.value = true
+//            Log.d("Status variable","lastpage true")
+//        }
+//        if (_currentPageIndex.value < _pages.lastIndex) {
+//            _currentPageIndex.value++
+//            _isFirstPage.value = false
+//            Log.d("Status variable", "first page false")
+//        }
     }
 
     fun previousPage() {
@@ -291,13 +335,13 @@ class TaskStudentViewModel(
     }
 
     fun speakCurrentPage() {
-        stopSpeech()
-        val currentText = _pages[_currentPageIndex.value]
-        ttsManager.speak(currentText)
-        _isSpeaking.value = true
-        _isStopped.value = false
-        _isPaused.value = false
-        _showExtraButton.value = true
+//        stopSpeech()
+//        val currentText = _pages[_currentPageIndex.value]
+//        ttsManager.speak(currentText)
+//        _isSpeaking.value = true
+//        _isStopped.value = false
+//        _isPaused.value = false
+//        _showExtraButton.value = true
     }
 
     fun startRecording(){

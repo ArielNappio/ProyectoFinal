@@ -7,5 +7,6 @@ data class Task(
     val isFavorite: Boolean,
     val lastRead: String,
     val pageCount: Int,
-    val hasComments: Boolean
+    val hasComments: Boolean,
+    val paragraphs: List<String>
 )

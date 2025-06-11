@@ -15,5 +15,5 @@ object ApiUrls {
     const val MESSAGES = "${BASE_URL}api/Message/getMessagesByUserId/{userId}"
     const val UPDATE_MESSAGE = "${BASE_URL}api/Message/updateMessage"
     const val SEND_MESSAGE = "${BASE_URL}api/Message/sendMessage"
-
+    const val ORDER_MANAGMENT = "${BASE_URL}api/OrderManagment/getAllByStudent/{studentId}"
 }
