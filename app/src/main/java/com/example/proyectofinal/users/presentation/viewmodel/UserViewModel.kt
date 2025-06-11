@@ -131,11 +131,24 @@ class UserViewModel (
 
     fun deleteUser(id: String) {
         viewModelScope.launch {
-            deleteUserUseCase(id)
+            deleteUserUseCase(id).collect { response ->
+                when (response) {
+                    is NetworkResponse.Loading -> {
+                        Log.d("UserViewModel", "Eliminando usuario...")
+                        // Aquí podrías manejar un estado de loading si querés mostrarlo en la UI
+                    }
+                    is NetworkResponse.Success -> {
+                        Log.d("UserViewModel", "Usuario eliminado correctamente")
+                        fetchUsers() // Recargar la lista después de eliminar
+                    }
+                    is NetworkResponse.Failure -> {
+                        Log.e("UserViewModel", "Error al eliminar usuario: ${response.error}")
+                        // Manejo de error: mostrar mensaje, etc.
+                    }
+                }
+            }
         }
     }
-
-
 
 }
 
