@@ -9,10 +9,8 @@ import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.TextField
-import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.example.proyectofinal.userpreferences.presentation.component.AppText
@@ -29,9 +27,8 @@ fun SearchBar(
         onValueChange = onTextChange,
         placeholder = {
             AppText(
-                "Busca  palabras claves",
+                "Buscá palabras claves",
                 isTitle = false,
-                color = Color.White,
                 overflow = TextOverflow.Ellipsis,
                 modifier = Modifier.fillMaxWidth()
             )
@@ -39,8 +36,7 @@ fun SearchBar(
         leadingIcon = {
             Icon(
                 imageVector = Icons.Default.Search,
-                contentDescription = "Buscar",
-                tint = Color.White
+                contentDescription = "Buscar"
             )
         },
         trailingIcon = {
@@ -48,24 +44,23 @@ fun SearchBar(
                 Icon(
                     imageVector = Icons.Default.Mic,
                     contentDescription = "Buscar por voz",
-                    tint = Color.White
                 )
             }
         },
-        colors = TextFieldDefaults.colors(
-            focusedContainerColor = Color(0xFF1E1E1E),
-            unfocusedContainerColor = Color(0xFF1E1E1E),
-            disabledContainerColor = Color(0xFF1E1E1E),
-            cursorColor = Color.White,
-            focusedIndicatorColor = Color.Transparent,
-            unfocusedIndicatorColor = Color.Transparent,
-            disabledIndicatorColor = Color.Transparent,
-            focusedTextColor = Color.White,
-            unfocusedTextColor = Color.White,
-            disabledTextColor = Color.White,
-            focusedPlaceholderColor = Color.White.copy(alpha = 0.5f),
-            unfocusedPlaceholderColor = Color.White.copy(alpha = 0.5f)
-        ),
+//        colors = TextFieldDefaults.colors(
+//            focusedContainerColor = Color(0xFF1E1E1E),
+//            unfocusedContainerColor = Color(0xFF1E1E1E),
+//            disabledContainerColor = Color(0xFF1E1E1E),
+//            cursorColor = Color.White,
+//            focusedIndicatorColor = Color.Transparent,
+//            unfocusedIndicatorColor = Color.Transparent,
+//            disabledIndicatorColor = Color.Transparent,
+//            focusedTextColor = Color.White,
+//            unfocusedTextColor = Color.White,
+//            disabledTextColor = Color.White,
+//            focusedPlaceholderColor = Color.White.copy(alpha = 0.5f),
+//            unfocusedPlaceholderColor = Color.White.copy(alpha = 0.5f)
+//        ),
         shape = RoundedCornerShape(50),
         modifier = modifier
             .fillMaxWidth()

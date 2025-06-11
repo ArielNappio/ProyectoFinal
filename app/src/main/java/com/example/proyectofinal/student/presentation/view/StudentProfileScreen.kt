@@ -11,12 +11,12 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Switch
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -27,13 +27,12 @@ import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.proyectofinal.R
 import com.example.proyectofinal.core.theme.LocalTheme
 import com.example.proyectofinal.core.ui.ThemeViewModel
 import com.example.proyectofinal.navigation.ScreensRoute
-import com.example.proyectofinal.userpreferences.presentation.theme.LocalUserPreferences
+import com.example.proyectofinal.userpreferences.presentation.component.AppText
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
@@ -48,7 +47,7 @@ fun StudentProfileScreen(modifier: Modifier = Modifier, navController: NavContro
         Row(
             modifier = Modifier
                 .fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceEvenly,
+            horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
             // Profile Image
@@ -61,15 +60,12 @@ fun StudentProfileScreen(modifier: Modifier = Modifier, navController: NavContro
                     .background(Color.DarkGray)
             )
 
-            Spacer(modifier = Modifier.height(16.dp))
-
+            Spacer(modifier = Modifier.width(24.dp))
             // Placeholder for user info
             Column {
-                Text("Información de usuario", fontSize = LocalUserPreferences.current.fontSize.sp, fontWeight = FontWeight.Bold)
+                AppText("Información de usuario", isTitle = true, fontWeight = FontWeight.Bold)
                 Spacer(modifier = Modifier.height(4.dp))
-                Text("Ana Fernández", fontSize = 16.sp, fontWeight = FontWeight.Bold)
-                Spacer(modifier = Modifier.height(4.dp))
-                Text("Carrera: Abogacia", fontSize = 16.sp, fontWeight = FontWeight.Bold)
+                AppText("Ana Fernández")
             }
         }
 
@@ -82,9 +78,8 @@ fun StudentProfileScreen(modifier: Modifier = Modifier, navController: NavContro
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Text(
+            AppText(
                 text = "Modo Oscuro",
-                fontSize = 20.sp,
                 fontWeight = FontWeight.Bold,
                 modifier = Modifier.semantics { contentDescription = "Toggle de modo oscuro" }
             )
@@ -106,7 +101,7 @@ fun StudentProfileScreen(modifier: Modifier = Modifier, navController: NavContro
             ),
             shape = RoundedCornerShape(24.dp)
         ) {
-            Text(text = "Configuración de fuente")
+            AppText(text = "Configuración de fuente")
         }
 
         Spacer(modifier = Modifier.weight(1f))
@@ -128,7 +123,7 @@ fun StudentProfileScreen(modifier: Modifier = Modifier, navController: NavContro
             ),
             shape = RoundedCornerShape(24.dp)
         ) {
-            Text("Cerrar sesión")
+            AppText("Cerrar sesión")
         }
 
         Spacer(modifier = Modifier.height(16.dp))
