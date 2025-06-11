@@ -6,6 +6,6 @@ import com.example.proyectofinal.orderManagment.domain.usecase.GetOrdersManagmen
 import org.koin.dsl.module
 
 val orderModule = module {
-    single<OrderManagmentProvider> { OrderManagmentImpl(get()) }
+    single<OrderManagmentProvider> { OrderManagmentImpl(get(), get()) }
     factory { GetOrdersManagmentUseCase(get()) }
 }

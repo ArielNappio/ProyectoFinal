@@ -42,7 +42,6 @@ class AuthRemoteProviderImpl (
    }
 
    override fun getMe(token: String): Flow<NetworkResponse<UserResponseDto>> = flow {
-
        try {
            val response = ktorClient.get(ApiUrls.AUTH_ME) {
                header("Authorization", "Bearer $token")
@@ -56,7 +55,6 @@ class AuthRemoteProviderImpl (
        } catch (e: Exception) {
            emit(NetworkResponse.Failure(error = e.toString()))
        }
-
    }
 
 }
