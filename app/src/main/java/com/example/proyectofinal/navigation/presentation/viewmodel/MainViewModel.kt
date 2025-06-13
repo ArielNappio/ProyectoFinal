@@ -89,7 +89,7 @@ class MainViewModel(
 
     fun logout() {
         viewModelScope.launch {
-            tokenManager.clearToken()
+            tokenManager.clearAuthData()
             _isLoggedIn.update { false }
             println("MainViewModel: Logout called, token cleared, isLoggedIn set to false") // Add this log
         }

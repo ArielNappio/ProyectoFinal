@@ -79,6 +79,7 @@ class LoginViewModel(
                             println("Respuesta exitosa: ${response.data}")
                             if (response.data != null) {
                                 tokenManager.saveToken(response.data.token)
+                                tokenManager.saveUserId(response.data.userId)
                                 _loginState.update { UiState.Success(response.data) }
                                 println("token guardado exitosamente: ${response.data.token}")
                             } else {

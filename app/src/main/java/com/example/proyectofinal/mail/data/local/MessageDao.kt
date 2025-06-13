@@ -19,11 +19,11 @@ interface MessageDao {
 
     // Mensajes en bandeja de entrada
     @Query("SELECT * FROM message WHERE userToID = :currentUserId ORDER BY date DESC")
-    fun getInboxMessages(currentUserId: Int): List<MessageEntity>
+    fun getInboxMessages(currentUserId: String): List<MessageEntity>
 
     // Mensajes en bandeja de salida
     @Query("SELECT * FROM message WHERE userFromId = :currentUserId ORDER BY date DESC")
-    fun getOutboxMessages(currentUserId: Int): List<MessageEntity>
+    fun getOutboxMessages(currentUserId: String): List<MessageEntity>
 
     // Guardar borrador
     @Insert(onConflict = OnConflictStrategy.REPLACE)

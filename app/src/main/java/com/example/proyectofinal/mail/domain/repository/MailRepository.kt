@@ -9,7 +9,7 @@ interface MailRepository {
     suspend fun saveDraft(message: MessageModel)
     suspend fun getDrafts(): List<MessageModel>
     suspend fun deleteDraftById(idMessage: Int)
-    suspend fun getInboxMessages(currentUserId: Int): List<MessageModel>
-    suspend fun getOutboxMessages(currentUserId: Int): List<MessageModel>
+    suspend fun getInboxMessages(currentUserId: String): List<MessageModel>
+    suspend fun getOutboxMessages(currentUserId: String): List<MessageModel>
     suspend fun getDraftById(idMessage: Int): MessageModel
 }
