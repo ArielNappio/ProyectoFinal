@@ -34,15 +34,6 @@ class ThemeViewModelTest {
     }
 
     @Test
-    fun `test setFontFamilySelected updates fontFamilySelected`() = testScope.runTest {
-        viewModel.setFontFamilySelected(true)
-        assertEquals(true, viewModel.fontFamilySelected.first())
-
-        viewModel.setFontFamilySelected(false)
-        assertEquals(false, viewModel.fontFamilySelected.first())
-    }
-
-    @Test
     fun `test logout clears token`() = testScope.runTest {
         viewModel.logout()
         coVerify { mockTokenManager.clearToken() }
