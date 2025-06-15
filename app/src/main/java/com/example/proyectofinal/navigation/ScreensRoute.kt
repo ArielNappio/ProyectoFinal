@@ -14,6 +14,7 @@ enum class ScreensRoute(
     Comments("comments", showsTopBar = false, showsBottomBar = false),
     Chat("chat"),
     UpdateUser("update_user", showsTopBar = true, showsBottomBar = false),
-    ManageUsers("manage_users")
+    ManageUsers("manage_users"),
+    CreateUser("create_user")
 
 }

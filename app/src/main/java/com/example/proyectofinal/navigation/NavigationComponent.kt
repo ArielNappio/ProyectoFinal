@@ -17,6 +17,7 @@ import com.example.proyectofinal.student.presentation.view.HomeScreen
 import com.example.proyectofinal.student.presentation.view.StudentProfileScreen
 import com.example.proyectofinal.student.presentation.view.TaskDetailScreen
 import com.example.proyectofinal.task_student.presentation.view.TaskStudent
+import com.example.proyectofinal.users.presentation.view.CreateUserScreen
 import com.example.proyectofinal.users.presentation.view.ManageUserScreen
 import com.example.proyectofinal.users.presentation.view.UpdateUserScreen
 
@@ -80,7 +81,10 @@ fun NavigationComponent(
             arguments = listOf(navArgument("userId") { type = NavType.StringType})
         ) { backStackEntry ->
             val userId = backStackEntry.arguments?.getString("userId") ?: 0
-            UpdateUserScreen(userId = userId.toString())
+            UpdateUserScreen(
+                userId = userId.toString(),
+                navController = navController
+            )
         }
 
 
@@ -88,6 +92,9 @@ fun NavigationComponent(
             ManageUserScreen(navController = navController)
         }
 
+        composable(route = ScreensRoute.CreateUser.route) {
+            CreateUserScreen(navController = navController)
+        }
 
     }
 }

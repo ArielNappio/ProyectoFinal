@@ -80,7 +80,8 @@ fun ManageUserContent(
         floatingActionButton = {
             ExtendedFloatingActionButton(
                 onClick = {
-                    // Acción para agregar voluntario
+                    navController.navigate("create_user")
+
                 },
                 icon = {
                     Icon(

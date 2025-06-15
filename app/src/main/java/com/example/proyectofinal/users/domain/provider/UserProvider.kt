@@ -9,5 +9,6 @@ interface UserProvider {
     fun getUsers(): Flow<NetworkResponse<List<User>>>
     fun deleteUser(id: String): Flow<NetworkResponse<Unit>>
     fun updateUser(id: String, updatedUser: User): Flow<NetworkResponse<Unit>>
+    fun createUser(createUser: User) : Flow<NetworkResponse<User>>
 
 }

@@ -9,6 +9,7 @@ import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.request.delete
 import io.ktor.client.request.get
+import io.ktor.client.request.post
 import io.ktor.client.request.put
 import io.ktor.client.request.setBody
 import io.ktor.client.statement.bodyAsText
@@ -70,33 +71,55 @@ class UserProviderImpl(
         }
     }
 
-        override fun updateUser(id: String, updatedUser: User): Flow<NetworkResponse<Unit>> = flow {
-            try {
-                emit(NetworkResponse.Loading())
+    override fun updateUser(id: String, updatedUser: User): Flow<NetworkResponse<Unit>> = flow {
+        try {
+            emit(NetworkResponse.Loading())
 
-                val encodedId = id.encodeURLPath()
-                val url = "${ApiUrls.USER.trimEnd('/')}/$encodedId"
+            val encodedId = id.encodeURLPath()
+            val url = "${ApiUrls.USER.trimEnd('/')}/$encodedId"
 
-                Log.d("UpdateUser", "URL final: $url")
+            Log.d("UpdateUser", "URL final: $url")
 
-                val response = ktorClient.put(url) {
-                    contentType(ContentType.Application.Json)
-                    setBody(updatedUser)  // Asegurate que 'User' es serializable
-                }
-
-                if (response.status == HttpStatusCode.OK) {
-                    emit(NetworkResponse.Success(data = Unit))
-                } else {
-                    emit(
-                        NetworkResponse.Failure(
-                            error = "Status: ${response.status}, Body: ${response.bodyAsText()}"
-                        )
-                    )
-                }
-            } catch (e: Exception) {
-                emit(NetworkResponse.Failure(error = e.localizedMessage ?: "Unknown error"))
+            val response = ktorClient.put(url) {
+                contentType(ContentType.Application.Json)
+                setBody(updatedUser)  // Asegurate que 'User' es serializable
             }
 
+            if (response.status == HttpStatusCode.OK) {
+                emit(NetworkResponse.Success(data = Unit))
+            } else {
+                emit(
+                    NetworkResponse.Failure(
+                        error = "Status: ${response.status}, Body: ${response.bodyAsText()}"
+                    )
+                )
+            }
+        } catch (e: Exception) {
+            emit(NetworkResponse.Failure(error = e.localizedMessage ?: "Unknown error"))
         }
 
+    }
+
+    override fun createUser(createUser: User): Flow<NetworkResponse<User>> = flow {
+        emit(NetworkResponse.Loading())
+        try {
+            val response = ktorClient.post(ApiUrls.REGISTER) {   // Cambié USER por REGISTER
+                contentType(ContentType.Application.Json)
+                setBody(createUser)
+            }
+
+            if (response.status == HttpStatusCode.Created || response.status == HttpStatusCode.OK) {
+                val createdUser = response.body<User>()
+                emit(NetworkResponse.Success(createdUser))
+            } else {
+                emit(
+                    NetworkResponse.Failure(
+                        error = "Status: ${response.status}, Body: ${response.bodyAsText()}"
+                    )
+                )
+            }
+        } catch (e: Exception) {
+            emit(NetworkResponse.Failure(error = e.localizedMessage ?: "Unknown error"))
+        }
+    }
 }

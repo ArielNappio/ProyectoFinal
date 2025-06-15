@@ -8,6 +8,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.proyectofinal.auth.di.repositoryModule
 import com.example.proyectofinal.core.network.NetworkResponse
 import com.example.proyectofinal.users.data.model.User
+import com.example.proyectofinal.users.domain.provider.usecase.CreateUserUseCase
 import com.example.proyectofinal.users.domain.provider.usecase.DeleteUserUseCase
 import com.example.proyectofinal.users.domain.provider.usecase.GetUserUseCase
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -18,7 +19,8 @@ import kotlinx.coroutines.launch
 class UserViewModel (
     private val getUserUserCase : GetUserUseCase,
     private val deleteUserUseCase:DeleteUserUseCase,
-    private val updateUserUseCase: UpdateUserUseCase
+    private val updateUserUseCase: UpdateUserUseCase,
+    private val createUserUseCase: CreateUserUseCase
 ) : ViewModel() {
 
 
@@ -202,6 +204,27 @@ class UserViewModel (
             }
         }
     }
+
+
+
+    fun createdUser(user : User) {
+        viewModelScope.launch {
+            createUserUseCase(user).collect{ response ->
+                when (response){
+                    is NetworkResponse.Loading<*> -> {
+                        Log.d("UserViewModel", "Creando Usuario...")
+                    }
+                    is NetworkResponse.Success<*> -> {
+                        Log.d("UserViewModel", "Creacion exitosa ...")
+                    }
+                    is NetworkResponse.Failure<*> -> {
+                        Log.e("UserViewModel", "Error al crear usuario: ${(response as NetworkResponse.Failure).error}")
+                    }
+                }
+            }
+        }
+    }
+
 }
 
 

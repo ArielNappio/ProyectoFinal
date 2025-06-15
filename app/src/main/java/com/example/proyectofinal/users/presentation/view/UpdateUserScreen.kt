@@ -6,6 +6,7 @@ import androidx.annotation.RequiresApi
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -13,11 +14,16 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Divider
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
@@ -38,6 +44,8 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
 import com.example.proyectofinal.users.data.model.User
 import com.example.proyectofinal.users.presentation.viewmodel.UserViewModel
 import org.koin.androidx.compose.koinViewModel
@@ -46,7 +54,9 @@ import org.koin.androidx.compose.koinViewModel
 @Composable
 fun ModificarVoluntarioPreview() {
     MaterialTheme {
-        UpdateUserScreen(userId = "1")
+        val navController = rememberNavController()
+
+        UpdateUserScreen(userId = "1", navController = navController)
     }
 }
 
@@ -54,7 +64,9 @@ fun ModificarVoluntarioPreview() {
 @Composable
 fun UpdateUserScreen(
     userId: String,
-    viewModel: UserViewModel = koinViewModel()
+    viewModel: UserViewModel = koinViewModel(),
+    navController: NavHostController, // <- AGREGAR ESTO
+
 ) {
     val user by viewModel.selectedUser.collectAsState()
     val users by viewModel.users.collectAsState()
@@ -96,15 +108,28 @@ fun UpdateUserScreen(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Spacer(modifier = Modifier.height(10.dp))
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(bottom = 24.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            IconButton(onClick = { navController.popBackStack() }) {
+                Icon(
+                    imageVector = Icons.Default.ArrowBack,
+                    contentDescription = "Volver"
+                )
+            }
 
-        Text(
-            text = "Modificar usuario",
-            style = MaterialTheme.typography.titleMedium.copy(
-                fontSize = 24.sp,
-                fontWeight = FontWeight.Bold
-            ),
-            modifier = Modifier.padding(bottom = 24.dp)
-        )
+            Text(
+                text = "Modificar usuario",
+                style = MaterialTheme.typography.titleMedium.copy(
+                    fontSize = 24.sp,
+                    fontWeight = FontWeight.Bold
+                ),
+                modifier = Modifier.padding(start = 8.dp)
+            )
+        }
 
         Divider()
         Spacer(modifier = Modifier.height(100.dp))
