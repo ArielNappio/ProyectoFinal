@@ -1,5 +1,6 @@
 package com.example.proyectofinal.users.presentation.viewmodel
 
+import UpdateUserUseCase
 import android.util.Log
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
@@ -16,7 +17,8 @@ import kotlinx.coroutines.launch
 
 class UserViewModel (
     private val getUserUserCase : GetUserUseCase,
-    private val deleteUserUseCase:DeleteUserUseCase
+    private val deleteUserUseCase:DeleteUserUseCase,
+    private val updateUserUseCase: UpdateUserUseCase
 ) : ViewModel() {
 
 
@@ -73,26 +75,24 @@ class UserViewModel (
 
 
     fun selectUser(user: User) {
-        updateId(user.id)
-        updateUserName(user.userName)
-        updateFullName(user.fullName)
-        updateEmail(user.email)
-        updatePhoneNumber(user.phoneNumber)
-        updateRoles(user.roles)
+             updateId(user.id)
+            updateUserName(user.userName)
+            updateFullName(user.fullName)
+            updateEmail(user.email)
+            updatePhoneNumber(user.phoneNumber)
+            updateRoles(user.roles)
 
-        User(
-            id = id.value,
-            userName = userName.value,
-            fullName = fullName.value,
-            email = email.value,
-            password = password.value,
-            phoneNumber = phoneNumber.value,
-            roles = roles.value
-        )
-
-       }
+            _selectedUser.value = user
+        }
 
 
+    fun getUserById(userId: String) {
+        val user = _users.value.find { it.id == userId }
+        user?.let {
+            _selectedUser.value = it
+            selectUser(it)
+        }
+    }
 
     fun updateUsers(newUsers: List<User>) {
         _users.value = newUsers
@@ -128,11 +128,6 @@ class UserViewModel (
 
     fun updateRoles(newRoles: List<String>) {
         _roles.value = newRoles
-    }
-
-
-
-    fun changedUser(){
     }
 
 
@@ -189,7 +184,24 @@ class UserViewModel (
             }
         }
     }
-
+    fun changedUser(id: String, updatedUser: User) {
+        viewModelScope.launch {
+            updateUserUseCase(id, updatedUser).collect { response ->
+                when (response) {
+                    is NetworkResponse.Loading -> {
+                        Log.d("UserViewModel", "Actualizando orden de usuario...")
+                    }
+                    is NetworkResponse.Success -> {
+                        Log.d("UserViewModel", "Orden del usuario actualizada correctamente")
+                        fetchUsers()
+                    }
+                    is NetworkResponse.Failure -> {
+                        Log.e("UserViewModel", "Error al actualizar orden del usuario: ${response.error}")
+                    }
+                }
+            }
+        }
+    }
 }
 
 

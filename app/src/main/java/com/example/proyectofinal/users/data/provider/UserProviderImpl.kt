@@ -9,8 +9,12 @@ import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.request.delete
 import io.ktor.client.request.get
+import io.ktor.client.request.put
+import io.ktor.client.request.setBody
 import io.ktor.client.statement.bodyAsText
+import io.ktor.http.ContentType
 import io.ktor.http.HttpStatusCode
+import io.ktor.http.contentType
 import io.ktor.http.encodeURLPath
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
@@ -65,4 +69,34 @@ class UserProviderImpl(
             emit(NetworkResponse.Failure(error = e.toString()))
         }
     }
+
+        override fun updateUser(id: String, updatedUser: User): Flow<NetworkResponse<Unit>> = flow {
+            try {
+                emit(NetworkResponse.Loading())
+
+                val encodedId = id.encodeURLPath()
+                val url = "${ApiUrls.USER.trimEnd('/')}/$encodedId"
+
+                Log.d("UpdateUser", "URL final: $url")
+
+                val response = ktorClient.put(url) {
+                    contentType(ContentType.Application.Json)
+                    setBody(updatedUser)  // Asegurate que 'User' es serializable
+                }
+
+                if (response.status == HttpStatusCode.OK) {
+                    emit(NetworkResponse.Success(data = Unit))
+                } else {
+                    emit(
+                        NetworkResponse.Failure(
+                            error = "Status: ${response.status}, Body: ${response.bodyAsText()}"
+                        )
+                    )
+                }
+            } catch (e: Exception) {
+                emit(NetworkResponse.Failure(error = e.localizedMessage ?: "Unknown error"))
+            }
+
+        }
+
 }

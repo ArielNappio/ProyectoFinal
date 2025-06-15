@@ -1,5 +1,6 @@
 package com.example.proyectofinal.users.data.di
 
+import UpdateUserUseCase
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.proyectofinal.users.data.provider.UserProviderImpl
 import com.example.proyectofinal.users.domain.provider.UserProvider
@@ -18,11 +19,13 @@ val userModule = module {
         viewModel {
         UserViewModel(
             getUserUserCase = get(),
-            deleteUserUseCase = get()
+            deleteUserUseCase = get(),
+            updateUserUseCase = get()
         )
     }
 
 
     factory { GetUserUseCase(get()) }
     factory { DeleteUserUseCase(get()) }
+    factory { UpdateUserUseCase(get()) }
 }

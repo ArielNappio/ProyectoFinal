@@ -11,4 +11,5 @@ object ApiUrls {
     const val TASKS = "${BASE_URL}api/Task"
     const val TASK = "${BASE_URL}api/Task/{id}"
     const val USER = "${BASE_URL}api/User"
+
 }

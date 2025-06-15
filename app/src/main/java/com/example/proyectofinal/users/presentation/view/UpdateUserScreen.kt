@@ -38,13 +38,12 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.proyectofinal.users.data.model.User
 import com.example.proyectofinal.users.presentation.viewmodel.UserViewModel
 import org.koin.androidx.compose.koinViewModel
-
 @RequiresApi(Build.VERSION_CODES.O)
 @Preview(showBackground = true, showSystemUi = true)
 @Composable
-
 fun ModificarVoluntarioPreview() {
     MaterialTheme {
         UpdateUserScreen(userId = "1")
@@ -57,10 +56,8 @@ fun UpdateUserScreen(
     userId: String,
     viewModel: UserViewModel = koinViewModel()
 ) {
-
-
-
     val user by viewModel.selectedUser.collectAsState()
+    val users by viewModel.users.collectAsState()
 
     var email by remember { mutableStateOf("") }
     var userName by remember { mutableStateOf("") }
@@ -69,8 +66,11 @@ fun UpdateUserScreen(
     var phoneNumber by remember { mutableStateOf("") }
     var roles by remember { mutableStateOf("") }
 
-
-
+    LaunchedEffect(userId, users) {
+        if (users.isNotEmpty()) {
+            viewModel.getUserById(userId)
+        }
+    }
 
     LaunchedEffect(user) {
         user?.let {
@@ -82,9 +82,6 @@ fun UpdateUserScreen(
             roles = it.roles.joinToString(", ")
         }
     }
-
-
-
 
     val textFieldColors = OutlinedTextFieldDefaults.colors(
         focusedBorderColor = Color.Blue,
@@ -110,23 +107,20 @@ fun UpdateUserScreen(
         )
 
         Divider()
-
         Spacer(modifier = Modifier.height(100.dp))
 
         Card(
             modifier = Modifier.fillMaxWidth(),
             border = BorderStroke(1.dp, Color.Blue),
             shape = RoundedCornerShape(8.dp),
-            colors = CardDefaults.cardColors(
-                containerColor = Color.White
-            )
+            colors = CardDefaults.cardColors(containerColor = Color.White)
         ) {
             Column(modifier = Modifier.padding(16.dp)) {
                 Text("Email", fontSize = 16.sp, fontWeight = FontWeight.SemiBold)
                 OutlinedTextField(
                     value = email,
                     onValueChange = { email = it },
-                    label = { Text(email, color = Color.Gray) },
+                    label = { Text("Email", color = Color.Gray) },
                     modifier = Modifier.fillMaxWidth(),
                     colors = textFieldColors
                 )
@@ -137,21 +131,8 @@ fun UpdateUserScreen(
                 OutlinedTextField(
                     value = userName,
                     onValueChange = { userName = it },
-                    label = { Text(userName, color = Color.Gray) },
+                    label = { Text("Nombre de usuario", color = Color.Gray) },
                     modifier = Modifier.fillMaxWidth(),
-                    colors = textFieldColors
-                )
-
-                Spacer(modifier = Modifier.height(8.dp))
-
-                Text("Contraseña", fontSize = 16.sp, fontWeight = FontWeight.SemiBold)
-                OutlinedTextField(
-                    value = password,
-                    onValueChange = { password = it },
-                    label = { Text("Password", color = Color.Gray) },
-                    modifier = Modifier.fillMaxWidth(),
-                    visualTransformation = PasswordVisualTransformation(),
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
                     colors = textFieldColors
                 )
 
@@ -161,9 +142,21 @@ fun UpdateUserScreen(
                 OutlinedTextField(
                     value = fullName,
                     onValueChange = { fullName = it },
-                    label = { Text(fullName , color = Color.Gray) },
+                    label = { Text("Nombre completo", color = Color.Gray) },
                     modifier = Modifier.fillMaxWidth(),
                     colors = textFieldColors
+                )
+                Spacer(modifier = Modifier.height(8.dp))
+                Text("Contraseña", fontSize = 16.sp, fontWeight = FontWeight.SemiBold)
+
+                OutlinedTextField(
+                    value = password,
+                    onValueChange = { password = it },
+                    label = { Text("Contraseña", color = Color.Gray) },
+                    modifier = Modifier.fillMaxWidth(),
+                    visualTransformation = PasswordVisualTransformation(),
+                    colors = textFieldColors,
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password)
                 )
 
                 Spacer(modifier = Modifier.height(8.dp))
@@ -172,7 +165,7 @@ fun UpdateUserScreen(
                 OutlinedTextField(
                     value = phoneNumber,
                     onValueChange = { phoneNumber = it },
-                    label = { Text("Phone Number", color = Color.Gray) },
+                    label = { Text("Teléfono", color = Color.Gray) },
                     modifier = Modifier.fillMaxWidth(),
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
                     colors = textFieldColors
@@ -180,20 +173,19 @@ fun UpdateUserScreen(
 
                 Spacer(modifier = Modifier.height(8.dp))
 
-                Text("Roles (separados por coma)", fontSize = 16.sp, fontWeight = FontWeight.SemiBold)
-                OutlinedTextField(
-                    value = roles,
-                    onValueChange = { roles = it },
-                    label = { Text("Roles", color = Color.Gray) },
-                    modifier = Modifier.fillMaxWidth(),
-                    colors = textFieldColors
-                )
-
-                Spacer(modifier = Modifier.height(16.dp))
 
                 Button(
                     onClick = {
-                        // Acción para actualizar usuario
+                        val updatedUser = User(
+                            id = userId,
+                            email = email,
+                            userName = userName,
+                            password = password ,
+                            fullName = fullName,
+                            phoneNumber = phoneNumber,
+                            roles = roles.split(",").map { it.trim() }
+                            )
+                        viewModel.changedUser(userId, updatedUser)
                     },
                     modifier = Modifier.fillMaxWidth(),
                     colors = ButtonDefaults.buttonColors(
@@ -203,7 +195,7 @@ fun UpdateUserScreen(
                         disabledContentColor = Color.LightGray
                     )
                 ) {
-                    Text(user.toString())
+                    Text("Actualizar")
                 }
             }
         }
