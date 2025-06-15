@@ -1,8 +1,10 @@
 package com.example.proyectofinal.users.presentation.viewmodel
 
 import android.util.Log
+import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.proyectofinal.auth.di.repositoryModule
 import com.example.proyectofinal.core.network.NetworkResponse
 import com.example.proyectofinal.users.data.model.User
 import com.example.proyectofinal.users.domain.provider.usecase.DeleteUserUseCase
@@ -52,6 +54,44 @@ class UserViewModel (
 
     private val _roles = MutableStateFlow<List<String>>(emptyList())
     val roles: MutableStateFlow<List<String>> = _roles
+
+
+
+
+
+    private val _selectedUser = MutableStateFlow (User(
+        userName = "",
+        id = "",
+        fullName = "",
+        email = "",
+        password = "",
+        phoneNumber = "",
+        roles = mutableListOf("")
+    ))
+    val selectedUser: StateFlow<User> = _selectedUser.asStateFlow()
+
+
+
+    fun selectUser(user: User) {
+        updateId(user.id)
+        updateUserName(user.userName)
+        updateFullName(user.fullName)
+        updateEmail(user.email)
+        updatePhoneNumber(user.phoneNumber)
+        updateRoles(user.roles)
+
+        User(
+            id = id.value,
+            userName = userName.value,
+            fullName = fullName.value,
+            email = email.value,
+            password = password.value,
+            phoneNumber = phoneNumber.value,
+            roles = roles.value
+        )
+
+       }
+
 
 
     fun updateUsers(newUsers: List<User>) {

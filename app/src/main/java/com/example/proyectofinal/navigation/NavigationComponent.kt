@@ -1,5 +1,7 @@
 package com.example.proyectofinal.navigation
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
@@ -15,7 +17,10 @@ import com.example.proyectofinal.student.presentation.view.HomeScreen
 import com.example.proyectofinal.student.presentation.view.StudentProfileScreen
 import com.example.proyectofinal.student.presentation.view.TaskDetailScreen
 import com.example.proyectofinal.task_student.presentation.view.TaskStudent
+import com.example.proyectofinal.users.presentation.view.ManageUserScreen
+import com.example.proyectofinal.users.presentation.view.UpdateUserScreen
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun NavigationComponent(
     navController: NavHostController,
@@ -23,7 +28,7 @@ fun NavigationComponent(
 ) {
     NavHost(
         navController = navController,
-        startDestination = ScreensRoute.Login.route
+        startDestination = ScreensRoute.ManageUsers.route
     ) {
         composable(route = ScreensRoute.Login.route) {
             LoginScreen(navController)
@@ -69,5 +74,20 @@ fun NavigationComponent(
         composable(route = ScreensRoute.Chat.route) {
             ChatScreen(modifier, navController)
         }
+
+        composable(
+            route = "${ScreensRoute.UpdateUser.route}/{userId}" ,
+            arguments = listOf(navArgument("userId") { type = NavType.StringType})
+        ) { backStackEntry ->
+            val userId = backStackEntry.arguments?.getString("userId") ?: 0
+            UpdateUserScreen(userId = userId.toString())
+        }
+
+
+        composable(route = ScreensRoute.ManageUsers.route) {
+            ManageUserScreen(navController = navController)
+        }
+
+
     }
 }

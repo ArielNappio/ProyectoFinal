@@ -1,9 +1,11 @@
 package com.example.proyectofinal
 
+import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.CompositionLocalProvider
@@ -15,16 +17,20 @@ import com.example.proyectofinal.core.theme.CurrentTheme
 import com.example.proyectofinal.core.theme.LocalTheme
 import com.example.proyectofinal.core.theme.ProyectoFinalTheme
 import com.example.proyectofinal.core.ui.ThemeViewModel
+import com.example.proyectofinal.navigation.NavigationComponent
 import com.example.proyectofinal.navigation.presentation.view.Main
 import com.example.proyectofinal.users.presentation.view.ManageUserScreen
 import org.koin.androidx.compose.koinViewModel
 
 class MainActivity : ComponentActivity() {
+    @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         setContent {
-            ManageUserScreen()
+            val navController = rememberNavController()
+            NavigationComponent(navController = navController)
+
         }
     }
 }

@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Folder
 import androidx.compose.material.icons.filled.Group
@@ -37,36 +38,42 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import androidx.navigation.NavController
+import com.example.proyectofinal.navigation.ScreensRoute
 import com.example.proyectofinal.users.presentation.viewmodel.UserViewModel
 import org.koin.androidx.compose.koinViewModel
 
 
-
 @Composable
-fun ManageUserScreen() {
+fun ManageUserScreen(navController: NavController) {
     val viewModel: UserViewModel = koinViewModel()
     val usuarios by viewModel.users.collectAsState()
 
     LaunchedEffect(Unit) {
         viewModel.fetchUsers()
     }
+
     ManageUserContent(
         usuarios = usuarios,
+        navController = navController,
         onClickEliminar = { user ->
             Log.d("ManageUserScreen", "Eliminar usuario: ${user.id}")
-         viewModel.deleteUser(id = user.id)
-            Log.d("d",user.id)
+            viewModel.deleteUser(id = user.id)
+        },
+        onClickModificar = { user ->
+            viewModel.selectUser(user)
+            navController.navigate("update_user/${user.id}")
         }
     )
-
 }
 
 @Composable
 fun ManageUserContent(
     usuarios: List<User>,
-    onClickEliminar: (User) -> Unit
+    navController: NavController,
+    onClickEliminar: (User) -> Unit,
+    onClickModificar: (User) -> Unit
 ) {
-    val navController = rememberNavController()
     var selectedItem by remember { mutableStateOf(1) }
 
     Scaffold(
@@ -89,7 +96,7 @@ fun ManageUserContent(
                 },
                 containerColor = Color(0xFF0D6EFD),
                 contentColor = Color.White,
-                shape = androidx.compose.foundation.shape.RoundedCornerShape(50)
+                shape = RoundedCornerShape(50)
             )
         },
         bottomBar = {
@@ -139,9 +146,7 @@ fun ManageUserContent(
                         user = user,
                         navController = navController,
                         onClickEliminar = { onClickEliminar(user) },
-                        onClickModificar = {
-
-                        }
+                        onClickModificar = { onClickModificar(user) }
                     )
                 }
             }
