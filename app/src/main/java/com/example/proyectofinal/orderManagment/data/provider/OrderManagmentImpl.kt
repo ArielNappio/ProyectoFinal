@@ -3,10 +3,10 @@ package com.example.proyectofinal.orderManagment.data.provider
 import com.example.proyectofinal.auth.data.tokenmanager.TokenManager
 import com.example.proyectofinal.core.network.ApiUrls
 import com.example.proyectofinal.core.network.NetworkResponse
-import com.example.proyectofinal.orderManagment.data.dto.OrderResponseDto
+import com.example.proyectofinal.orderManagment.data.dto.OrderDeliveredDto
+import com.example.proyectofinal.orderManagment.domain.model.TaskGroup
 import com.example.proyectofinal.orderManagment.domain.provider.OrderManagmentProvider
-import com.example.proyectofinal.orderManagment.mapper.toTask
-import com.example.proyectofinal.student.domain.model.Task
+import com.example.proyectofinal.orderManagment.mapper.toTaskGroup
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.request.get
@@ -21,7 +21,7 @@ class OrderManagmentImpl(
     private val tokenManager: TokenManager
 ) : OrderManagmentProvider {
 
-    override fun getOrdersManagment(studentId: String): Flow<NetworkResponse<List<Task>>> = flow {
+    override fun getOrdersManagment(studentId: String): Flow<NetworkResponse<List<TaskGroup>>> = flow {
         emit(NetworkResponse.Loading())
 
         try {
@@ -38,9 +38,9 @@ class OrderManagmentImpl(
             }
 
             if (response.status == HttpStatusCode.OK) {
-                val responseBody = response.body<List<OrderResponseDto>>()
-                val tasks = responseBody.map { it.toTask() }
-                emit(NetworkResponse.Success(data = tasks))
+                val responseBody = response.body<List<OrderDeliveredDto>>()
+                val taskGroups = responseBody.map { it.toTaskGroup() }  // mapeo a grupos de tareas
+                emit(NetworkResponse.Success(data = taskGroups))
             } else {
                 emit(NetworkResponse.Failure(error = "Error: ${response.status}"))
             }

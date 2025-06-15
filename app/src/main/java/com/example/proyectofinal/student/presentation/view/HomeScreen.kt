@@ -21,9 +21,8 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.proyectofinal.audio.speechrecognizer.SpeechRecognizerManager
 import com.example.proyectofinal.core.network.NetworkResponse
-import com.example.proyectofinal.student.domain.model.Task
 import com.example.proyectofinal.student.presentation.component.SearchBar
-import com.example.proyectofinal.student.presentation.component.TaskCard
+import com.example.proyectofinal.student.presentation.component.TaskGroupCard
 import com.example.proyectofinal.student.presentation.viewmodel.HomeScreenViewModel
 import org.koin.androidx.compose.koinViewModel
 
@@ -80,15 +79,15 @@ fun HomeScreen(navController: NavController, modifier: Modifier = Modifier) {
                     LazyColumn(
                         modifier = Modifier.fillMaxSize()
                     ) {
-                        items(state.data!!) { task: Task ->
-                            TaskCard(
-                                task = task,
-                                onToggleFavorite = { /*id -> viewModel.toggleFavorite(id)*/ },
+                        // Por cada TaskGroup
+                        items(state.data!!) { taskGroup ->
+                            TaskGroupCard(
+                                taskGroup = taskGroup,
+                                onToggleFavorite = { viewModel.toggleFavorite(it) },
                                 navController = navController
                             )
                         }
-                    }
-                }
+                }}
 
                 is NetworkResponse.Failure -> {
                     Text("Error al cargar órdenes: ${state.error}")

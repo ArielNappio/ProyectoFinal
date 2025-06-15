@@ -7,6 +7,13 @@ data class OrderResponseDto(
 )
 
 @kotlinx.serialization.Serializable
+data class OrderDeliveredDto(
+    val id: Int,
+    val title: String,
+    val orders: List<OrderDto>
+)
+
+@kotlinx.serialization.Serializable
 data class OrderDto(
     val id: Int,
     val name: String,

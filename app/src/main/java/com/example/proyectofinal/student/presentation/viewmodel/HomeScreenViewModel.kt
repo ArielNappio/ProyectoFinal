@@ -5,8 +5,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.proyectofinal.auth.data.tokenmanager.TokenManager
 import com.example.proyectofinal.core.network.NetworkResponse
+import com.example.proyectofinal.orderManagment.domain.model.TaskGroup
 import com.example.proyectofinal.orderManagment.domain.usecase.GetOrdersManagmentUseCase
-import com.example.proyectofinal.student.domain.model.Task
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -21,8 +21,8 @@ class HomeScreenViewModel(
     private val _searchText = MutableStateFlow("")
     val searchText = _searchText.asStateFlow()
 
-    private val _orderManagmentState = MutableStateFlow<NetworkResponse<List<Task>>>(NetworkResponse.Loading())
-    val orderManagmentState: StateFlow<NetworkResponse<List<Task>>> = _orderManagmentState.asStateFlow()
+    private val _orderManagmentState = MutableStateFlow<NetworkResponse<List<TaskGroup>>>(NetworkResponse.Loading())
+    val orderManagmentState: StateFlow<NetworkResponse<List<TaskGroup>>> = _orderManagmentState.asStateFlow()
 
     init {
         getOrdersManagments()
