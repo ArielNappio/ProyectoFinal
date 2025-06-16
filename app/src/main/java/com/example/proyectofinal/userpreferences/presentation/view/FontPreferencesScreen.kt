@@ -4,10 +4,10 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material3.Button
@@ -47,6 +47,13 @@ fun FontPreferencesScreen(onDone: () -> Unit) {
     val viewModel: PreferencesViewModel = koinViewModel()
     val prefs by viewModel.preferences.collectAsState()
 
+    val fontOptions = mapOf<String, FontFamily>(
+        ATKINSON_HYPERLEGIBLE_FAMILY_NAME to AtkinsonHyperlegibleFamily,
+        OPEN_DYSLEXIC_FAMILY_NAME to OpenDyslexicFamily,
+        "Default Serif" to FontFamily.Serif,
+        "Monospace" to FontFamily.Monospace
+    )
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -64,97 +71,99 @@ fun FontPreferencesScreen(onDone: () -> Unit) {
 
         HorizontalDivider(thickness = 1.dp, color = Color.DarkGray)
 
-        Text(
-            text = "Tamaño:",
-            color = Color.White,
-            fontSize = prefs.fontSize.sp,
-            fontWeight = FontWeight.SemiBold
-        )
-
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(12.dp)
+        LazyColumn(
+            modifier = Modifier.weight(1f),
+            verticalArrangement = Arrangement.spacedBy(24.dp)
         ) {
-            Slider(
-                value = prefs.fontSize,
-                onValueChange = { viewModel.updateFontSize(it) },
-                valueRange = 12f..40f,
-                steps = 5,
-                modifier = Modifier
-                    .weight(1f)
-                    .semantics {
-                        contentDescription = "Selector de tamaño de fuente"
-                    },
-                colors = SliderDefaults.colors(
-                    thumbColor = BlueDark,
-                    activeTrackColor = CustomBlue,
-                    inactiveTrackColor = Color.DarkGray,
-                    activeTickColor = Color.White,
-                    inactiveTickColor = BlueGray
+            item {
+                Text(
+                    text = "Tamaño:",
+                    color = Color.White,
+                    fontSize = prefs.fontSize.sp,
+                    fontWeight = FontWeight.SemiBold
                 )
-            )
-            Text(
-                text = "${prefs.fontSize.toInt()} sp",
-                color = Color.White,
-                fontSize = 18.sp
-            )
-        }
-
-        Text(
-            text = "Tipo:",
-            color = Color.White,
-            fontSize = prefs.fontSize.sp,
-            fontWeight = FontWeight.SemiBold
-        )
-
-        val fontOptions = mapOf<String, FontFamily>(
-            ATKINSON_HYPERLEGIBLE_FAMILY_NAME to AtkinsonHyperlegibleFamily,
-            OPEN_DYSLEXIC_FAMILY_NAME to OpenDyslexicFamily,
-            "Default Serif" to FontFamily.Serif,
-            "Monospace" to FontFamily.Monospace
-        )
-
-
-        Column(
-            verticalArrangement = Arrangement.spacedBy(12.dp)
-        ) {
-            fontOptions.map { font ->
-                Card(
-                    colors = CardDefaults.cardColors(
-                        containerColor = if (prefs.fontFamily == font.key) CustomBlue else BlueGray
-                    ),
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .semantics { contentDescription = "Botón fuente $font" },
-                    onClick = { viewModel.updateFontFamily(font.key) }
+            }
+            item {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
-                    Row(
+                    Slider(
+                        value = prefs.fontSize,
+                        onValueChange = { viewModel.updateFontSize(it) },
+                        valueRange = 26f..50f,
+                        steps = 5,
                         modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(16.dp),
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.SpaceBetween
-                    ) {
-                        Text(
-                            text = font.key,
-                            fontFamily = font.value,
-                            color = Color.White,
-                            fontSize = prefs.fontSize.sp,
-                            lineHeight = (prefs.fontSize * 1.2).sp
+                            .weight(1f)
+                            .semantics {
+                                contentDescription = "Selector de tamaño de fuente"
+                            },
+                        colors = SliderDefaults.colors(
+                            thumbColor = BlueDark,
+                            activeTrackColor = CustomBlue,
+                            inactiveTrackColor = Color.DarkGray,
+                            activeTickColor = Color.White,
+                            inactiveTickColor = BlueGray
                         )
-                        if (prefs.fontFamily == font.key) {
-                            Icon(
-                                imageVector = Icons.Default.Check,
-                                contentDescription = "Fuente seleccionada",
-                                tint = Color.White
-                            )
+                    )
+                    Text(
+                        text = "${prefs.fontSize.toInt()} sp",
+                        color = Color.White,
+                        fontSize = 18.sp
+                    )
+                }
+
+            }
+            item {
+
+                Text(
+                    text = "Tipo:",
+                    color = Color.White,
+                    fontSize = prefs.fontSize.sp,
+                    fontWeight = FontWeight.SemiBold
+                )
+            }
+            item {
+                Column(
+                    verticalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
+                    fontOptions.map { font ->
+                        Card(
+                            colors = CardDefaults.cardColors(
+                                containerColor = if (prefs.fontFamily == font.key) CustomBlue else BlueGray
+                            ),
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .semantics { contentDescription = "Botón fuente $font" },
+                            onClick = { viewModel.updateFontFamily(font.key) }
+                        ) {
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(16.dp),
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.SpaceBetween
+                            ) {
+                                Text(
+                                    text = font.key,
+                                    fontFamily = font.value,
+                                    color = Color.White,
+                                    fontSize = prefs.fontSize.sp,
+                                    lineHeight = (prefs.fontSize * 1.2).sp
+                                )
+                                if (prefs.fontFamily == font.key) {
+                                    Icon(
+                                        imageVector = Icons.Default.Check,
+                                        contentDescription = "Fuente seleccionada",
+                                        tint = Color.White
+                                    )
+                                }
+                            }
                         }
                     }
                 }
             }
         }
-
-        Spacer(Modifier.weight(1f))
 
         Button(
             onClick = onDone,

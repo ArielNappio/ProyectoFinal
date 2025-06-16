@@ -173,7 +173,8 @@ class MessageViewModel(
     ): File {
         viewModelScope.launch {
             if (isFormValid(career, subject, note, chapter, date)) {
-                val file = saveFormToFile(context, career, subject, note, chapter, date)
+//                val file = saveFormToFile(context, career, subject, note, chapter, date) // FIXME: LOOP INFINITO
+                val file = File("")
                 Log.d("SaveFormDraft", "Archivo guardado en: ${file.absolutePath}")
             } else {
                 Log.e("SaveFormDraft", "Formulario incompleto, no se guarda")
