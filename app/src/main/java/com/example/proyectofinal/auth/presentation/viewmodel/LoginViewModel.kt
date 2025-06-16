@@ -80,10 +80,25 @@ class LoginViewModel(
                             if (response.data != null) {
                                 tokenManager.saveToken(response.data.token)
                                 tokenManager.saveUserId(response.data.userId)
+
+                                repository.getMe().collect { userResponse ->
+                                    when (userResponse) {
+                                        is NetworkResponse.Success -> {
+                                            tokenManager.saveUser(userResponse.data)
+                                            println("Usuario obtenido y guardado: ${userResponse.data?.email}")
+                                        }
+
+                                        is NetworkResponse.Failure -> {
+                                            println("Error al obtener el usuario: ${userResponse.error}")
+                                        }
+
+                                        is NetworkResponse.Loading -> {
+                                            println("Cargando usuario...")
+                                        }
+                                    }
+                                }
+
                                 _loginState.update { UiState.Success(response.data) }
-                                println("token guardado exitosamente: ${response.data.token}")
-                            } else {
-                                println("Datos nulos en la respuesta")
                             }
                         }
                         is NetworkResponse.Loading -> {

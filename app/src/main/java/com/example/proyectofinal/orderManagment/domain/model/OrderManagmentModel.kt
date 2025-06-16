@@ -1,15 +1,33 @@
 package com.example.proyectofinal.orderManagment.domain.model
 
 
-import com.example.proyectofinal.order.domain.model.Order
-import com.example.proyectofinal.student.domain.model.Task
-
-data class OrderManagmentModel(
-    val order: Order,
-    val paragraphTexts: List<String>,
+data class OrderDelivered(
+    val studentId: String,
+    val id: Int,
+    val status: String,
+    val title: String,
+    val orders: List<OrderStudent>,
+    val orderParagraphs: List<OrderParagraph>,
 )
 
-data class TaskGroup(
-    val title: String,
-    val tasks: List<Task>
+data class OrderStudent(
+    val id: Int,
+    val name: String,
+    val description: String,
+    val isFavorite: Boolean = false,
+    val lastRead: String = "0",
+    val pageCount: Int = 0,
+    val hasComments: Boolean = false,
+    val subject: String,
+    val authorName: String?,
+    val rangePage: String?,
+    val status: String?,
+    val voluntarioId: String?,
+    val alumnoId: String?
+)
+
+data class OrderParagraph(
+    val orderId: Int,
+    val paragraphText: String,
+    val pageNumber: Int,
 )

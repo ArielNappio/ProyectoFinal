@@ -4,13 +4,14 @@ import com.example.proyectofinal.auth.data.tokenmanager.TokenManager
 import com.example.proyectofinal.core.network.ApiUrls
 import com.example.proyectofinal.core.network.NetworkResponse
 import com.example.proyectofinal.orderManagment.data.dto.OrderDeliveredDto
-import com.example.proyectofinal.orderManagment.domain.model.TaskGroup
+import com.example.proyectofinal.orderManagment.domain.model.OrderDelivered
 import com.example.proyectofinal.orderManagment.domain.provider.OrderManagmentProvider
-import com.example.proyectofinal.orderManagment.mapper.toTaskGroup
+import com.example.proyectofinal.orderManagment.mapper.toDomain
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.request.get
 import io.ktor.client.request.header
+import io.ktor.client.statement.bodyAsText
 import io.ktor.http.HttpStatusCode
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.firstOrNull
@@ -21,7 +22,7 @@ class OrderManagmentImpl(
     private val tokenManager: TokenManager
 ) : OrderManagmentProvider {
 
-    override fun getOrdersManagment(studentId: String): Flow<NetworkResponse<List<TaskGroup>>> = flow {
+    override fun getOrdersManagment(studentId: String): Flow<NetworkResponse<List<OrderDelivered>>> = flow {
         emit(NetworkResponse.Loading())
 
         try {
@@ -36,11 +37,13 @@ class OrderManagmentImpl(
             val response = httpClient.get(url) {
                 header("Authorization", "Bearer $token")
             }
+            val bodyText = response.bodyAsText()
+            println("DEBUG JSON: $bodyText")
 
             if (response.status == HttpStatusCode.OK) {
                 val responseBody = response.body<List<OrderDeliveredDto>>()
-                val taskGroups = responseBody.map { it.toTaskGroup() }  // mapeo a grupos de tareas
-                emit(NetworkResponse.Success(data = taskGroups))
+                val orderDelivered = responseBody.map { it.toDomain() }
+                emit(NetworkResponse.Success(data = orderDelivered))
             } else {
                 emit(NetworkResponse.Failure(error = "Error: ${response.status}"))
             }

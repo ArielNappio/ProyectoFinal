@@ -79,7 +79,6 @@ fun HomeScreen(navController: NavController, modifier: Modifier = Modifier) {
                     LazyColumn(
                         modifier = Modifier.fillMaxSize()
                     ) {
-                        // Por cada TaskGroup
                         items(state.data!!) { taskGroup ->
                             TaskGroupCard(
                                 taskGroup = taskGroup,

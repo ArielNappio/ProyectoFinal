@@ -50,7 +50,7 @@ class MainViewModel(
 
     private suspend fun getUserData(token: String) {
         println("MainViewModel: Attempting to fetch user data with token: $token")
-        authRemoteRepository.getMe(token)
+        authRemoteRepository.getMe()
             .onStart {
                 if (_userState.value !is UiState.Loading) {
                     _userState.update { UiState.Loading }

@@ -2,6 +2,7 @@ package com.example.proyectofinal.order.domain.model
 
 import kotlinx.serialization.Serializable
 
+
 @Serializable
 data class Order(
     val id: Int,

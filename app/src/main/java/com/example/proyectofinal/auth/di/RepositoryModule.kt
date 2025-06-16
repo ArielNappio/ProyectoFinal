@@ -6,7 +6,7 @@ import org.koin.dsl.module
 
 val repositoryModule = module {
     single<AuthRemoteProvider> {
-        AuthRemoteProviderImpl(get())
-        AuthRemoteProviderImpl(get())
+        AuthRemoteProviderImpl(get(),get())
+        AuthRemoteProviderImpl(get(),get())
     }
 }
