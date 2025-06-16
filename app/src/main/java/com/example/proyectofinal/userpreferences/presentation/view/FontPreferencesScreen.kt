@@ -32,11 +32,11 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.proyectofinal.core.theme.ATKINSON_HYPERLEGIBLE_FAMILY_NAME
+import com.example.proyectofinal.core.theme.AtkinsonHyperlegibleFamily
 import com.example.proyectofinal.core.theme.BlueDark
 import com.example.proyectofinal.core.theme.BlueGray
 import com.example.proyectofinal.core.theme.CustomBlue
 import com.example.proyectofinal.core.theme.CustomGreen
-import com.example.proyectofinal.core.theme.AtkinsonHyperlegibleFamily
 import com.example.proyectofinal.core.theme.OPEN_DYSLEXIC_FAMILY_NAME
 import com.example.proyectofinal.core.theme.OpenDyslexicFamily
 import com.example.proyectofinal.userpreferences.presentation.viewmodel.PreferencesViewModel
@@ -171,4 +171,3 @@ fun FontPreferencesScreen(onDone: () -> Unit) {
         }
     }
 }
-

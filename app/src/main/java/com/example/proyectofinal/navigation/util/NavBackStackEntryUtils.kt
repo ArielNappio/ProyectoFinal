@@ -11,14 +11,8 @@ private fun NavBackStackEntry.hasProperty(predicate: (ScreensRoute) -> Boolean):
     }
 }
 
-fun NavBackStackEntry.showsBottomBar(): Boolean {
-    return hasProperty { it.showsBottomBar }
-}
+fun NavBackStackEntry.showsBottomBar(): Boolean = hasProperty { it.showsBottomBar }
 
-fun NavBackStackEntry.showsTopBar(): Boolean {
-    return hasProperty { it.showsTopBar }
-}
+fun NavBackStackEntry.showsTopBar(): Boolean = hasProperty { it.showsTopBar }
 
-fun NavBackStackEntry.showBackButton(): Boolean {
-    return destination.route?.startsWith(ScreensRoute.TaskDetails.route) == true
-}
+fun NavBackStackEntry.showBackButton(): Boolean = hasProperty { it.showsBackButton }
