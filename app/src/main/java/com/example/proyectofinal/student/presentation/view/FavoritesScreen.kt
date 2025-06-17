@@ -22,7 +22,7 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.proyectofinal.R
 import com.example.proyectofinal.core.network.NetworkResponse
-import com.example.proyectofinal.orderManagment.domain.model.OrderStudent
+import com.example.proyectofinal.orderManagement.domain.model.OrderStudent
 import com.example.proyectofinal.student.presentation.component.TaskCard
 import com.example.proyectofinal.student.presentation.viewmodel.HomeScreenViewModel
 import org.koin.androidx.compose.koinViewModel
@@ -33,7 +33,7 @@ fun FavoritesScreen(
     navController: NavController
 ) {
     val viewModel = koinViewModel<HomeScreenViewModel>()
-    val state by viewModel.orderManagmentState.collectAsState()
+    val state by viewModel.orderManagementState.collectAsState()
 
     val favoriteTasks = when (state) {
         is NetworkResponse.Success -> {

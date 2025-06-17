@@ -1,6 +1,8 @@
-package com.example.proyectofinal.orderManagment.data.dto
+package com.example.proyectofinal.orderManagement.data.dto
 
-@kotlinx.serialization.Serializable
+import kotlinx.serialization.Serializable
+
+@Serializable
 data class OrderDeliveredDto(
     val studentId: String,
     val id: Int,
@@ -10,7 +12,7 @@ data class OrderDeliveredDto(
     val orderParagraphs: List<OrderParagraphDto>,
 )
 
-@kotlinx.serialization.Serializable
+@Serializable
 data class OrderDto(
     val id: Int,
     val name: String,
@@ -23,7 +25,7 @@ data class OrderDto(
     val alumnoId: String,
 )
 
-@kotlinx.serialization.Serializable
+@Serializable
 data class OrderParagraphDto(
     val orderId: Int,
     val paragraphText: String,

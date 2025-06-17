@@ -107,7 +107,7 @@ fun InboxScreen(
                 viewModel.updateMessageStatus(message.id, OutboxMessageModel.MessageStatus.valueOf(status))
             } } else null,
             onDelete = if (mailboxType == MailboxType.DRAFT) { { id ->
-                viewModel.discardDraft(id.toInt())
+                viewModel.discardDraft(id.toInt()) 
             } } else null,
             onContinueEditing = if (mailboxType == MailboxType.DRAFT) { { message ->
                 navController.navigate("${ScreensRoute.Message.route}?draftId=${message.id}")

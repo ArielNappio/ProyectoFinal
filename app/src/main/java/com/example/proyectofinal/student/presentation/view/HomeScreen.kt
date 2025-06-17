@@ -29,8 +29,7 @@ import org.koin.androidx.compose.koinViewModel
 @Composable
 fun HomeScreen(navController: NavController, modifier: Modifier = Modifier) {
     val viewModel = koinViewModel<HomeScreenViewModel>()
-    //val tasks by viewModel.tasks.collectAsState()
-    val orderState by viewModel.orderManagmentState.collectAsState()
+    val orderState by viewModel.orderManagementState.collectAsState()
     Log.d("HomeScreen", "OrderState: $orderState")
 
     val context = LocalContext.current
@@ -70,7 +69,7 @@ fun HomeScreen(navController: NavController, modifier: Modifier = Modifier) {
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            when (val state = orderState) {
+            when (val orders = orderState) {
                 is NetworkResponse.Loading -> {
                     Text("Cargando órdenes...")
                 }
@@ -79,9 +78,9 @@ fun HomeScreen(navController: NavController, modifier: Modifier = Modifier) {
                     LazyColumn(
                         modifier = Modifier.fillMaxSize()
                     ) {
-                        items(state.data!!) { taskGroup ->
+                        items(orders.data!!) { task ->
                             TaskGroupCard(
-                                taskGroup = taskGroup,
+                                taskGroup = task,
                                 onToggleFavorite = { viewModel.toggleFavorite(it) },
                                 navController = navController
                             )
@@ -89,7 +88,7 @@ fun HomeScreen(navController: NavController, modifier: Modifier = Modifier) {
                 }}
 
                 is NetworkResponse.Failure -> {
-                    Text("Error al cargar órdenes: ${state.error}")
+                    Text("Error al cargar órdenes: ${orders.error}")
                 }
             }
 

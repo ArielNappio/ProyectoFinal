@@ -1,9 +1,8 @@
-package com.example.proyectofinal.orderManagment.domain.model
-
+package com.example.proyectofinal.orderManagement.domain.model
 
 data class OrderDelivered(
     val studentId: String,
-    val id: Int,
+    val id: String,
     val status: String,
     val title: String,
     val orders: List<OrderStudent>,

@@ -8,4 +8,5 @@ data class Task(
     val lastRead: String,
     val pageCount: Int,
     val hasComments: Boolean,
+    //texto: List<String>
 )

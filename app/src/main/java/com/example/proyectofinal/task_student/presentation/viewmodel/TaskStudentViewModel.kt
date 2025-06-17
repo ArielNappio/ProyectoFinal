@@ -10,8 +10,8 @@ import com.example.proyectofinal.audio.domain.repository.AudioRepository
 import com.example.proyectofinal.audio.player.AudioPlayerManager
 import com.example.proyectofinal.audio.recorder.AudioRecorderManager
 import com.example.proyectofinal.core.network.NetworkResponse
-import com.example.proyectofinal.orderManagment.domain.provider.OrderManagmentProvider
-import com.example.proyectofinal.orderManagment.domain.usecase.GetOrdersManagmentUseCase
+import com.example.proyectofinal.orderManagement.domain.provider.OrderManagementProvider
+import com.example.proyectofinal.orderManagement.domain.usecase.GetTaskGroupByStudentUseCase
 import com.example.proyectofinal.task_student.presentation.tts.TextToSpeechManager
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -29,7 +29,7 @@ class TaskStudentViewModel(
     private val audioRecorderManager: AudioRecorderManager,
     private val audioPlayerManager: AudioPlayerManager,
     private val audioRepositoryImpl: AudioRepository,
-    private val getOrderManagment: GetOrdersManagmentUseCase
+    private val getOrderManagment: GetTaskGroupByStudentUseCase
 ): ViewModel() {
 
     private val _comments = MutableStateFlow<List<RecordedAudio>>(emptyList())
@@ -83,7 +83,7 @@ class TaskStudentViewModel(
         D. Un paquete tiene un numero de puerto origen y destino
     """.trimIndent()
 
-    private val _orderManagment = MutableStateFlow<NetworkResponse<OrderManagmentProvider?>>(NetworkResponse.Loading())
+    private val _orderManagment = MutableStateFlow<NetworkResponse<OrderManagementProvider?>>(NetworkResponse.Loading())
     val orderManagment = _orderManagment.asStateFlow()
 
     private val _pages = MutableStateFlow<List<String>>(emptyList())

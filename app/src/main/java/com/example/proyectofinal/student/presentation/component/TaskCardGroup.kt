@@ -17,7 +17,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import com.example.proyectofinal.orderManagment.domain.model.OrderDelivered
+import com.example.proyectofinal.orderManagement.domain.model.OrderDelivered
 import com.example.proyectofinal.userpreferences.presentation.component.AppText
 
 @Composable

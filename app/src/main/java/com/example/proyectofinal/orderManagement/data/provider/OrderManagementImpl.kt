@@ -1,12 +1,12 @@
-package com.example.proyectofinal.orderManagment.data.provider
+package com.example.proyectofinal.orderManagement.data.provider
 
 import com.example.proyectofinal.auth.data.tokenmanager.TokenManager
 import com.example.proyectofinal.core.network.ApiUrls
 import com.example.proyectofinal.core.network.NetworkResponse
-import com.example.proyectofinal.orderManagment.data.dto.OrderDeliveredDto
-import com.example.proyectofinal.orderManagment.domain.model.OrderDelivered
-import com.example.proyectofinal.orderManagment.domain.provider.OrderManagmentProvider
-import com.example.proyectofinal.orderManagment.mapper.toDomain
+import com.example.proyectofinal.orderManagement.data.dto.OrderDeliveredDto
+import com.example.proyectofinal.orderManagement.domain.model.OrderDelivered
+import com.example.proyectofinal.orderManagement.domain.provider.OrderManagementProvider
+import com.example.proyectofinal.orderManagement.mapper.toDomain
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.request.get
@@ -17,12 +17,12 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flow
 
-class OrderManagmentImpl(
+class OrderManagementImpl(
     private val httpClient: HttpClient,
     private val tokenManager: TokenManager
-) : OrderManagmentProvider {
+) : OrderManagementProvider {
 
-    override fun getOrdersManagment(studentId: String): Flow<NetworkResponse<List<OrderDelivered>>> = flow {
+    override fun getOrdersManagement(studentId: String): Flow<NetworkResponse<List<OrderDelivered>>> = flow {
         emit(NetworkResponse.Loading())
 
         try {
@@ -33,7 +33,7 @@ class OrderManagmentImpl(
                 return@flow
             }
 
-            val url = ApiUrls.ORDER_MANAGMENT.replace("{studentId}", studentId)
+            val url = ApiUrls.ORDERS_BY_STUDENT.replace("{studentId}", studentId)
             val response = httpClient.get(url) {
                 header("Authorization", "Bearer $token")
             }

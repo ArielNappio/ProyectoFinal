@@ -25,7 +25,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.proyectofinal.core.theme.CustomOrange
 import com.example.proyectofinal.navigation.ScreensRoute
-import com.example.proyectofinal.orderManagment.domain.model.OrderStudent
+import com.example.proyectofinal.orderManagement.domain.model.OrderStudent
 import com.example.proyectofinal.userpreferences.presentation.component.AppText
 
 @Composable

@@ -5,8 +5,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.proyectofinal.auth.data.tokenmanager.TokenManager
 import com.example.proyectofinal.core.network.NetworkResponse
-import com.example.proyectofinal.orderManagment.domain.model.OrderDelivered
-import com.example.proyectofinal.orderManagment.domain.usecase.GetOrdersManagmentUseCase
+import com.example.proyectofinal.orderManagement.domain.model.OrderDelivered
+import com.example.proyectofinal.orderManagement.domain.usecase.GetTaskGroupByStudentUseCase
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -14,26 +14,30 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 
 class HomeScreenViewModel(
-    private val getOrdersManagment: GetOrdersManagmentUseCase,
+    private val getOrders: GetTaskGroupByStudentUseCase,
     private val tokenManager: TokenManager,
     ) : ViewModel() {
 
     private val _searchText = MutableStateFlow("")
     val searchText = _searchText.asStateFlow()
 
-    private val _orderManagmentState = MutableStateFlow<NetworkResponse<List<OrderDelivered>>>(NetworkResponse.Loading())
-    val orderManagmentState: StateFlow<NetworkResponse<List<OrderDelivered>>> = _orderManagmentState.asStateFlow()
+    private val _orderManagementState = MutableStateFlow<NetworkResponse<List<OrderDelivered>>>(NetworkResponse.Loading())
+    val orderManagementState: StateFlow<NetworkResponse<List<OrderDelivered>>> = _orderManagementState.asStateFlow()
+
+    private val _orders = MutableStateFlow<List<OrderDelivered>>(emptyList())
+    val orders: StateFlow<List<OrderDelivered>> = _orders.asStateFlow()
 
     init {
-        getOrdersManagments()
+        getOrdersManagements()
     }
 
-    private fun getOrdersManagments() {
+    private fun getOrdersManagements() {
         viewModelScope.launch {
             val userId = tokenManager.userId.first()
             if (userId != null) {
-                getOrdersManagment(userId).collect { response ->
-                    _orderManagmentState.value = response
+                getOrders(userId).collect { response ->
+                    _orderManagementState.value = response
+                    _orders.value = response.data ?: emptyList()
                     println("DEBUG JSON: $response")
                 }
                 Log.d("Home", "User ID: $userId")
