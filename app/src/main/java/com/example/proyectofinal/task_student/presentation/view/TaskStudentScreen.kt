@@ -27,11 +27,13 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.MenuBook
 import androidx.compose.material.icons.automirrored.filled.VolumeUp
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.ArrowForward
@@ -41,7 +43,6 @@ import androidx.compose.material.icons.filled.Description
 import androidx.compose.material.icons.filled.Feedback
 import androidx.compose.material.icons.filled.FileDownload
 import androidx.compose.material.icons.filled.FontDownload
-import androidx.compose.material.icons.filled.MenuBook
 import androidx.compose.material.icons.filled.Pause
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Star
@@ -53,6 +54,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -68,6 +70,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -81,7 +84,6 @@ import com.example.proyectofinal.task_student.presentation.viewmodel.TaskStudent
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import org.koin.androidx.compose.koinViewModel
 
-
 @OptIn(ExperimentalPermissionsApi::class)
 @Composable
 fun TaskStudent(navController: NavHostController) {
@@ -89,6 +91,7 @@ fun TaskStudent(navController: NavHostController) {
     val viewModel = koinViewModel<TaskStudentViewModel>()
     val text by viewModel.texto.collectAsState()
     val isSpeaking by viewModel.isSpeaking.collectAsState()
+    val isDownloading by viewModel.isDownloadInProgress.collectAsState()
     val isPaused by viewModel.isPaused.collectAsState()
 
     val showExtraButtons by viewModel.showExtraButton.collectAsState()
@@ -109,18 +112,16 @@ fun TaskStudent(navController: NavHostController) {
 
     var rating by remember { mutableStateOf(0) }
 
-
-
     var isRecording by remember { mutableStateOf(false) }
     var hasRecording by remember { mutableStateOf(false) }
     var isPlaying by remember { mutableStateOf(false) }
     val recordedFilePath by viewModel.recordedFeedbackFilePath.collectAsState()
 
-
     // Simula el tiempo grabado
     val timer = rememberCoroutineScope()
     var playbackTimeLeft by remember { mutableStateOf(0L) }
 
+    val currentContext = LocalContext.current
 
     Column(
         modifier = Modifier
@@ -488,8 +489,8 @@ fun TaskStudent(navController: NavHostController) {
                     }
                     Spacer(modifier = Modifier.height(8.dp))
 
-                    DownloadOption(".PDF", Icons.Default.MenuBook) {
-                        // Acción al presionar PDF
+                    DownloadOption(".PDF", Icons.AutoMirrored.Filled.MenuBook) {
+                        viewModel.downloadTextAsPdfFile(currentContext)
                     }
                     Spacer(modifier = Modifier.height(8.dp))
 
@@ -655,6 +656,27 @@ fun TaskStudent(navController: NavHostController) {
                         Text(text = "Enviar opinión", color = Color.White)
                     }
                 }
+            }
+        }
+    }
+
+    // Circular progress for download in progress
+    if (isDownloading) {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(Color.Black.copy(alpha = 0.5f)),
+            contentAlignment = Alignment.Center
+        ) {
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center
+            ) {
+                CircularProgressIndicator(
+                    modifier = Modifier.width(64.dp)
+                )
+                Spacer(modifier = Modifier.height(32.dp))
+                Text(text = "Descargando documento...")
             }
         }
     }

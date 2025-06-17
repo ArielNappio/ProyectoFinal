@@ -13,6 +13,7 @@ import com.example.proyectofinal.mail.di.mailModule
 import com.example.proyectofinal.student.data.di.CommentsRepositoryModule
 import com.example.proyectofinal.student.data.di.taskProviderModule
 import com.example.proyectofinal.student.data.di.taskRepositoryModule
+import com.example.proyectofinal.task_student.di.downloadFileUseCasesModule
 import com.example.proyectofinal.task_student.di.ttsModule
 import com.example.proyectofinal.userpreferences.di.preferencesModule
 import com.example.proyectofinal.text_editor.di.pdfBitmapConverterModule
@@ -38,6 +39,7 @@ class WirinApplication: Application() {
                 taskRepositoryModule,
                 taskProviderModule,
                 ttsModule,
+                downloadFileUseCasesModule,
                 CommentsRepositoryModule,
                 mailDatabaseModule,
                 mailModule,

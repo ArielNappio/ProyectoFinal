@@ -1,7 +1,9 @@
 package com.example.proyectofinal.task_student.presentation.viewmodel
 
 
+import android.content.Context
 import android.util.Log
+import android.widget.Toast
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -9,7 +11,9 @@ import com.example.proyectofinal.audio.domain.model.RecordedAudio
 import com.example.proyectofinal.audio.domain.repository.AudioRepository
 import com.example.proyectofinal.audio.player.AudioPlayerManager
 import com.example.proyectofinal.audio.recorder.AudioRecorderManager
+import com.example.proyectofinal.task_student.domain.DownloadAsPdfUseCase
 import com.example.proyectofinal.task_student.presentation.tts.TextToSpeechManager
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -19,6 +23,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.io.File
 
 
@@ -26,7 +31,8 @@ class TaskStudentViewModel(
     private val ttsManager: TextToSpeechManager,
     private val audioRecorderManager: AudioRecorderManager,
     private val audioPlayerManager: AudioPlayerManager,
-    private val audioRepositoryImpl: AudioRepository
+    private val audioRepositoryImpl: AudioRepository,
+    private val downloadAsPdfUseCase: DownloadAsPdfUseCase
 ): ViewModel() {
 
     private val _comments = MutableStateFlow<List<RecordedAudio>>(emptyList())
@@ -40,6 +46,9 @@ class TaskStudentViewModel(
 
     private val _isPlaying = MutableStateFlow(false)
     val isPlaying: StateFlow<Boolean> = _isPlaying
+
+    private val _isDownloadInProgress = MutableStateFlow(false)
+    val isDownloadInProgress: StateFlow<Boolean> = _isDownloadInProgress
 
     private var currentAudioFile: File? = null
 
@@ -338,6 +347,31 @@ class TaskStudentViewModel(
         }
         currentAudioFile = null
         _recordedFeedbackFilePath.value = null
+    }
+
+    fun downloadTextAsPdfFile(context: Context) {
+        _isDownloadInProgress.value = true
+        viewModelScope.launch(context = Dispatchers.IO) {
+            try {
+                downloadAsPdfUseCase(
+                    context,
+                    "Parcial de Seguridad en Aplicaciones Web", // TODO: Cambiar por el título del documento
+                    _pages,
+                    totalPages,
+                    _fontSize.value.value
+                )
+                withContext(Dispatchers.Main) {
+                    _isDownloadInProgress.value = false
+                    Toast.makeText(context, "PDF downloaded successfully", Toast.LENGTH_SHORT).show()
+                }
+            } catch (e: Exception) {
+                Log.e("TaskStudentViewModel", "Error generating and saving PDF: ${e.message}")
+                withContext(Dispatchers.Main) {
+                    _isDownloadInProgress.value = false
+                    Toast.makeText(context, "Error downloading PDF", Toast.LENGTH_SHORT).show()
+                }
+            }
+        }
     }
 
     companion object {

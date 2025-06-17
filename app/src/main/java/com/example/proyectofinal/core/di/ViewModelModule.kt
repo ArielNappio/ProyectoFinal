@@ -19,7 +19,7 @@ val viewModelModule = module {
     viewModel { MainViewModel(get(), get()) }
     viewModel { HomeScreenViewModel(get()) }
     viewModel { DetailsViewModel(get()) }
-    viewModel { TaskStudentViewModel(get(), get(), get(), get()) }
+    viewModel { TaskStudentViewModel(get(), get(), get(), get(), get()) }
     viewModel { CommentsViewModel(get(),get())}
     single { ThemeViewModel(get()) }
     viewModel { TextEditorViewModel(get(), get(), get()) }
