@@ -9,6 +9,10 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
@@ -22,38 +26,37 @@ fun TaskGroupCard(
     onToggleFavorite: (Int) -> Unit,
     navController: NavController
 ) {
+    // Estado para saber si está expandido o no
+    var expanded by remember { mutableStateOf(false) }
+
     Card(
         modifier = Modifier
-            .padding(vertical = 8.dp, horizontal = 16.dp) // Padding exterior para separar esta Card de otras
-            .fillMaxWidth() // Ocupa todo el ancho disponible
+            .padding(vertical = 8.dp, horizontal = 16.dp)
+            .fillMaxWidth()
             .clickable {
-                Log.d("TaskGroupCard", "Click en grupo: ${taskGroup.title}")
-                // Aquí podrías navegar a una pantalla de detalles del grupo o realizar otra acción
+                expanded = !expanded
+                Log.d("TaskGroupCard", "Click en grupo: ${taskGroup.title}, expanded: $expanded")
             },
-        // Estilo de la Card similar a tu TaskCard
-        border = BorderStroke(1.dp, Color.White), // Borde blanco como en TaskCard
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp) // Una pequeña elevación
+        border = BorderStroke(1.dp, Color.White),
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
     ) {
-        Column(
-            modifier = Modifier
-                .padding(16.dp) // Padding interno para el contenido de la Card
-        ) {
-            // Título del grupo de tareas
-            AppText( // Usamos AppText para consistencia con tu TaskCard
+        Column(modifier = Modifier.padding(16.dp)) {
+            AppText(
                 text = taskGroup.title,
-                isTitle = true, // Asumimos que quieres el título del grupo como un título
+                isTitle = true,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(bottom = 8.dp) // Pequeño padding debajo del título para separar de las tareas
+                    .padding(bottom = if (expanded) 8.dp else 0.dp)
             )
 
-            // Iterar y mostrar cada TaskCard dentro de este grupo
-            taskGroup.orders.forEach { task ->
-                TaskCard(
-                    task = task,
-                    onToggleFavorite = onToggleFavorite,
-                    navController = navController
-                )
+            if (expanded) {
+                taskGroup.orders.forEach { task ->
+                    TaskCard(
+                        task = task,
+                        onToggleFavorite = onToggleFavorite,
+                        navController = navController
+                    )
+                }
             }
         }
     }

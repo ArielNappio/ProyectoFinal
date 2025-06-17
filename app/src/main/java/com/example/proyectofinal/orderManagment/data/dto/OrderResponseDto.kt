@@ -19,7 +19,7 @@ data class OrderDto(
     val authorName: String,
     val rangePage: String,
     val status: String,
-    val voluntarioId: String,
+    val voluntarioId: String?,
     val alumnoId: String,
 )
 

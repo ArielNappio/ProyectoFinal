@@ -78,13 +78,13 @@ fun TaskCard(task: OrderStudent, onToggleFavorite: (Int) -> Unit, navController:
                     )
                 }
             }
-            AppText(
-                text = "📅 Ultima vez leído: ${task.lastRead ?: "Sin leer"}",
-                maxLines = 2,
-                //style = MaterialTheme.typography.bodyMedium,
-                overflow = TextOverflow.Ellipsis,
-                //fontSize = 18.sp
-            )
+//            AppText(
+//                text = "📅 Ultima vez leído: ${task.lastRead ?: "Sin leer"}",
+//                maxLines = 2,
+//                //style = MaterialTheme.typography.bodyMedium,
+//                overflow = TextOverflow.Ellipsis,
+//                //fontSize = 18.sp
+//            )
 
             Row(
                 modifier = Modifier
