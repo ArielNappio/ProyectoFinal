@@ -137,7 +137,7 @@ fun TaskDetailScreen(
                 Spacer(modifier = Modifier.height(24.dp))
 
                 Button(
-                    onClick = { navController.navigate(ScreensRoute.Task.route) },
+                    onClick = {  },
                     modifier = Modifier
                         .align(Alignment.CenterHorizontally)
                         .semantics {

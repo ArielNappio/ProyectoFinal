@@ -44,6 +44,7 @@ class OrderManagementImpl(
                 val responseBody = response.body<List<OrderDeliveredDto>>()
                 val orderDelivered = responseBody.map { it.toDomain() }
                 emit(NetworkResponse.Success(data = orderDelivered))
+                println("se supone que todo ok y q la trajo")
             } else {
                 emit(NetworkResponse.Failure(error = "Error: ${response.status}"))
             }

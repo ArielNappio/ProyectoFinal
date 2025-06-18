@@ -7,6 +7,7 @@ import com.example.proyectofinal.orderManagement.data.entity.OrderEntity
 import com.example.proyectofinal.orderManagement.domain.model.OrderDelivered
 import com.example.proyectofinal.orderManagement.domain.model.OrderParagraph
 import com.example.proyectofinal.orderManagement.domain.model.OrderStudent
+import kotlinx.serialization.json.Json
 
 fun OrderDeliveredDto.toDomain(): OrderDelivered = OrderDelivered(
     studentId = studentId,
@@ -45,23 +46,48 @@ fun OrderParagraphDto.toDomain(): OrderParagraph = OrderParagraph(
 )
 
 
-fun OrderDelivered.toEntity(studentId: String) : OrderEntity{
-    return OrderEntity(
-        id = title,
-        title = title,
-        studentId = studentId,
-        content = TODO()
-    )
+fun OrderDelivered.toEntity(studentId: String): OrderEntity {
+    return OrderMapper.toEntity(this)
 }
 
-fun OrderEntity.toTaskGroup() : OrderDelivered {
-    return OrderDelivered(
-        studentId = studentId,
-        id = id,
-        status = TODO(),
-        title = title,
-        orders = TODO(),
-        orderParagraphs = TODO()
-    )
+fun OrderEntity.toTaskGroup(): OrderDelivered {
+    return OrderMapper.toDomain(this)
 }
 
+object OrderMapper {
+    
+    private val json = Json { 
+        ignoreUnknownKeys = true 
+        encodeDefaults = true
+    }
+    
+    fun toEntity(orderDelivered: OrderDelivered): OrderEntity {
+        return OrderEntity(
+            id = orderDelivered.id,
+            title = orderDelivered.title,
+            studentId = orderDelivered.studentId,
+            status = orderDelivered.status,
+            ordersJson = json.encodeToString(orderDelivered.orders),
+            orderParagraphsJson = json.encodeToString(orderDelivered.orderParagraphs)
+        )
+    }
+    
+    fun toDomain(orderEntity: OrderEntity): OrderDelivered {
+        return OrderDelivered(
+            id = orderEntity.id,
+            title = orderEntity.title,
+            studentId = orderEntity.studentId,
+            status = orderEntity.status,
+            orders = json.decodeFromString<List<OrderStudent>>(orderEntity.ordersJson),
+            orderParagraphs = json.decodeFromString<List<OrderParagraph>>(orderEntity.orderParagraphsJson)
+        )
+    }
+    
+    fun toDomainList(entities: List<OrderEntity>): List<OrderDelivered> {
+        return entities.map { toDomain(it) }
+    }
+    
+    fun toEntityList(orders: List<OrderDelivered>): List<OrderEntity> {
+        return orders.map { toEntity(it) }
+    }
+}

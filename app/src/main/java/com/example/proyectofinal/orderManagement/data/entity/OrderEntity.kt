@@ -9,6 +9,7 @@ data class OrderEntity(
     val title: String,
 //    val deliveryDate: String?,
     val studentId: String,
-    val content: List<String>
+    val status: String,
+    val ordersJson: String, // JSON string de List<OrderStudent>
+    val orderParagraphsJson: String // JSON string de List<OrderParagraph>
 )
-

@@ -1,5 +1,7 @@
 package com.example.proyectofinal.orderManagement.domain.model
 
+import kotlinx.serialization.Serializable
+
 data class OrderDelivered(
     val studentId: String,
     val id: String,
@@ -9,6 +11,7 @@ data class OrderDelivered(
     val orderParagraphs: List<OrderParagraph>,
 )
 
+@Serializable
 data class OrderStudent(
     val id: Int,
     val name: String,
@@ -25,6 +28,7 @@ data class OrderStudent(
     val alumnoId: String?
 )
 
+@Serializable
 data class OrderParagraph(
     val orderId: Int,
     val paragraphText: String,

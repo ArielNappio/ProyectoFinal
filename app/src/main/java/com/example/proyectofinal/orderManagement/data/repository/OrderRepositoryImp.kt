@@ -20,25 +20,30 @@ class OrderRepositoryImpl(
         emit(NetworkResponse.Loading())
 
         try {
-            val response = orderProvider.getOrdersManagement(studentId).first()
+            orderProvider.getOrdersManagement(studentId).collect { response ->
+                when (response) {
+                    is NetworkResponse.Success -> {
+                        val entities = response.data!!.map { it.toEntity(studentId) }
+                        orderDao.saveTaskGroup(entities)
+                        emit(response)
+                    }
 
-            if (response is NetworkResponse.Success<*>) {
-                // Guardar en Room
-                val entities = response.data!!.map { it.toEntity(studentId) }
-                orderDao.saveTaskGroup(entities)
-                emit(response)
-            } else {
-                // Leer local
-                val cached = orderDao.getTasksByStudent(studentId).first()
-                if (cached.isNotEmpty()) {
-                    val taskGroups = cached.map { it.toTaskGroup() }
-                    emit(NetworkResponse.Success(taskGroups))
-                } else {
-                    emit(response)
+                    is NetworkResponse.Failure -> {
+                        val cached = orderDao.getTasksByStudent(studentId).first()
+                        if (cached.isNotEmpty()) {
+                            val taskGroups = cached.map { it.toTaskGroup() }
+                            emit(NetworkResponse.Success(taskGroups))
+                        } else {
+                            emit(response)
+                        }
+                    }
+
+                    is NetworkResponse.Loading -> {
+                        // opcional: podés emitir de nuevo Loading si querés mantener el estado
+                    }
                 }
             }
         } catch (e: Exception) {
-            // En error, leer local
             val cached = orderDao.getTasksByStudent(studentId).first()
             if (cached.isNotEmpty()) {
                 val taskGroups = cached.map { it.toTaskGroup() }

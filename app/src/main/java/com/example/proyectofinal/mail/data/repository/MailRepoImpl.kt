@@ -61,7 +61,7 @@ class MailRepoImpl(
     override suspend fun saveDraft(message: MessageModel) {
         withContext(Dispatchers.IO) {
             val draftEntity = message.toEntity()
-            val existingDraft = messageDao.getDraftById(message.studentId.toInt())
+            val existingDraft = messageDao.getDraftById(message.id)
             if (existingDraft != null) {
                 messageDao.updateDraft(draftEntity)
             } else {
