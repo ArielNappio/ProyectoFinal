@@ -14,6 +14,7 @@ import com.example.proyectofinal.audio.recorder.AudioRecorderManager
 import com.example.proyectofinal.task_student.domain.usecase.DownloadAsMp3UseCase
 import com.example.proyectofinal.task_student.domain.usecase.DownloadAsPdfUseCase
 import com.example.proyectofinal.task_student.domain.model.DownloadType
+import com.example.proyectofinal.task_student.domain.usecase.DownloadAsTxtUseCase
 import com.example.proyectofinal.task_student.presentation.tts.TextToSpeechManager
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -35,7 +36,8 @@ class TaskStudentViewModel(
     private val audioPlayerManager: AudioPlayerManager,
     private val audioRepositoryImpl: AudioRepository,
     private val downloadAsPdfUseCase: DownloadAsPdfUseCase,
-    private val downloadAsMp3UseCase: DownloadAsMp3UseCase
+    private val downloadAsMp3UseCase: DownloadAsMp3UseCase,
+    private val downloadAsTxtUseCase: DownloadAsTxtUseCase
 ): ViewModel() {
 
     private val _comments = MutableStateFlow<List<RecordedAudio>>(emptyList())
@@ -356,6 +358,7 @@ class TaskStudentViewModel(
         context: Context,
         type: DownloadType
     ) {
+        var resultMessage = ""
         _isDownloadInProgress.value = true
         viewModelScope.launch(context = Dispatchers.IO) {
             try {
@@ -372,23 +375,28 @@ class TaskStudentViewModel(
                         "Parcial de Seguridad en Aplicaciones Web", // TODO: Cambiar por el título del documento
                         rawText
                     )
-                    DownloadType.TXT -> TODO()
+                    DownloadType.TXT -> downloadAsTxtUseCase(
+                        context,
+                        "Parcial de Seguridad en Aplicaciones Web", // TODO: Cambiar por el título del documento
+                        rawText
+                    )
                 }
-                withContext(Dispatchers.Main) {
-                    _isDownloadInProgress.value = false
-                    Toast.makeText(context, "${type.friendlyName} downloaded successfully", Toast.LENGTH_SHORT).show()
-                }
+                resultMessage = "${type.friendlyName} downloaded successfully"
             } catch (e: Exception) {
                 Log.e("TaskStudentViewModel", "Error generating and saving ${type.friendlyName}: ${e.message}")
+                resultMessage = "Error downloading ${type.friendlyName}"
+            } finally {
                 withContext(Dispatchers.Main) {
                     _isDownloadInProgress.value = false
-                    Toast.makeText(context, "Error downloading ${type.friendlyName}", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(context, resultMessage, Toast.LENGTH_SHORT).show()
                 }
             }
         }
     }
 
     fun downloadTextAsPdfFile(context: Context) = manageFileDownload(context, DownloadType.PDF)
+
+    fun downloadTextAsTxtFile(context: Context) = manageFileDownload(context, DownloadType.TXT)
 
     fun downloadTextAsMp3File(context: Context) = manageFileDownload(context, DownloadType.MP3)
 

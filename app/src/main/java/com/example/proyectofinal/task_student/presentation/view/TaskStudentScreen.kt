@@ -494,7 +494,7 @@ fun TaskStudent(navController: NavHostController) {
                     Spacer(modifier = Modifier.height(8.dp))
 
                     DownloadOption("Texto Plano", Icons.Default.Description) {
-                        // Acción al presionar Texto Plano
+                        viewModel.downloadTextAsTxtFile(currentContext)
                     }
 
                     Spacer(modifier = Modifier.height(24.dp))
