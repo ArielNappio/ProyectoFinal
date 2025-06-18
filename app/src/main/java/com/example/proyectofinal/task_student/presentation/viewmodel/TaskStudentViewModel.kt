@@ -11,7 +11,9 @@ import com.example.proyectofinal.audio.domain.model.RecordedAudio
 import com.example.proyectofinal.audio.domain.repository.AudioRepository
 import com.example.proyectofinal.audio.player.AudioPlayerManager
 import com.example.proyectofinal.audio.recorder.AudioRecorderManager
-import com.example.proyectofinal.task_student.domain.DownloadAsPdfUseCase
+import com.example.proyectofinal.task_student.domain.usecase.DownloadAsMp3UseCase
+import com.example.proyectofinal.task_student.domain.usecase.DownloadAsPdfUseCase
+import com.example.proyectofinal.task_student.domain.model.DownloadType
 import com.example.proyectofinal.task_student.presentation.tts.TextToSpeechManager
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -32,7 +34,8 @@ class TaskStudentViewModel(
     private val audioRecorderManager: AudioRecorderManager,
     private val audioPlayerManager: AudioPlayerManager,
     private val audioRepositoryImpl: AudioRepository,
-    private val downloadAsPdfUseCase: DownloadAsPdfUseCase
+    private val downloadAsPdfUseCase: DownloadAsPdfUseCase,
+    private val downloadAsMp3UseCase: DownloadAsMp3UseCase
 ): ViewModel() {
 
     private val _comments = MutableStateFlow<List<RecordedAudio>>(emptyList())
@@ -349,30 +352,45 @@ class TaskStudentViewModel(
         _recordedFeedbackFilePath.value = null
     }
 
-    fun downloadTextAsPdfFile(context: Context) {
+    private fun manageFileDownload(
+        context: Context,
+        type: DownloadType
+    ) {
         _isDownloadInProgress.value = true
         viewModelScope.launch(context = Dispatchers.IO) {
             try {
-                downloadAsPdfUseCase(
-                    context,
-                    "Parcial de Seguridad en Aplicaciones Web", // TODO: Cambiar por el título del documento
-                    _pages,
-                    totalPages,
-                    _fontSize.value.value
-                )
+                when (type) {
+                    DownloadType.PDF -> downloadAsPdfUseCase(
+                        context,
+                        "Parcial de Seguridad en Aplicaciones Web", // TODO: Cambiar por el título del documento
+                        _pages,
+                        totalPages,
+                        _fontSize.value.value
+                    )
+                    DownloadType.MP3 -> downloadAsMp3UseCase(
+                        context,
+                        "Parcial de Seguridad en Aplicaciones Web", // TODO: Cambiar por el título del documento
+                        rawText
+                    )
+                    DownloadType.TXT -> TODO()
+                }
                 withContext(Dispatchers.Main) {
                     _isDownloadInProgress.value = false
-                    Toast.makeText(context, "PDF downloaded successfully", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(context, "${type.friendlyName} downloaded successfully", Toast.LENGTH_SHORT).show()
                 }
             } catch (e: Exception) {
-                Log.e("TaskStudentViewModel", "Error generating and saving PDF: ${e.message}")
+                Log.e("TaskStudentViewModel", "Error generating and saving ${type.friendlyName}: ${e.message}")
                 withContext(Dispatchers.Main) {
                     _isDownloadInProgress.value = false
-                    Toast.makeText(context, "Error downloading PDF", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(context, "Error downloading ${type.friendlyName}", Toast.LENGTH_SHORT).show()
                 }
             }
         }
     }
+
+    fun downloadTextAsPdfFile(context: Context) = manageFileDownload(context, DownloadType.PDF)
+
+    fun downloadTextAsMp3File(context: Context) = manageFileDownload(context, DownloadType.MP3)
 
     companion object {
         private const val FONT_SIZE_CHANGER_VALUE = 6

@@ -49,7 +49,6 @@ import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.filled.Stop
 import androidx.compose.material.icons.filled.TextDecrease
 import androidx.compose.material.icons.filled.TextIncrease
-import androidx.compose.material.icons.filled.VolumeUp
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
@@ -484,8 +483,8 @@ fun TaskStudent(navController: NavHostController) {
                         modifier = Modifier.padding(bottom = 16.dp)
                     )
 
-                    DownloadOption(".MP3", Icons.Default.VolumeUp) {
-                        // Acción al presionar MP3
+                    DownloadOption(".MP3", Icons.AutoMirrored.Filled.VolumeUp) {
+                        viewModel.downloadTextAsMp3File(currentContext)
                     }
                     Spacer(modifier = Modifier.height(8.dp))
 

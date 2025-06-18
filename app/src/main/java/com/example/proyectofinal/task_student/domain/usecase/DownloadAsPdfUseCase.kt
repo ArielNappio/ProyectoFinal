@@ -1,4 +1,4 @@
-package com.example.proyectofinal.task_student.domain
+package com.example.proyectofinal.task_student.domain.usecase
 
 import android.annotation.SuppressLint
 import android.content.ContentValues
@@ -10,6 +10,7 @@ import android.graphics.Paint
 import android.graphics.Typeface
 import android.graphics.pdf.PdfDocument
 import android.graphics.pdf.PdfDocument.PageInfo
+import android.net.Uri
 import android.os.Build
 import android.os.Environment
 import android.provider.MediaStore
@@ -104,15 +105,11 @@ class DownloadAsPdfUseCase {
         }
 
         val contentResolver = context.contentResolver
-        val downloadsUri = MediaStore.Downloads.EXTERNAL_CONTENT_URI
-
-        // TODO: Handle pre-Q versions
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+        val downloadsUri = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             MediaStore.Downloads.EXTERNAL_CONTENT_URI
         } else {
-            // Define a file path in the app's
-            // private storage (no permissions required)
-            context.getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS)?.toURI()
+            // TODO: Handle pre-Q versions
+            Uri.EMPTY
         }
 
         val contentValues = ContentValues().apply {
@@ -136,34 +133,3 @@ class DownloadAsPdfUseCase {
         }
     }
 }
-
-
-// POSITION calculation
-//val text = "Your Text Here"
-//val paint = Paint().apply {
-//    textSize = 50f
-//    textAlign = Paint.Align.LEFT // Change to CENTER or RIGHT as needed
-//}
-//
-//// Measure text width
-//val textWidth = paint.measureText(text)
-//
-//// Get font metrics
-//val fontMetrics = paint.fontMetrics
-//val textHeight = fontMetrics.descent - fontMetrics.ascent
-//
-//// Calculate x position
-//val canvasWidth = canvas.width
-//val x = when (paint.textAlign) {
-//    Paint.Align.LEFT -> 0f
-//    Paint.Align.CENTER -> canvasWidth / 2f - textWidth / 2f
-//    Paint.Align.RIGHT -> canvasWidth - textWidth
-//    else -> 0f
-//}
-//
-//// Calculate y position
-//val canvasHeight = canvas.height
-//val y = canvasHeight / 2f - (fontMetrics.ascent + fontMetrics.descent) / 2f
-//
-//// Draw text
-//canvas.drawText(text, x, y, paint)
