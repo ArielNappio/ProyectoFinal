@@ -26,11 +26,29 @@ class MainActivity : ComponentActivity() {
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        enableEdgeToEdge()
 
         setContent {
-            val navController = rememberNavController()
-            NavigationComponent(navController = navController)
+            val themeViewModel: ThemeViewModel = koinViewModel()
+            val isDarkTheme by themeViewModel.isDarkTheme.collectAsState()
+            val isCustomFontFamilySelected by themeViewModel.fontFamilySelected.collectAsState()
 
+            val currentTheme = CurrentTheme(isDarkTheme, isCustomFontFamilySelected)
+
+            ProyectoFinalTheme(
+                darkTheme = isDarkTheme,
+                customTypographySelected = isCustomFontFamilySelected
+            ) {
+                CompositionLocalProvider(LocalTheme provides currentTheme) {
+                    Surface(
+                        modifier = Modifier
+                            .fillMaxSize()
+                    ) {
+                        val navController = rememberNavController()
+                        Main(Modifier.fillMaxSize(), navController)
+                    }
+                }
+            }
         }
     }
 }
