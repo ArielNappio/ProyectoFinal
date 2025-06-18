@@ -18,6 +18,7 @@ import com.example.proyectofinal.student.presentation.view.CommentsScreen
 import com.example.proyectofinal.student.presentation.view.FavoritesScreen
 import com.example.proyectofinal.student.presentation.view.HomeScreen
 import com.example.proyectofinal.student.presentation.view.ProjectDetailScreen
+import com.example.proyectofinal.student.presentation.view.SearchScreen
 import com.example.proyectofinal.student.presentation.view.StudentProfileScreen
 import com.example.proyectofinal.student.presentation.view.TaskDetailScreen
 import com.example.proyectofinal.task_student.presentation.view.TaskStudent
@@ -39,6 +40,9 @@ fun NavigationComponent(
         }
         composable(route = ScreensRoute.Home.route) {
             HomeScreen(navController, modifier)
+        }
+        composable(route = ScreensRoute.Search.route) {
+            SearchScreen(navController)
         }
         composable(
             route = "${ScreensRoute.TaskDetails.route}/{taskId}",

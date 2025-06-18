@@ -7,6 +7,7 @@ enum class ScreensRoute(
 ) {
     Login("login", false, false),
     Home("home"),
+    Search("search", false, false),
     Favorites("favorites"),
     Profile("profile"),
     TaskDetails("task_details", showsBottomBar = false),

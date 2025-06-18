@@ -12,8 +12,10 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.outlined.Email
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -61,6 +63,24 @@ fun TopBar(navController: NavController) {
                 Spacer(modifier = Modifier.size(56.dp)) // espacio placeholder para mantener simetría
             }
         } else {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 0.dp),
+                horizontalArrangement = Arrangement.Start,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                IconButton(onClick = {
+                    navController.navigate(ScreensRoute.Search.route)
+                }) {
+                    Icon(
+                        imageVector = Icons.Filled.Search,
+                        contentDescription = "Buscar",
+                        tint = if (LocalTheme.current.isDark) Color.White else Color.Black
+                    )
+                }
+            }
+
             Image(
                 painter = painterResource(
                     id = R.drawable.wirin_25

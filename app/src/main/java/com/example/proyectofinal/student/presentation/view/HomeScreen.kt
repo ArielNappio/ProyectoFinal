@@ -18,21 +18,17 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.proyectofinal.R
-import com.example.proyectofinal.audio.speechrecognizer.SpeechRecognizerManager
 import com.example.proyectofinal.core.network.NetworkResponse
 import com.example.proyectofinal.orderManagement.domain.model.OrderDelivered
-import com.example.proyectofinal.student.presentation.component.SearchBar
 import com.example.proyectofinal.student.presentation.viewmodel.HomeScreenViewModel
 import org.koin.androidx.compose.koinViewModel
 
@@ -40,30 +36,8 @@ import org.koin.androidx.compose.koinViewModel
 fun HomeScreen(navController: NavController, modifier: Modifier = Modifier) {
     val viewModel = koinViewModel<HomeScreenViewModel>()
     val orderState by viewModel.orderManagementState.collectAsState()
+
     Log.d("HomeScreen", "OrderState: $orderState")
-
-    val context = LocalContext.current
-
-    // Speech recognizer
-    val searchText by viewModel.searchText.collectAsState()
-
-    val speechRecognizerManager = remember {
-        SpeechRecognizerManager(
-            context = context,
-            onResult = { result ->
-                viewModel.updateSearchText(result)
-            },
-            onError = { error ->
-                Log.e("SpeechRecognizer", error)
-            }
-        )
-    }
-
-    DisposableEffect(Unit) {
-        onDispose {
-            speechRecognizerManager.stopListening()
-        }
-    }
 
     Box(modifier = modifier.fillMaxSize()) {
         Column(
@@ -71,12 +45,6 @@ fun HomeScreen(navController: NavController, modifier: Modifier = Modifier) {
                 .fillMaxSize()
                 .padding(16.dp)
         ) {
-            SearchBar(
-                searchText = searchText,
-                onTextChange = { viewModel.updateSearchText(it) },
-                onVoiceClick = { speechRecognizerManager.startListening() }
-            )
-
             Spacer(modifier = Modifier.height(16.dp))
 
             when (val orders = orderState) {
@@ -101,36 +69,37 @@ fun HomeScreen(navController: NavController, modifier: Modifier = Modifier) {
                 }
 
                 is NetworkResponse.Success -> {
-                    val filteredProjects = orders.data?.filter { 
-                        it.title.contains(searchText, ignoreCase = true) 
-                    } ?: emptyList()
-                    
+                    val projects = orders.data ?: emptyList()
+
                     LazyColumn(
                         modifier = Modifier.fillMaxSize()
                     ) {
-                        items(filteredProjects) { project ->
+                        items(projects) { project ->
                             ProjectCard(
                                 project = project,
                                 onClick = {
                                     navController.navigate("project_detail/${project.id}")
                                 }
                             )
+                            Spacer(modifier = Modifier.height(8.dp))
                         }
                     }
                 }
-                
+
                 is NetworkResponse.Failure -> {
-                    Text("Error al cargar órdenes: ${orders.error}")
+                    Text(
+                        text = "Error al cargar proyectos: ${orders.error}",
+                        color = Color.White
+                    )
                 }
-
             }
-
         }
     }
 }
 
+
 @Composable
-private fun ProjectCard(
+fun ProjectCard(
     project: OrderDelivered,
     onClick: () -> Unit
 ) {
