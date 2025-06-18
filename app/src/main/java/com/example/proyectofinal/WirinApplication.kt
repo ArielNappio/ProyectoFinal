@@ -15,19 +15,20 @@ import com.example.proyectofinal.student.data.di.CommentsRepositoryModule
 import com.example.proyectofinal.student.data.di.taskProviderModule
 import com.example.proyectofinal.student.data.di.taskRepositoryModule
 import com.example.proyectofinal.task_student.di.ttsModule
+import com.example.proyectofinal.users.data.di.userModule
 import com.example.proyectofinal.userpreferences.di.preferencesModule
 import com.example.proyectofinal.text_editor.di.pdfBitmapConverterModule
 import com.example.proyectofinal.text_editor.di.pdfRemoteRepositoryModule
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.context.GlobalContext.startKoin
 
-class WirinApplication: Application() {
+class MyApplication: Application() {
 
     override fun onCreate() {
         super.onCreate()
 
         startKoin {
-            androidContext(this@WirinApplication)
+            androidContext(this@MyApplication)
             modules(
                 audioModule,
                 databaseModule,
@@ -39,6 +40,9 @@ class WirinApplication: Application() {
                 taskRepositoryModule,
                 taskProviderModule,
                 ttsModule,
+                CommentsRepositoryModule,
+                repositoryModule,
+                userModule,
                 CommentsRepositoryModule,
                 mailDatabaseModule,
                 mailModule,

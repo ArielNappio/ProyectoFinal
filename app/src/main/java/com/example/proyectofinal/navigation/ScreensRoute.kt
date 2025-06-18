@@ -15,5 +15,8 @@ enum class ScreensRoute(
     Mail("mail/{mailboxType}", false, false),
     Message("message", false, false),
     Preferences("user_preferences", false, false),
-    TextEdit("text_edit/{taskId}", showsTopBar = false, showsBottomBar = false)
-}
+    TextEdit("text_edit/{taskId}", showsTopBar = false, showsBottomBar = false),
+    Chat("chat"),
+    UpdateUser("update_user", showsTopBar = true, showsBottomBar = false),
+    ManageUsers("manage_users"),
+    CreateUser("create_user")}
