@@ -11,12 +11,17 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Description
+import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -30,6 +35,7 @@ import com.example.proyectofinal.R
 import com.example.proyectofinal.core.network.NetworkResponse
 import com.example.proyectofinal.orderManagement.domain.model.OrderDelivered
 import com.example.proyectofinal.student.presentation.viewmodel.HomeScreenViewModel
+import com.example.proyectofinal.userpreferences.presentation.component.AppText
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
@@ -63,7 +69,8 @@ fun HomeScreen(navController: NavController, modifier: Modifier = Modifier) {
                             "Están llegando...",
                             "Cultivando ideas...",
                             "Criando animalitos...",
-                            "Rompiendo leyes..."
+                            "Rompiendo leyes...",
+                            "Acariciando gatos..."
                         )
                     )
                 }
@@ -87,9 +94,8 @@ fun HomeScreen(navController: NavController, modifier: Modifier = Modifier) {
                 }
 
                 is NetworkResponse.Failure -> {
-                    Text(
-                        text = "Error al cargar proyectos: ${orders.error}",
-                        color = Color.White
+                    AppText(
+                        text = "Error al cargar proyectos: ${orders.error}"
                     )
                 }
             }
@@ -103,10 +109,12 @@ fun ProjectCard(
     project: OrderDelivered,
     onClick: () -> Unit
 ) {
+    val formattedTitle = project.title.replace(Regex(""" (\S+)$"""), "\u00A0$1")
+
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(vertical = 4.dp)
+            .padding(vertical = 4.dp, horizontal = 16.dp)
             .clickable { onClick() },
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
     ) {
@@ -115,31 +123,49 @@ fun ProjectCard(
                 .fillMaxWidth()
                 .padding(16.dp)
         ) {
-            Text(
-                text = project.title,
-                style = MaterialTheme.typography.headlineSmall,
-                fontWeight = FontWeight.Bold
-            )
-            
-            Spacer(modifier = Modifier.height(8.dp))
-            
+            // Título + favorito
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Text(
-                    text = "Estado: ${project.status}",
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                AppText(
+                    text = formattedTitle,
+                    isTitle = true,
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier.weight(1f)
                 )
-                
+            }
+
+            Spacer(modifier = Modifier.height(12.dp))
+
+            // Tareas con ícono
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Description,
+                    contentDescription = "Tareas",
+                    tint = Color(0xFFB0BEC5)
+                )
+                Spacer(modifier = Modifier.width(6.dp))
+                AppText(
+                    text = "${project.orders.size}",
+                    fontWeight = FontWeight.Medium,
+                    color = Color.Gray
+                )
+
                 Spacer(modifier = Modifier.weight(1f))
-                
-                Text(
-                    text = "${project.orders.size} tareas",
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.primary
-                )
+
+
+                IconButton(onClick = { /* toggle favorito acá */ }) {
+                    Icon(
+                        imageVector = Icons.Default.Star,
+                        modifier = Modifier.size(36.dp),
+                        contentDescription = "Favorito",
+                        tint = Color.Yellow
+                    )
+                }
             }
         }
     }
