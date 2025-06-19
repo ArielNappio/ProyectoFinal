@@ -10,6 +10,8 @@ lifecycleRuntimeKtx = "2.8.7"
 activityCompose = "1.10.1"
 composeBom = "2024.09.00"
 ktor = "3.1.2"
+serialization = "1.8.1"
+pluginserialization = "2.0.21"
 koin = "4.0.3"
 cameraX = "1.4.2"
 accompanistPermissions = "0.37.2"
@@ -19,7 +21,7 @@ navigationRuntimeKtx = "2.8.9"
 navigationRuntimeAndroid = "2.9.0-beta01"
 datastore = "1.1.4"
 roomVersion = "2.6.1"
-ksp = "2.0.0-1.0.24"
+ksp = "2.0.21-1.0.27"
 roomCommonJvm = "2.7.1"
 uiTestJunit4Android = "1.8.2"
 adsMobileSdk = "0.16.0-alpha01"
@@ -43,6 +45,8 @@ androidx-material3 = { group = "androidx.compose.material3", name = "material3" 
 androidx-material-icons-extended = { module = "androidx.compose.material:material-icons-extended" }
 
 kotlinx-coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", version.ref = "kotlinxCoroutinesTest" }
+kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "serialization" }
+
 
 #datastore
 datastore-preferences = { module = "androidx.datastore:datastore-preferences", version.ref = "datastore" }
@@ -93,6 +97,6 @@ android-application = { id = "com.android.application", version.ref = "agp" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 
-jetbrainsKotlinSerialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
+jetbrainsKotlinSerialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "pluginserialization" }
 
 ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }

@@ -6,6 +6,7 @@ import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.proyectofinal.auth.data.tokenmanager.TokenManager
 import com.example.proyectofinal.core.network.NetworkResponse
 import com.example.proyectofinal.mail.domain.model.MessageModel
 import com.example.proyectofinal.mail.domain.usecase.DeleteMessageByIdUseCase
@@ -18,6 +19,8 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.io.File
 import java.time.LocalDateTime
@@ -28,8 +31,13 @@ class MessageViewModel(
     private val sendMessageUseCase: SendMessageUseCase,
     private val saveDraftUseCase: SaveDraftUseCase,
     private val getDraftByIdUseCase: GetDraftByIdUseCase,
-    private val deleteDraftUseCase: DeleteMessageByIdUseCase
+    private val deleteDraftUseCase: DeleteMessageByIdUseCase,
+    private val tokenManager: TokenManager
 ) : ViewModel() {
+
+    init {
+        loadUserId()
+    }
 
     private val _to = MutableStateFlow("")
     val to: StateFlow<String> = _to
@@ -64,6 +72,17 @@ class MessageViewModel(
 
     private val _voiceToText = MutableStateFlow("")
     val voiceToText = _voiceToText.asStateFlow()
+
+    private val _userId = MutableStateFlow("")
+    val userId: StateFlow<String> = _userId
+
+    fun loadUserId() {
+        viewModelScope.launch {
+            val userIdValue = tokenManager.userId.first()
+            _userId.update { userIdValue.toString() }
+            println("${_userId.value} es el userid")
+        }
+    }
 
     fun updateTo(value: String) {
         _to.value = value
@@ -110,7 +129,6 @@ class MessageViewModel(
                 _messageErrorEvent.emit("Por favor, completa todos los campos antes de enviar.")
                 return@launch
             }
-
             _sendMessageState.value = NetworkResponse.Loading()
             sendMessageUseCase(messageModel).collect { response ->
                 _sendMessageState.value = response
@@ -125,7 +143,7 @@ class MessageViewModel(
                 sender = to.value,
                 subject = subject.value,
                 content = message.value,
-                date = Date.from(LocalDateTime.now().atZone(ZoneId.systemDefault()).toInstant()),
+                date = Date.from(LocalDateTime.now().atZone(ZoneId.systemDefault()).toInstant()).toString(),
                 id = draftId.value,
                 formPath = formPath.value,
                 isDraft = true,

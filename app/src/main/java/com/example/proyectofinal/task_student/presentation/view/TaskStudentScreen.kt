@@ -58,6 +58,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -84,12 +85,15 @@ import org.koin.androidx.compose.koinViewModel
 
 @OptIn(ExperimentalPermissionsApi::class)
 @Composable
-fun TaskStudent(navController: NavHostController) {
+fun TaskStudent(taskId: Int, navController: NavHostController) {
 
     val viewModel = koinViewModel<TaskStudentViewModel>()
-    val text by viewModel.texto.collectAsState()
+    val text by viewModel.textoPorPagina.collectAsState()
+    val paragraphs by viewModel.paragraphs.collectAsState()
     val isSpeaking by viewModel.isSpeaking.collectAsState()
     val isPaused by viewModel.isPaused.collectAsState()
+    val currentPage by viewModel.currentPageIndex.collectAsState()
+    val totalPages by viewModel.totalPages.collectAsState()
 
     val showExtraButtons by viewModel.showExtraButton.collectAsState()
     val showDownloadDialog by viewModel.showDownloadDialog.collectAsState()
@@ -120,6 +124,18 @@ fun TaskStudent(navController: NavHostController) {
     // Simula el tiempo grabado
     val timer = rememberCoroutineScope()
     var playbackTimeLeft by remember { mutableStateOf(0L) }
+
+    LaunchedEffect(taskId) {
+        viewModel.loadProject(taskId)
+        println("DEBUG de TEXT: $text")
+    }
+
+    LaunchedEffect(paragraphs) {
+        println("🔥 Se actualizaron los párrafos:")
+        paragraphs.forEach {
+            println("📄 Página: ${it.pageNumber}, Texto: ${it.paragraphText}")
+        }
+    }
 
 
     Column(
@@ -239,7 +255,7 @@ fun TaskStudent(navController: NavHostController) {
                 )
             }
             Text(
-                text = "${currentPageIndex + 1} / ${viewModel.totalPages}",
+                text = "${currentPage + 1} / $totalPages",
                 color = Color.Black,
                 fontSize = 24.sp,
                 modifier = Modifier

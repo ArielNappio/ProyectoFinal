@@ -9,6 +9,12 @@ import com.example.proyectofinal.audio.domain.model.RecordedAudio
 import com.example.proyectofinal.audio.domain.repository.AudioRepository
 import com.example.proyectofinal.audio.player.AudioPlayerManager
 import com.example.proyectofinal.audio.recorder.AudioRecorderManager
+import com.example.proyectofinal.auth.data.tokenmanager.TokenManager
+import com.example.proyectofinal.core.network.NetworkResponse
+import com.example.proyectofinal.orderManagement.domain.model.OrderDelivered
+import com.example.proyectofinal.orderManagement.domain.model.OrderParagraph
+import com.example.proyectofinal.orderManagement.domain.provider.OrderManagementProvider
+import com.example.proyectofinal.orderManagement.domain.usecase.GetTaskGroupByStudentUseCase
 import com.example.proyectofinal.task_student.presentation.tts.TextToSpeechManager
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -16,18 +22,24 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import java.io.File
 
-
 class TaskStudentViewModel(
     private val ttsManager: TextToSpeechManager,
     private val audioRecorderManager: AudioRecorderManager,
     private val audioPlayerManager: AudioPlayerManager,
-    private val audioRepositoryImpl: AudioRepository
+    private val audioRepositoryImpl: AudioRepository,
+    private val getOrders: GetTaskGroupByStudentUseCase,
+    private val tokenManager: TokenManager
 ): ViewModel() {
+
+    private val _projectState = MutableStateFlow<NetworkResponse<OrderDelivered>>(NetworkResponse.Loading())
+    val projectState: StateFlow<NetworkResponse<OrderDelivered>> = _projectState.asStateFlow()
 
     private val _comments = MutableStateFlow<List<RecordedAudio>>(emptyList())
     val comments: StateFlow<List<RecordedAudio>> = _comments
@@ -46,53 +58,27 @@ class TaskStudentViewModel(
     private val _currentPosition = MutableStateFlow(0L)
     val currentPosition: StateFlow<Long> = _currentPosition
 
-    // Texto que se muestra y se lee - hay que cambiar y que traiga texto de la api
-    private val rawText = """
-        1- ¿A que ataque del OWASP Top-Ten se refiere la siguiente definición: "El atacante puede ejecutar secuencias de
-        comandos en el navegador de la víctima..."?
-        A. Secuencia de Comandos en Sitios Cruzados (XSS)
-        B. Ausencia de Control de Acceso a Funciones
-        C. Falsificación de Peticiones en sitios Cruzados (CSRF)
-        D. Referencia Directa Insegura a Objetos
+    private val _paragraphs = MutableStateFlow<List<OrderParagraph>>(emptyList())
+    val paragraphs: StateFlow<List<OrderParagraph>> = _paragraphs
 
-        2- ¿Cuál de estas tecnologías es considerada generadora de riesgo por ser ejecutada en el cliente?
-        A. Java Applet
-        B. Active X
-        C. JavaScript
-        D. Todas son correctas
+    private val _orderManagment = MutableStateFlow<NetworkResponse<OrderManagementProvider?>>(NetworkResponse.Loading())
+    val orderManagment = _orderManagment.asStateFlow()
 
-        3- ¿Cuál de los siguientes puntos NO corresponde a un tipo de vulnerabilidad?
-        A. Debidas al uso
-        B. Debidas al diseño
-        C. Debidas a la implementación
-        D. Ninguna de las anteriores
-       
-        4- ¿Cuál de estas afirmaciones es verdadera con relación a los Firewalls?
-        A. No protege de ataques internos
-        B. No protege de ataques internos
-        C. No protege de todos los ataques dañinos
-        D. Todas las anteriores
-       
-        5- ¿Cuál de los siguientes puntos no es un atributo del protocolo TCP?
-        A. No es orientado a conexión
-        B. Corre sobre IP
-        C. Cada paquete tiene un numero de secuencia y un flag
-        D. Un paquete tiene un numero de puerto origen y destino
-    """.trimIndent()
+    private val _pages = MutableStateFlow<List<String>>(emptyList())
+    val pages = _pages.asStateFlow()
 
-    // Manejo de texto y páginas
-
-    private val _pages = rawText.split("\n\n")
     private val _currentPageIndex = MutableStateFlow(0)
     val currentPageIndex = _currentPageIndex.asStateFlow()
 
-    val totalPages = _pages.size
+    val texto = currentPageIndex
+        .combine(_pages) { index, pages ->
+            pages.getOrNull(index) ?: ""
+        }.stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000),
+            initialValue = ""
+        )
 
-    val texto = currentPageIndex.map { index -> _pages[index] }.stateIn(
-        scope = viewModelScope,
-        started = SharingStarted.WhileSubscribed(5000),
-        initialValue = _pages[0]
-    )
 
     private val _isFirstPage = MutableStateFlow(true)
     val isFirstPage = _isFirstPage.asStateFlow()
@@ -132,6 +118,24 @@ class TaskStudentViewModel(
     private val _fontSize = MutableStateFlow(MIN_FONT_SIZE)
     val fontSize = _fontSize.asStateFlow()
 
+    private val _totalPages = _paragraphs.map { paragraphs ->
+        paragraphs.map { it.pageNumber }
+            .distinct()
+            .count()
+    }.stateIn(viewModelScope, SharingStarted.Eagerly, 0)
+
+    val totalPages: StateFlow<Int> = _totalPages
+
+    val textoPorPagina = combine(currentPageIndex, _paragraphs) { index, paragraphs ->
+        paragraphs
+            .filter { it.pageNumber == index + 1 }
+            .joinToString(separator = "\n\n") { it.paragraphText }
+    }.stateIn(
+        viewModelScope,
+        SharingStarted.WhileSubscribed(5000),
+        ""
+    )
+
     init {
         viewModelScope.launch {
             _comments.value = audioRepositoryImpl.getAllAudios()
@@ -141,7 +145,7 @@ class TaskStudentViewModel(
                     _showExtraButton.value = false
                     _isSpeaking.value = false
                     ttsManager.resetStoppedFlag()
-                    if(_currentPageIndex.value < totalPages-1){
+                    if(_currentPageIndex.value < totalPages.value){
                         nextPage()
                         speakCurrentPage()
                     }
@@ -237,9 +241,17 @@ class TaskStudentViewModel(
     }
 
     fun startSpeech() {
-        ttsManager.speak(texto.value)
-        print("Start speech activado")
+
+        val currentPage = _currentPageIndex.value
+        val currentText = _paragraphs.value
+            .filter { it.pageNumber == currentPage + 1 }
+            .joinToString("\n") { it.paragraphText }
+
+        println("currentText del StartSpeech: $currentText")
+
+        ttsManager.speak(currentText)
         _isSpeaking.value = true
+        println("Start speech activado")
     }
 
     fun pauseSpeech() {
@@ -267,33 +279,39 @@ class TaskStudentViewModel(
     }
 
     fun nextPage() {
-        if (_currentPageIndex.value == _pages.lastIndex-1){
-            _isLastPage.value = true
-            Log.d("Status variable","lastpage true")
-        }
-        if (_currentPageIndex.value < _pages.lastIndex) {
-            _currentPageIndex.value++
+        val total = _totalPages.value
+        val currentIndex = _currentPageIndex.value
+        if (currentIndex < total - 1) {
+            _currentPageIndex.value = currentIndex + 1
+            _isLastPage.value = (currentIndex + 1) == total - 1
             _isFirstPage.value = false
-            Log.d("Status variable", "first page false")
+        } else {
+            _isLastPage.value = true
         }
     }
 
     fun previousPage() {
-        if(_currentPageIndex.value == 1){
-            _isFirstPage.value = true
-            Log.d("Status variable","first true")
-        }
-        if (_currentPageIndex.value > 0) {
-            _currentPageIndex.value--
+        val currentIndex = _currentPageIndex.value
+        if (currentIndex > 0) {
+            _currentPageIndex.value = currentIndex - 1
+            _isFirstPage.value = (currentIndex - 1) == 0
             _isLastPage.value = false
-            Log.d("Status variable", "last page false")
+        } else {
+            _isFirstPage.value = true
         }
     }
 
     fun speakCurrentPage() {
         stopSpeech()
-        val currentText = _pages[_currentPageIndex.value]
+
+        val currentPage = _currentPageIndex.value
+        val currentText = _paragraphs.value
+            .filter { it.pageNumber == currentPage }
+            .joinToString("\n") { it.paragraphText }
+
+        println("currentText del SpeakCurrentPage: $currentText")
         ttsManager.speak(currentText)
+
         _isSpeaking.value = true
         _isStopped.value = false
         _isPaused.value = false
@@ -344,6 +362,47 @@ class TaskStudentViewModel(
         private const val FONT_SIZE_CHANGER_VALUE = 6
         private val MAX_FONT_SIZE = 52.sp
         private val MIN_FONT_SIZE = 28.sp
+    }
+
+    fun loadProject(taskId: Int) {
+        viewModelScope.launch {
+            try {
+                val userId = tokenManager.userId.first()
+                if (userId != null) {
+                    getOrders(userId).collect { response ->
+                        when (response) {
+                            is NetworkResponse.Success -> {
+                                val allParagraphs = response.data?.flatMap { it.orderParagraphs }.orEmpty()
+                                val matchingParagraphs = allParagraphs.filter { it.orderId == taskId }
+
+                                val matchingOrderDelivered = response.data?.find { delivered ->
+                                    delivered.orderParagraphs.any { it.orderId == taskId }
+                                }
+
+                                if (matchingOrderDelivered != null) {
+                                    // Podés guardar también matchingParagraphs si querés exponerlo en otro StateFlow
+                                    _projectState.value = NetworkResponse.Success(matchingOrderDelivered)
+                                    _paragraphs.value = matchingParagraphs // <- si querés mostrar solo esos párrafos
+                                } else {
+                                    _projectState.value = NetworkResponse.Failure("Proyecto no encontrado")
+                                }
+                            }
+                            is NetworkResponse.Failure -> {
+                                println("Error al cargar los paragrafos")
+                            }
+
+                            is NetworkResponse.Loading -> {
+                                println("Loading los paragrafos")
+                        }
+                        }
+                    }
+                } else {
+                    _projectState.value = NetworkResponse.Failure("Usuario no autenticado")
+                }
+            } catch (e: Exception) {
+                _projectState.value = NetworkResponse.Failure(e.message ?: "Error desconocido")
+            }
+        }
     }
 
 }

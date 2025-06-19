@@ -7,9 +7,11 @@ enum class ScreensRoute(
 ) {
     Login("login", false, false),
     Home("home"),
+    Search("search", false, false),
     Favorites("favorites"),
     Profile("profile"),
     TaskDetails("task_details", showsBottomBar = false),
+    ProjectDetail("project_detail", showsTopBar = false, showsBottomBar = false),
     Task("task", false, false),
     Comments("comments", showsTopBar = false, showsBottomBar = false),
     Mail("mail/{mailboxType}", false, false),

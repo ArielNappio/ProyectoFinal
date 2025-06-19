@@ -127,7 +127,7 @@ fun FormScreen(
                             id = 0,
                             sender = "Usuario",
                             subject = "Formulario Adjunto",
-                            date = Date.from(LocalDateTime.now().atZone(ZoneId.systemDefault()).toInstant()),
+                            date = Date.from(LocalDateTime.now().atZone(ZoneId.systemDefault()).toInstant()).toString(),
                             content = "Se adjunta un formulario.",
                             formPath = file.absolutePath,
                             isDraft = false,

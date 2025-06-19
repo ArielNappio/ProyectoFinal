@@ -1,7 +1,5 @@
 package com.example.proyectofinal.mail.data.repository
 
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
 import com.example.proyectofinal.core.network.NetworkResponse
 import com.example.proyectofinal.mail.data.local.MessageDao
 import com.example.proyectofinal.mail.domain.model.MessageModel
@@ -9,7 +7,9 @@ import com.example.proyectofinal.mail.domain.provider.MailProvider
 import com.example.proyectofinal.mail.domain.repository.MailRepository
 import com.example.proyectofinal.mail.mapper.toDomain
 import com.example.proyectofinal.mail.mapper.toEntity
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.withContext
 
 class MailRepoImpl(
     private val mailProvider: MailProvider,
@@ -46,13 +46,13 @@ class MailRepoImpl(
         }
     }
 
-    override suspend fun getInboxMessages(currentUserId: Int): List<MessageModel> {
+    override suspend fun getInboxMessages(currentUserId: String): List<MessageModel> {
         return messageDao.getInboxMessages(
             currentUserId
         ).map { it.toDomain() }
     }
 
-    override suspend fun getOutboxMessages(currentUserId: Int): List<MessageModel> {
+    override suspend fun getOutboxMessages(currentUserId: String): List<MessageModel> {
         return messageDao.getOutboxMessages(
             currentUserId
         ).map { it.toDomain() }

@@ -45,6 +45,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.proyectofinal.R
+import com.example.proyectofinal.core.network.NetworkResponse
 import com.example.proyectofinal.core.theme.CustomGreen
 import com.example.proyectofinal.core.theme.LocalTheme
 import com.example.proyectofinal.mail.domain.model.MailboxType
@@ -62,12 +63,18 @@ fun InboxScreen(
     onMessageClick: (MessageModel) -> Unit
 ) {
     val viewModel = koinViewModel<InboxViewModel>()
-    val messagesState = when (mailboxType) {
-        MailboxType.INBOX -> viewModel.inboxMessages
-        MailboxType.OUTBOX -> viewModel.outboxMessages
-        MailboxType.DRAFT -> viewModel.draftMessages
+    val receivedState by viewModel.receivedMessages.collectAsState()
+
+    val messages = when (mailboxType) {
+        MailboxType.INBOX -> {
+            when (receivedState) {
+                is NetworkResponse.Success -> (receivedState as NetworkResponse.Success<List<MessageModel>>).data ?: emptyList()
+                else -> emptyList()
+            }
+        }
+        MailboxType.OUTBOX -> viewModel.outboxMessages.collectAsState().value
+        MailboxType.DRAFT -> viewModel.draftMessages.collectAsState().value
     }
-    val messages by messagesState.collectAsState()
 
     Column(modifier = Modifier.fillMaxSize()) {
         InboxScreenTopBar(
@@ -100,7 +107,7 @@ fun InboxScreen(
                 viewModel.updateMessageStatus(message.id, OutboxMessageModel.MessageStatus.valueOf(status))
             } } else null,
             onDelete = if (mailboxType == MailboxType.DRAFT) { { id ->
-                viewModel.discardDraft(id.toInt())
+                viewModel.discardDraft(id.toInt()) 
             } } else null,
             onContinueEditing = if (mailboxType == MailboxType.DRAFT) { { message ->
                 navController.navigate("${ScreensRoute.Message.route}?draftId=${message.id}")

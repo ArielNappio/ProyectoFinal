@@ -10,6 +10,8 @@ import com.example.proyectofinal.core.di.useCaseModule
 import com.example.proyectofinal.core.di.viewModelModule
 import com.example.proyectofinal.mail.di.mailDatabaseModule
 import com.example.proyectofinal.mail.di.mailModule
+import com.example.proyectofinal.orderManagement.di.orderDatabaseModule
+import com.example.proyectofinal.orderManagement.di.orderModule
 import com.example.proyectofinal.student.data.di.CommentsRepositoryModule
 import com.example.proyectofinal.student.data.di.taskProviderModule
 import com.example.proyectofinal.student.data.di.taskRepositoryModule
@@ -43,7 +45,9 @@ class WirinApplication: Application() {
                 mailModule,
                 preferencesModule,
                 pdfBitmapConverterModule,
-                pdfRemoteRepositoryModule
+                pdfRemoteRepositoryModule,
+                orderModule,
+                orderDatabaseModule
             )
         }
 
