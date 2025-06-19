@@ -11,6 +11,7 @@ import com.example.proyectofinal.student.presentation.viewmodel.HomeScreenViewMo
 import com.example.proyectofinal.student.presentation.viewmodel.ProjectDetailViewModel
 import com.example.proyectofinal.task_student.presentation.viewmodel.TaskStudentViewModel
 import com.example.proyectofinal.text_editor.presentation.viewmodel.TextEditorViewModel
+import com.example.proyectofinal.users.presentation.viewmodel.UserViewModel
 import org.koin.core.module.dsl.viewModel
 import org.koin.core.module.dsl.viewModelOf
 import org.koin.dsl.module
@@ -26,4 +27,5 @@ val viewModelModule = module {
     viewModel { CommentsViewModel(get(),get())}
     single { ThemeViewModel(get()) }
     viewModel { TextEditorViewModel(get(), get(), get()) }
+    viewModel { UserViewModel(get(), get() , get() , get()) }
 }

@@ -18,4 +18,7 @@ enum class ScreensRoute(
     Message("message", false, false),
     Preferences("user_preferences", false, false),
     TextEdit("text_edit/{taskId}", showsTopBar = false, showsBottomBar = false)
+    UpdateUser("update_user", showsTopBar = true, showsBottomBar = false),
+    ManageUsers("manage_users"),
+    CreateUser("create_user")
 }

@@ -24,6 +24,9 @@ import com.example.proyectofinal.student.presentation.view.TaskDetailScreen
 import com.example.proyectofinal.task_student.presentation.view.TaskStudent
 import com.example.proyectofinal.text_editor.presentation.view.TextEditorScreen
 import com.example.proyectofinal.userpreferences.presentation.view.FontPreferencesScreen
+import com.example.proyectofinal.users.presentation.view.CreateUserScreen
+import com.example.proyectofinal.users.presentation.view.ManageUserScreen
+import com.example.proyectofinal.users.presentation.view.UpdateUserScreen
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
@@ -33,7 +36,7 @@ fun NavigationComponent(
 ) {
     NavHost(
         navController = navController,
-        startDestination = ScreensRoute.Home.route
+        startDestination = ScreensRoute.Login.route
     ) {
         composable(route = ScreensRoute.Login.route) {
             LoginScreen(navController)
@@ -144,5 +147,26 @@ fun NavigationComponent(
             val taskId = it.arguments?.getInt("taskId") ?: 0
             TextEditorScreen(navController, taskId)
         }
+
+        composable(
+            route = "${ScreensRoute.UpdateUser.route}/{userId}" ,
+            arguments = listOf(navArgument("userId") { type = NavType.StringType})
+        ) { backStackEntry ->
+            val userId = backStackEntry.arguments?.getString("userId") ?: 0
+            UpdateUserScreen(
+                userId = userId.toString(),
+                navController = navController
+            )
+        }
+
+
+        composable(route = ScreensRoute.ManageUsers.route) {
+            ManageUserScreen(navController = navController)
+        }
+
+        composable(route = ScreensRoute.CreateUser.route) {
+            CreateUserScreen(navController = navController)
+        }
+
     }
 }
