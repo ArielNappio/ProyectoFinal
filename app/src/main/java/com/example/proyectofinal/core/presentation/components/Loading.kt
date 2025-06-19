@@ -1,4 +1,3 @@
-
 import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.infiniteRepeatable
@@ -10,27 +9,34 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import kotlinx.coroutines.delay
+import kotlin.random.Random
 
 @Composable
 fun LoadingWithImageBar(
     modifier: Modifier = Modifier,
     imageResId: Int,
-    loadingText: String = "Cargando..."
+    loadingTexts: List<String> = listOf("Cargando...")
 ) {
 
     Column(
@@ -42,7 +48,8 @@ fun LoadingWithImageBar(
     ) {
         Box(
             contentAlignment = Alignment.Center,
-            modifier = Modifier.size(350.dp)
+            modifier = Modifier.fillMaxWidth()
+                .aspectRatio(1f)
         ){
             PulseAnimation(
                 modifier = Modifier.matchParentSize()
@@ -51,7 +58,7 @@ fun LoadingWithImageBar(
                 painter = painterResource(id = imageResId),
                 contentDescription = "Logo Loading",
                 modifier = Modifier
-                    .size(256.dp)
+                    .fillMaxSize(0.7f)
                     .graphicsLayer {
                         this.alpha = 1f
                     }
@@ -59,17 +66,29 @@ fun LoadingWithImageBar(
         }
         Spacer(modifier = Modifier.height(16.dp))
 
-        AnimatedLoadingText()
+        AnimatedLoadingText(texts = loadingTexts)
     }
 }
 
 @Composable
 fun AnimatedLoadingText(
-    text: String = "Cargando...",
+    texts: List<String> = listOf("Cargando..."),
     modifier: Modifier = Modifier,
     color: Color = MaterialTheme.colorScheme.primary
 ) {
+    var currentTextIndex by remember { mutableIntStateOf(0) }
+    
+    // Cambia el texto cada 4 segundos de forma aleatoria
+    LaunchedEffect(texts) {
+        while (true) {
+            delay(3000)
+            currentTextIndex = Random.nextInt(texts.size)
+        }
+    }
+    
     val infiniteTransition = rememberInfiniteTransition(label = "textAlpha")
+    
+    // Animación de alfa para el efecto pulsante
     val alpha by infiniteTransition.animateFloat(
         initialValue = 0.4f,
         targetValue = 1f,
@@ -80,14 +99,15 @@ fun AnimatedLoadingText(
         label = "alpha animation"
     )
 
+    val currentText = texts[currentTextIndex]
+
     Text(
-        text = text,
+        text = currentText,
         color = color.copy(alpha = alpha),
         style = MaterialTheme.typography.titleLarge,
         modifier = modifier
     )
 }
-
 
 @Composable
 fun PulseAnimation(
@@ -111,7 +131,6 @@ fun PulseAnimation(
                 scaleY = progress
                 alpha = progress
             }
-            .size(600.dp)
             .border(
                 width = 6.dp,
                 color = color.copy(alpha = 1f - progress),

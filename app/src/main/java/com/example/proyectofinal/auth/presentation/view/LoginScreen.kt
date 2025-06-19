@@ -89,7 +89,18 @@ fun LoginScreen(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
-            LoadingWithImageBar(imageResId = R.drawable.wirin_logo_dark)
+            LoadingWithImageBar(imageResId = R.drawable.wirin_logo_dark,
+                loadingTexts = listOf(
+                "Creando libros...",
+                "Fabricando historias...",
+                "Leyendo mentes...",
+                "Preparando aventuras...",
+                "Hablando con los personajes...",
+                "Están llegando...",
+                "Cultivando ideas...",
+                "Criando animalitos...",
+                "Rompiendo leyes..."
+            ))
         }
     } else {
         Column(

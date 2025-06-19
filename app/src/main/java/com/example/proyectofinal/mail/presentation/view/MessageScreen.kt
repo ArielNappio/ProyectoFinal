@@ -41,17 +41,17 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.unit.dp
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.proyectofinal.audio.speechrecognizer.SpeechRecognizerManager
 import com.example.proyectofinal.core.network.NetworkResponse
@@ -75,7 +75,7 @@ fun MessageScreen(
     draftId: Int,
     onSendComplete: () -> Unit,
     onCancel: () -> Unit,
-    onDraftSaved: () -> Unit
+    onDraftSaved: () -> Unit,
 ) {
     val viewModel: MessageViewModel = koinViewModel()
 
@@ -85,6 +85,7 @@ fun MessageScreen(
     val formPath by viewModel.formPath.collectAsState()
     val attachments by viewModel.attachments.collectAsState()
     val sendState by viewModel.sendMessageState.collectAsState()
+    val userId by viewModel.userId.collectAsState()
     val draftSavedEvent = viewModel.draftSavedEvent
     val context = LocalContext.current
 
@@ -176,12 +177,12 @@ fun MessageScreen(
                                 attachments = attachments,
                                 date = Date.from(
                                     LocalDateTime.now().atZone(ZoneId.systemDefault()).toInstant()
-                                ),
+                                ).toString(),
                                 id = 0,
                                 isDraft = false,
                                 isResponse = false,
-                                studentId = "",
-                                userFromId = ""
+                                studentId = userId,
+                                userFromId = "0000"
                             )
                             viewModel.sendMessage(newMessage)
                             Log.d("MessageScreen", "Message sent: $newMessage")

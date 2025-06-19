@@ -9,6 +9,6 @@ import kotlinx.coroutines.flow.Flow
 interface AuthRemoteProvider{
 
     fun postLogin(loginRequestDto: LoginRequestDto): Flow<NetworkResponse<LoginResponseDto>>
-    fun getMe(token: String): Flow<NetworkResponse<UserResponseDto>>
+    fun getMe(): Flow<NetworkResponse<UserResponseDto>>
 
 }

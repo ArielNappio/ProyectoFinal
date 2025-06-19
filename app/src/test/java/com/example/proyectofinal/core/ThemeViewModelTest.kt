@@ -36,6 +36,6 @@ class ThemeViewModelTest {
     @Test
     fun `test logout clears token`() = testScope.runTest {
         viewModel.logout()
-        coVerify { mockTokenManager.clearToken() }
+        coVerify { mockTokenManager.clearAuthData() }
     }
 }

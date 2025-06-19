@@ -11,6 +11,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.filled.StarBorder
 import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.runtime.Composable
@@ -24,17 +25,21 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.proyectofinal.core.theme.CustomOrange
 import com.example.proyectofinal.navigation.ScreensRoute
-import com.example.proyectofinal.student.domain.model.Task
+import com.example.proyectofinal.orderManagement.domain.model.OrderStudent
 import com.example.proyectofinal.userpreferences.presentation.component.AppText
 
 @Composable
-fun TaskCard(task: Task, onToggleFavorite: (Int) -> Unit, navController: NavController) {
+fun TaskCard(task: OrderStudent, onToggleFavorite: (Int) -> Unit, navController: NavController) {
     Card(
         modifier = Modifier
             .padding(8.dp)
             .fillMaxWidth()
             .clickable { navController.navigate("${ScreensRoute.TaskDetails.route}/${task.id}") },
-        border = BorderStroke(1.dp, Color.White)
+        border = BorderStroke(1.dp, Color.White),
+        colors = CardDefaults.cardColors(
+            containerColor = Color.Black
+        ),
+
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
             Row(
@@ -73,13 +78,13 @@ fun TaskCard(task: Task, onToggleFavorite: (Int) -> Unit, navController: NavCont
                     )
                 }
             }
-            AppText(
-                text = "📅 Última vez leído: ${task.lastRead ?: "Sin leer"}",
-                maxLines = 2,
-                //style = MaterialTheme.typography.bodyMedium,
-                overflow = TextOverflow.Ellipsis,
-                //fontSize = 18.sp
-            )
+//            AppText(
+//                text = "📅 Ultima vez leído: ${task.lastRead ?: "Sin leer"}",
+//                maxLines = 2,
+//                //style = MaterialTheme.typography.bodyMedium,
+//                overflow = TextOverflow.Ellipsis,
+//                //fontSize = 18.sp
+//            )
 
             Row(
                 modifier = Modifier

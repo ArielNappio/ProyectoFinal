@@ -19,7 +19,7 @@ class ThemeViewModel(
 
     fun logout() {
         viewModelScope.launch {
-            tokenManager.clearToken()
+            tokenManager.clearAuthData()
             println("MainViewModel: Logout called, token cleared, isLoggedIn set to false") // Add this log
         }
     }

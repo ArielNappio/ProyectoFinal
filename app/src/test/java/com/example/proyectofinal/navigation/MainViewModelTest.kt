@@ -40,7 +40,7 @@ class MainViewModelTest {
         authRemoteProvider = mockk()
         tokenManager = mockk()
         every { tokenManager.token } returns MutableStateFlow("")
-        coEvery { tokenManager.clearToken() } returns Unit
+        coEvery { tokenManager.clearAuthData() } returns Unit
 
         viewModel = MainViewModel(authRemoteProvider, tokenManager)
     }
@@ -90,7 +90,7 @@ class MainViewModelTest {
 
         testDispatcher.scheduler.advanceUntilIdle()
 
-        coVerify { tokenManager.clearToken() }
+        coVerify { tokenManager.clearAuthData() }
         assertEquals(false, viewModel.isLoggedIn.value)
     }
 }

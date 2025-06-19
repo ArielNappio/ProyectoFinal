@@ -21,18 +21,26 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.proyectofinal.R
+import com.example.proyectofinal.core.network.NetworkResponse
+import com.example.proyectofinal.orderManagement.domain.model.OrderStudent
 import com.example.proyectofinal.student.presentation.component.TaskCard
 import com.example.proyectofinal.student.presentation.viewmodel.HomeScreenViewModel
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
 fun FavoritesScreen(
-    modifier: Modifier,
+    modifier: Modifier = Modifier,
     navController: NavController
 ) {
     val viewModel = koinViewModel<HomeScreenViewModel>()
-    val tasksViewModel by  viewModel.tasks.collectAsState()
-    val favoriteTasks = tasksViewModel.filter { it.isFavorite }
+    val state by viewModel.orderManagementState.collectAsState()
+
+    val favoriteTasks = when (state) {
+        is NetworkResponse.Success -> {
+            (state as NetworkResponse.Success<List<OrderStudent>>).data?.filter { it.isFavorite }
+        }
+        else -> emptyList()
+    }
 
     Scaffold(
         modifier = modifier.fillMaxSize()
@@ -42,39 +50,41 @@ fun FavoritesScreen(
                 .padding(innerPadding)
                 .fillMaxSize()
         ) {
-            if(favoriteTasks.isEmpty()){
-                Column(
-                    modifier = Modifier
-                        .fillMaxSize(),
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ){
-                    Spacer(modifier = Modifier.height(32.dp))
-                    Text(text = "Acá deberían estar tus favoritos :(", fontSize = 24.sp)
-                    Spacer(modifier = Modifier.height(16.dp))
-                    Image(
-                        painter = painterResource(id = R.drawable.wirin_logo_dark),
-                        contentDescription = "Logo de Wirin",
-                        modifier = Modifier.size(186.dp)
-                    )
-                    Text(
-                        text = "😢",
-                        fontSize = 48.sp
-                    )
-                }
-            } else {
-                LazyColumn(
-                    modifier = Modifier
-                        .fillMaxSize()
-                ) {
-                    items(favoriteTasks) { task ->
-                        TaskCard(
-                            task = task,
-                            onToggleFavorite = { id -> viewModel.toggleFavorite(id) },
-                            navController = navController
+            if (favoriteTasks != null) {
+                if (favoriteTasks.isEmpty()) {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxSize(),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        Spacer(modifier = Modifier.height(32.dp))
+                        Text(text = "Acá deberían estar tus favoritos :(", fontSize = 24.sp)
+                        Spacer(modifier = Modifier.height(16.dp))
+                        Image(
+                            painter = painterResource(id = R.drawable.wirin_logo_dark),
+                            contentDescription = "Logo de Wirin",
+                            modifier = Modifier.size(186.dp)
                         )
+                        Text(
+                            text = "😢",
+                            fontSize = 48.sp
+                        )
+                    }
+                } else {
+                    LazyColumn(
+                        modifier = Modifier.fillMaxSize()
+                    ) {
+                        items(favoriteTasks) { task ->
+                            TaskCard(
+                                task = task,
+                                onToggleFavorite = { id -> viewModel.toggleFavorite(id) },
+                                navController = navController
+                            )
+                        }
                     }
                 }
             }
         }
     }
 }
+
