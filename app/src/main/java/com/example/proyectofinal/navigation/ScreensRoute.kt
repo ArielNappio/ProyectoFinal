@@ -6,7 +6,7 @@ enum class ScreensRoute(
     val showsBottomBar: Boolean = true
 ) {
     Login("login", false, false),
-    Home("home"),
+    Home("home", showsTopBar = true, showsBottomBar = true),
     Search("search", false, false),
     Favorites("favorites"),
     Profile("profile"),
