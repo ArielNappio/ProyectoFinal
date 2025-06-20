@@ -135,7 +135,7 @@ fun FormScreen(
                             studentId = "",
                             userFromId = ""
                         )
-                        viewModel.sendMessage(message)
+                        viewModel.sendMessage()
                         onMessageSent()
                     }
                     else {

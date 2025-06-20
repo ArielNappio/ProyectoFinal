@@ -47,6 +47,6 @@ val mailModule = module {
     factory { DeleteMessageByIdUseCase(get()) }
     factory { GetDraftMessagesUseCase(get()) }
     factory { GetDraftByIdUseCase(get()) }
-    viewModel { InboxViewModel(get(), get(), get(), get(), get(), get()) }
-    viewModel { MessageViewModel(get(), get(), get(), get(), get()) }
+    viewModel { InboxViewModel(get(), get(), get(), get(), get(), get(), get()) }
+    viewModel { MessageViewModel(get(), get(), get(), get(), get(), get()) }
 }

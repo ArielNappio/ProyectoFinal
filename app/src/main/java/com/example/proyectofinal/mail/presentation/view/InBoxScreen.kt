@@ -30,6 +30,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -64,6 +65,7 @@ fun InboxScreen(
 ) {
     val viewModel = koinViewModel<InboxViewModel>()
     val receivedState by viewModel.receivedMessages.collectAsState()
+    val userId by viewModel.currentUserId.collectAsState()
 
     val messages = when (mailboxType) {
         MailboxType.INBOX -> {
@@ -76,13 +78,19 @@ fun InboxScreen(
         MailboxType.DRAFT -> viewModel.draftMessages.collectAsState().value
     }
 
-    Column(modifier = Modifier.fillMaxSize()) {
-        InboxScreenTopBar(
-            navController = navController,
-            mailboxType = mailboxType
-        )
+    LaunchedEffect(userId, mailboxType) {
+        userId?.let {
+            when (mailboxType) {
+                MailboxType.INBOX -> viewModel.loadReceivedMessages()
+                MailboxType.OUTBOX -> viewModel.loadSentMessages()
+                MailboxType.DRAFT -> {viewModel.draftMessages}
+            }
+        }
+    }
 
-        // Botón de Redactar
+    Column(modifier = Modifier.fillMaxSize()) {
+        InboxScreenTopBar(navController, mailboxType)
+
         Button(
             onClick = { navController.navigate(ScreensRoute.Message.route) },
             modifier = Modifier
@@ -91,11 +99,10 @@ fun InboxScreen(
             colors = ButtonDefaults.buttonColors(containerColor = CustomGreen, contentColor = Color.White)
         ) {
             Icon(Icons.Filled.Add, contentDescription = "Redactar", tint = Color.White)
-            Spacer(modifier = Modifier.width(6.dp))
+            Spacer(Modifier.width(6.dp))
             Text("Redactar", color = Color.White, fontSize = 18.sp)
         }
 
-        // Lista de mensajes
         MessageList(
             messages = messages,
             type = mailboxType,
@@ -107,7 +114,7 @@ fun InboxScreen(
                 viewModel.updateMessageStatus(message.id, OutboxMessageModel.MessageStatus.valueOf(status))
             } } else null,
             onDelete = if (mailboxType == MailboxType.DRAFT) { { id ->
-                viewModel.discardDraft(id.toInt()) 
+                viewModel.discardDraft(id.toInt())
             } } else null,
             onContinueEditing = if (mailboxType == MailboxType.DRAFT) { { message ->
                 navController.navigate("${ScreensRoute.Message.route}?draftId=${message.id}")
@@ -115,6 +122,7 @@ fun InboxScreen(
         )
     }
 }
+
 
 
 
