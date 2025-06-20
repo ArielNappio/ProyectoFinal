@@ -24,7 +24,7 @@ class LoginViewModel(
     private val _email = MutableStateFlow<String>("admin@bypass.com")
     val email = _email.asStateFlow()
 
-    private val _password = MutableStateFlow<String>("123456")
+    private val _password = MutableStateFlow<String>("Test123.")
     val password = _password.asStateFlow()
 
     private val _emailError = MutableStateFlow<String?>(null)

@@ -42,13 +42,22 @@ class UpdateOrderUseCaseTest {
     @Test
     fun whenRepoUpdatesOrder_useCaseEmitsSuccess() = runTest {
         val orderToUpdate = Order(
-            id = 5,
-            name = "Orden actualizada",
-            description = "Descripcion actualizada",
-            state = "En proceso",
-            dateCreation = "",
-            dateLimit = "",
-            userId = 4
+            id = 1,
+            name = "Example Order",
+            subject = "Mathematics",
+            description = "This is an example order for a math assignment.",
+            authorName = "John Doe",
+            rangePage = "1-10",
+            isPriority = true,
+            state = "Pending",
+            dateCreation = "2023-10-01",
+            limitDate = "2023-10-15",
+            createdByUserId = "123",
+            filePath = "/path/to/file.pdf",
+            voluntarioId = "456",
+            alumnoId = "789",
+            revisorId = "101",
+            delivererId = "112"
         )
 
         // Simulamos respuesta exitosa

@@ -25,7 +25,6 @@ import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -36,6 +35,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
@@ -66,46 +66,48 @@ fun TopBar(navController: NavController) {
         ) {
             if (navBackStackEntry?.showBackButton() == true) {
                 BackButton(navController)
-            }
-        } else {
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 0.dp),
-                horizontalArrangement = Arrangement.Start,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                IconButton(onClick = {
-                    navController.navigate(ScreensRoute.Search.route)
-                }) {
-                    Icon(
-                        imageVector = Icons.Filled.Search,
-                        contentDescription = "Buscar",
-                        tint = if (LocalTheme.current.isDark) Color.White else Color.Black
-                    )
+            } else {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 0.dp),
+                    horizontalArrangement = Arrangement.Start,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    IconButton(onClick = {
+                        navController.navigate(ScreensRoute.Search.route)
+                    }) {
+                        Icon(
+                            imageVector = Icons.Filled.Search,
+                            contentDescription = "Buscar",
+                            tint = if (LocalTheme.current.isDark) Color.White else Color.Black
+                        )
+                    }
                 }
-            }
 
-            Image(
-                painter = painterResource(
-                    id = R.drawable.wirin_25
-                ),
-                contentDescription = "Logo de Wirin",
-                modifier = Modifier.size(56.dp),
-                colorFilter = if (LocalTheme.current.isDark) ColorFilter.tint(Color.White) else ColorFilter.tint(Color.Black)
-            )
+                Image(
+                    painter = painterResource(
+                        id = R.drawable.wirin_25
+                    ),
+                    contentDescription = "Logo de Wirin",
+                    modifier = Modifier.size(56.dp),
+                    colorFilter = if (LocalTheme.current.isDark) ColorFilter.tint(Color.White) else ColorFilter.tint(
+                        Color.Black
+                    )
+                )
 
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 0.dp),
-                horizontalArrangement = Arrangement.End,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                if (navController.currentDestination?.route == ScreensRoute.Mail.route) {
-                    InboxMenuIcon(navController)
-                } else {
-                    ChatButton(navController)
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 0.dp),
+                    horizontalArrangement = Arrangement.End,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    if (navController.currentDestination?.route == ScreensRoute.Mail.route) {
+                        InboxMenuIcon(navController)
+                    } else {
+                        ChatButton(navController)
+                    }
                 }
             }
         }

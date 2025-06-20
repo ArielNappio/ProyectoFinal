@@ -49,14 +49,14 @@ class MainViewModelTest {
     fun `when token is updated, getUserData is called`() = testScope.runTest {
         val tokenFlow = MutableStateFlow("new_token")
         every { tokenManager.token } returns tokenFlow
-        coEvery { authRemoteProvider.getMe("new_token") } returns flowOf(
+        coEvery { authRemoteProvider.getMe() } returns flowOf(
             NetworkResponse.Success(userResponseStub)
         )
 
         viewModel = MainViewModel(authRemoteProvider, tokenManager)
         testDispatcher.scheduler.advanceUntilIdle()
 
-        coVerify { authRemoteProvider.getMe("new_token") }
+        coVerify { authRemoteProvider.getMe() }
         assertEquals(UiState.Success(userResponseStub), viewModel.userState.value)
         assertEquals(MainScreenUiState.Authenticated, viewModel.mainScreenUiState.value)
     }
@@ -73,7 +73,7 @@ class MainViewModelTest {
     fun `when getUserData fails, state is updated to Unauthenticated`() = testScope.runTest {
         val invalidToken = "invalid_token"
         every { tokenManager.token } returns MutableStateFlow(invalidToken)
-        coEvery { authRemoteProvider.getMe(invalidToken) } returns flowOf(
+        coEvery { authRemoteProvider.getMe() } returns flowOf(
             NetworkResponse.Failure("Invalid token")
         )
 

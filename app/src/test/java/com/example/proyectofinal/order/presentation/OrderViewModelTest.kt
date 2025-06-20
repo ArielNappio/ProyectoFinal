@@ -39,8 +39,24 @@ class OrderViewModelTest {
 
     private val testDispatcher = StandardTestDispatcher()
 
-    private val orderStub =
-        Order(1, "Order 1", "Order 1 description", "state", "2025-07-01", "2025-07-08", 1)
+    private val orderStub = Order(
+        id = 1,
+        name = "Example Order",
+        subject = "Mathematics",
+        description = "This is an example order for a math assignment.",
+        authorName = "John Doe",
+        rangePage = "1-10",
+        isPriority = true,
+        state = "Pending",
+        dateCreation = "2023-10-01",
+        limitDate = "2023-10-15",
+        createdByUserId = "123",
+        filePath = "/path/to/file.pdf",
+        voluntarioId = "456",
+        alumnoId = "789",
+        revisorId = "101",
+        delivererId = "112"
+    )
 
     @Before
     fun setUp() {

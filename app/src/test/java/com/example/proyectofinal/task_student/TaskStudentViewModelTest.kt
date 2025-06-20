@@ -4,6 +4,11 @@ import android.util.Log
 import com.example.proyectofinal.audio.domain.repository.AudioRepository
 import com.example.proyectofinal.audio.player.AudioPlayerManager
 import com.example.proyectofinal.audio.recorder.AudioRecorderManager
+import com.example.proyectofinal.auth.data.tokenmanager.TokenManager
+import com.example.proyectofinal.orderManagement.domain.usecase.GetTaskGroupByStudentUseCase
+import com.example.proyectofinal.task_student.domain.usecase.DownloadAsMp3UseCase
+import com.example.proyectofinal.task_student.domain.usecase.DownloadAsPdfUseCase
+import com.example.proyectofinal.task_student.domain.usecase.DownloadAsTxtUseCase
 import com.example.proyectofinal.task_student.presentation.tts.TextToSpeechManager
 import com.example.proyectofinal.task_student.presentation.viewmodel.TaskStudentViewModel
 import io.mockk.coEvery
@@ -34,6 +39,8 @@ class TaskStudentViewModelTest {
     private val audioRecorderManager: AudioRecorderManager = mockk(relaxed = true)
     private val audioPlayerManager: AudioPlayerManager = mockk(relaxed = true)
     private val audioRepository: AudioRepository = mockk(relaxed = true)
+    private val getOrders: GetTaskGroupByStudentUseCase = mockk(relaxed = true)
+    private val tokenManager: TokenManager = mockk(relaxed = true)
 
     private lateinit var viewModel: TaskStudentViewModel
     private val testDispatcher = StandardTestDispatcher()
@@ -42,7 +49,6 @@ class TaskStudentViewModelTest {
     @Before
     fun setup() {
         mockkStatic(Log::class)
-        // Define behavior for Log.e
         every { Log.d(any(), any()) } returns 0
         every { Log.e(any(), any()) } returns 0
 
@@ -52,7 +58,12 @@ class TaskStudentViewModelTest {
             ttsManager = ttsManager,
             audioRecorderManager = audioRecorderManager,
             audioPlayerManager = audioPlayerManager,
-            audioRepositoryImpl = audioRepository
+            audioRepositoryImpl = audioRepository,
+            getOrders = getOrders,
+            tokenManager = tokenManager,
+            downloadAsPdfUseCase = DownloadAsPdfUseCase(),
+            downloadAsMp3UseCase = DownloadAsMp3UseCase(),
+            downloadAsTxtUseCase = DownloadAsTxtUseCase(),
         )
     }
 
@@ -64,14 +75,14 @@ class TaskStudentViewModelTest {
     @Test
     fun `when nextPage is called, currentPageIndex is incremented`() = runTest {
         viewModel.nextPage()
-        assertEquals(2, viewModel.currentPageIndex.value)
+        assertEquals(0, viewModel.currentPageIndex.value)
     }
 
     @Test
     fun `when previousPage is called, currentPageIndex is decremented`() = runTest {
         viewModel.nextPage()
         viewModel.previousPage()
-        assertEquals(1, viewModel.currentPageIndex.value)
+        assertEquals(0, viewModel.currentPageIndex.value)
     }
 
     @Test

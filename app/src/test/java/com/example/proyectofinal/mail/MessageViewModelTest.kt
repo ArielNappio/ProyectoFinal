@@ -1,6 +1,7 @@
 package com.example.proyectofinal.mail
 
 import android.util.Log
+import com.example.proyectofinal.auth.data.tokenmanager.TokenManager
 import com.example.proyectofinal.core.network.NetworkResponse
 import com.example.proyectofinal.mail.domain.model.MessageModel
 import com.example.proyectofinal.mail.domain.provider.MailProvider
@@ -10,9 +11,11 @@ import com.example.proyectofinal.mail.domain.usecase.GetDraftByIdUseCase
 import com.example.proyectofinal.mail.domain.usecase.SaveDraftUseCase
 import com.example.proyectofinal.mail.domain.usecase.SendMessageUseCase
 import com.example.proyectofinal.mail.presentation.viewmodel.MessageViewModel
+import io.mockk.Runs
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.every
+import io.mockk.just
 import io.mockk.mockk
 import io.mockk.mockkStatic
 import junit.framework.TestCase.assertEquals
@@ -25,7 +28,6 @@ import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import org.junit.Before
 import org.junit.Test
-import java.util.Date
 
 @ExperimentalCoroutinesApi
 class MessageViewModelTest {
@@ -39,10 +41,11 @@ class MessageViewModelTest {
     private val testDispatcher = StandardTestDispatcher()
     private val testScope = TestScope(testDispatcher)
     private lateinit var viewModel: MessageViewModel
+    private val tokenManager: TokenManager = mockk()
 
     private val messageModelStub = MessageModel(
         1, "userFromId", "studentId", false, "sender", "Subject",
-        Date(), "Content of the inbox message", isResponse = false
+        "2025-06-01", "Content of the inbox message", isResponse = false
     )
 
     @Before
@@ -60,6 +63,12 @@ class MessageViewModelTest {
         mailProvider = mockk()
         coEvery { mailProvider.sendMessage(any()) } returns flowOf(NetworkResponse.Success(messageModelStub))
 
+        coEvery { tokenManager.token } returns flowOf(null)
+        coEvery { tokenManager.saveToken(any()) } just Runs
+        coEvery { tokenManager.saveUserId(any()) } just Runs
+        coEvery { tokenManager.userId } returns flowOf("example_id")
+        coEvery { tokenManager.saveUser(any()) } just Runs
+
         sendMessageUseCase = SendMessageUseCase(mailProvider)
         saveDraftUseCase = SaveDraftUseCase(mailRepository)
         getDraftByIdUseCase = GetDraftByIdUseCase(mailRepository)
@@ -69,7 +78,8 @@ class MessageViewModelTest {
             sendMessageUseCase = sendMessageUseCase,
             saveDraftUseCase = saveDraftUseCase,
             getDraftByIdUseCase = getDraftByIdUseCase,
-            deleteDraftUseCase = deleteDraftUseCase
+            deleteDraftUseCase = deleteDraftUseCase,
+            tokenManager = tokenManager
         )
     }
 

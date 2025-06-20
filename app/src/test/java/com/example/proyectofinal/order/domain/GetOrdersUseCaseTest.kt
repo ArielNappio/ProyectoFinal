@@ -43,27 +43,58 @@ class GetOrdersUseCaseTest {
     fun whenRepoReturnsOrders_useCaseEmitsSuccess() = runTest {
         val fakeOrders = listOf(
             Order(
-                1, "Tarea 1",
-                description = "description",
-                state = "En process",
-                dateCreation = "",
-                dateLimit = "",
-                userId = 3
-            ), Order(
-                1, "Tarea 2",
-                description = "description",
-                state = "Por hacer",
-                dateCreation = "",
-                dateLimit = "",
-                userId = 2
+                id = 1,
+                name = "Example Order 1",
+                subject = "Mathematics",
+                description = "This is an example order for a math assignment.",
+                authorName = "John Doe",
+                rangePage = "1-10",
+                isPriority = true,
+                state = "Pending",
+                dateCreation = "2023-10-01",
+                limitDate = "2023-10-15",
+                createdByUserId = "123",
+                filePath = "/path/to/file.pdf",
+                voluntarioId = "456",
+                alumnoId = "789",
+                revisorId = "101",
+                delivererId = "112"
             ),
             Order(
-                1, "Tarea 3",
-                description = "description",
-                state = "Terminado",
-                dateCreation = "",
-                dateLimit = "",
-                userId = 5
+                id = 2,
+                name = "Example Order 2",
+                subject = "Mathematics",
+                description = "This is an example order for a math assignment.",
+                authorName = "John Doe",
+                rangePage = "1-10",
+                isPriority = true,
+                state = "Pending",
+                dateCreation = "2023-10-01",
+                limitDate = "2023-10-15",
+                createdByUserId = "123",
+                filePath = "/path/to/file.pdf",
+                voluntarioId = "456",
+                alumnoId = "789",
+                revisorId = "101",
+                delivererId = "112"
+            ),
+            Order(
+                id = 3,
+                name = "Example Order 3",
+                subject = "Mathematics",
+                description = "This is an example order for a math assignment.",
+                authorName = "John Doe",
+                rangePage = "1-10",
+                isPriority = true,
+                state = "Pending",
+                dateCreation = "2023-10-01",
+                limitDate = "2023-10-15",
+                createdByUserId = "123",
+                filePath = "/path/to/file.pdf",
+                voluntarioId = "456",
+                alumnoId = "789",
+                revisorId = "101",
+                delivererId = "112"
             )
         )
 

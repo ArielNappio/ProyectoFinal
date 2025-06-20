@@ -111,7 +111,7 @@ fun NavigationComponent(
                 else -> MailboxType.INBOX
             }
             InboxScreen(
-                modifier = modifier,
+//                modifier = modifier,
                 navController = navController,
                 mailboxType = mailboxType,
                 onMessageClick = { }

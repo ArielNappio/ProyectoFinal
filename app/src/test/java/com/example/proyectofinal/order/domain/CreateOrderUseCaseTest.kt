@@ -43,12 +43,22 @@ class CreateOrderUseCaseTest {
     @Test
     fun whenRepoCreatesOrder_useCaseEmitsSuccessAndCallsRepoCreateOrder(): Unit = runTest {
         val orderToCreate = Order(
-            1, "Tarea nueva",
-            description = "description de tarea nueva",
-            state = "Por hacer",
-            dateCreation = "2025-04-29",
-            dateLimit = "2025-05-01",
-            userId = 3
+            id = 1,
+            name = "Example Order",
+            subject = "Mathematics",
+            description = "This is an example order for a math assignment.",
+            authorName = "John Doe",
+            rangePage = "1-10",
+            isPriority = true,
+            state = "Pending",
+            dateCreation = "2023-10-01",
+            limitDate = "2023-10-15",
+            createdByUserId = "123",
+            filePath = "/path/to/file.pdf",
+            voluntarioId = "456",
+            alumnoId = "789",
+            revisorId = "101",
+            delivererId = "112"
         )
 
         // Simulación de la respuesta cuando se crea una order

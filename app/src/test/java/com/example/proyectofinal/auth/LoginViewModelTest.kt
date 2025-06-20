@@ -2,6 +2,7 @@ package com.example.proyectofinal.auth
 
 import com.example.proyectofinal.auth.data.model.LoginRequestDto
 import com.example.proyectofinal.auth.data.model.LoginResponseDto
+import com.example.proyectofinal.auth.data.model.UserResponseDto
 import com.example.proyectofinal.auth.data.tokenmanager.TokenManager
 import com.example.proyectofinal.auth.domain.provider.AuthRemoteProvider
 import com.example.proyectofinal.auth.presentation.viewmodel.LoginViewModel
@@ -43,8 +44,12 @@ class LoginViewModelTest {
     fun setUp() {
         Dispatchers.setMain(testDispatcher)
         repository = mockk()
+        coEvery { repository.getMe() } returns flowOf(NetworkResponse.Success(UserResponseDto("", "", "", emptyList())))
         tokenManager = mockk()
         coEvery { tokenManager.token } returns flowOf(null)
+        coEvery { tokenManager.saveToken(any()) } just Runs
+        coEvery { tokenManager.saveUserId(any()) } just Runs
+        coEvery { tokenManager.saveUser(any()) } just Runs
         viewModel = LoginViewModel(repository, tokenManager)
     }
 

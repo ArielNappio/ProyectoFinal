@@ -383,24 +383,25 @@ class TaskStudentViewModel(
                 when (type) {
                     DownloadType.PDF -> downloadAsPdfUseCase(
                         context,
-                        "Parcial de Seguridad en Aplicaciones Web", // TODO: Cambiar por el título del documento
-                        _pages,
-                        totalPages,
+                        _projectState.value.data!!.title,
+                        _pages.value,
+                        totalPages.value,
                         _fontSize.value.value
                     )
                     DownloadType.MP3 -> downloadAsMp3UseCase(
                         context,
-                        "Parcial de Seguridad en Aplicaciones Web", // TODO: Cambiar por el título del documento
-                        rawText
+                        _projectState.value.data!!.title,
+                        texto.value
                     )
                     DownloadType.TXT -> downloadAsTxtUseCase(
                         context,
-                        "Parcial de Seguridad en Aplicaciones Web", // TODO: Cambiar por el título del documento
-                        rawText
+                        _projectState.value.data!!.title,
+                        texto.value
                     )
                 }
                 resultMessage = "${type.friendlyName} downloaded successfully"
             } catch (e: Exception) {
+                e.printStackTrace()
                 Log.e("TaskStudentViewModel", "Error generating and saving ${type.friendlyName}: ${e.message}")
                 resultMessage = "Error downloading ${type.friendlyName}"
             } finally {

@@ -15,8 +15,8 @@ import kotlinx.coroutines.launch
 
 class HomeScreenViewModel(
     private val getOrders: GetTaskGroupByStudentUseCase,
-    private val tokenManager: TokenManager,
-    ) : ViewModel() {
+    private val tokenManager: TokenManager
+) : ViewModel() {
 
     private val _searchText = MutableStateFlow("")
     val searchText = _searchText.asStateFlow()
