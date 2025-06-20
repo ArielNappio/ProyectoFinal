@@ -1,7 +1,6 @@
 package com.example.proyectofinal.student.presentation.view
 
 import LoadingWithImageBar
-import androidx.compose.ui.graphics.Color
 import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Column
@@ -17,9 +16,9 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
@@ -28,6 +27,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -36,6 +36,7 @@ import androidx.navigation.NavController
 import com.example.proyectofinal.R
 import com.example.proyectofinal.audio.speechrecognizer.SpeechRecognizerManager
 import com.example.proyectofinal.core.network.NetworkResponse
+import com.example.proyectofinal.student.presentation.component.ProjectCard
 import com.example.proyectofinal.student.presentation.component.SearchBar
 import com.example.proyectofinal.student.presentation.viewmodel.HomeScreenViewModel
 import org.koin.androidx.compose.koinViewModel
@@ -146,7 +147,8 @@ fun SearchScreen(navController: NavController) {
                                     project = project,
                                     onClick = {
                                         navController.navigate("project_detail/${project.id}")
-                                    }
+                                    },
+                                    onToggleFavorite = {}
                                 )
                                 Spacer(modifier = Modifier.height(8.dp))
                             }

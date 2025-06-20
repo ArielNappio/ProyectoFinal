@@ -7,7 +7,7 @@ import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
 import com.example.proyectofinal.orderManagement.data.entity.OrderEntity
 
-@Database(entities = [OrderEntity::class], version = 3, exportSchema = false)
+@Database(entities = [OrderEntity::class], version = 4, exportSchema = false)
 @TypeConverters(Converters::class)
 abstract class OrderDatabase : RoomDatabase() {
     abstract fun orderDao(): OrderDao
@@ -29,17 +29,23 @@ val MIGRATION_1_2 = object : Migration(1, 2) {
 
 val MIGRATION_2_3 = object : Migration(2, 3) {
     override fun migrate(database: SupportSQLiteDatabase) {
-        // Actualizar la tabla orders con las nuevas columnas
+        // Eliminar la tabla vieja
         database.execSQL("DROP TABLE IF EXISTS `orders`")
+
+        // Crear la nueva tabla con la columna isFavorite
         database.execSQL("""
             CREATE TABLE `orders` (
                 `id` TEXT NOT NULL PRIMARY KEY,
                 `title` TEXT NOT NULL,
                 `studentId` TEXT NOT NULL,
                 `status` TEXT NOT NULL,
+                `isFavorite` INTEGER NOT NULL,
                 `ordersJson` TEXT NOT NULL,
                 `orderParagraphsJson` TEXT NOT NULL
             )
         """)
     }
 }
+
+
+

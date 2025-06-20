@@ -23,9 +23,23 @@ class OrderRepositoryImpl(
             orderProvider.getOrdersManagement(studentId).collect { response ->
                 when (response) {
                     is NetworkResponse.Success -> {
-                        val entities = response.data!!.map { it.toEntity(studentId) }
-                        orderDao.saveTaskGroup(entities)
-                        emit(response)
+                        val cachedEntities = orderDao.getTasksByStudent(studentId).first()
+                        val apiEntities = response.data!!.map { it.toEntity(studentId) }
+
+                        val mergedEntities = apiEntities.map { apiEntity ->
+                            val cachedEntity = cachedEntities.find { it.id == apiEntity.id }
+                            if (cachedEntity != null) {
+                                apiEntity.copy(isFavorite = cachedEntity.isFavorite)
+                            } else {
+                                apiEntity
+                            }
+                        }
+
+                        orderDao.saveTaskGroup(mergedEntities)
+
+                        // ✅ EMITIR lista mergeada
+                        val mergedDomain = mergedEntities.map { it.toTaskGroup() }
+                        emit(NetworkResponse.Success(mergedDomain))
                     }
 
                     is NetworkResponse.Failure -> {
@@ -38,9 +52,7 @@ class OrderRepositoryImpl(
                         }
                     }
 
-                    is NetworkResponse.Loading -> {
-                        // opcional: podés emitir de nuevo Loading si querés mantener el estado
-                    }
+                    is NetworkResponse.Loading -> { /* opcional */ }
                 }
             }
         } catch (e: Exception) {
@@ -52,6 +64,11 @@ class OrderRepositoryImpl(
                 emit(NetworkResponse.Failure(e.localizedMessage ?: "Error desconocido"))
             }
         }
+    }
+
+
+    override suspend fun toggleFavorite(orderId: String, isFavorite: Boolean) {
+        orderDao.updateFavoriteStatus(orderId, isFavorite)
     }
 
 }

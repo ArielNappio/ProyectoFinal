@@ -54,6 +54,8 @@ fun OrderEntity.toTaskGroup(): OrderDelivered {
     return OrderMapper.toDomain(this)
 }
 
+
+
 object OrderMapper {
     
     private val json = Json { 
@@ -67,6 +69,7 @@ object OrderMapper {
             title = orderDelivered.title,
             studentId = orderDelivered.studentId,
             status = orderDelivered.status,
+            isFavorite = orderDelivered.isFavorite,
             ordersJson = json.encodeToString(orderDelivered.orders),
             orderParagraphsJson = json.encodeToString(orderDelivered.orderParagraphs)
         )
@@ -77,6 +80,7 @@ object OrderMapper {
             id = orderEntity.id,
             title = orderEntity.title,
             studentId = orderEntity.studentId,
+            isFavorite = orderEntity.isFavorite,
             status = orderEntity.status,
             orders = json.decodeFromString<List<OrderStudent>>(orderEntity.ordersJson),
             orderParagraphs = json.decodeFromString<List<OrderParagraph>>(orderEntity.orderParagraphsJson)

@@ -1,5 +1,6 @@
 package com.example.proyectofinal.student.presentation.view
 
+import LoadingWithImageBar
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -21,9 +22,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.proyectofinal.R
-import com.example.proyectofinal.core.network.NetworkResponse
-import com.example.proyectofinal.orderManagement.domain.model.OrderStudent
-import com.example.proyectofinal.student.presentation.component.TaskCard
+import com.example.proyectofinal.student.presentation.component.ProjectCard
 import com.example.proyectofinal.student.presentation.viewmodel.HomeScreenViewModel
 import org.koin.androidx.compose.koinViewModel
 
@@ -33,14 +32,10 @@ fun FavoritesScreen(
     navController: NavController
 ) {
     val viewModel = koinViewModel<HomeScreenViewModel>()
-    val state by viewModel.orderManagementState.collectAsState()
+    val orders by viewModel.orders.collectAsState()
+    val isLoading by viewModel.isLoading.collectAsState()
 
-    val favoriteTasks = when (state) {
-        is NetworkResponse.Success -> {
-            (state as NetworkResponse.Success<List<OrderStudent>>).data?.filter { it.isFavorite }
-        }
-        else -> emptyList()
-    }
+    val favoriteProjects = orders.filter { it.isFavorite }
 
     Scaffold(
         modifier = modifier.fillMaxSize()
@@ -50,8 +45,42 @@ fun FavoritesScreen(
                 .padding(innerPadding)
                 .fillMaxSize()
         ) {
-            if (favoriteTasks != null) {
-                if (favoriteTasks.isEmpty()) {
+            when {
+                isLoading == true -> {
+                    LoadingWithImageBar(
+                        loadingTexts = listOf(
+                            "Creando libros...",
+                            "Fabricando historias...",
+                            "Leyendo mentes...",
+                            "Preparando aventuras...",
+                            "Hablando con los personajes...",
+                            "Están llegando...",
+                            "Cultivando ideas...",
+                            "Criando animalitos...",
+                            "Rompiendo leyes..."
+                        )
+                    )
+                }
+
+                favoriteProjects.isNotEmpty() -> {
+                    LazyColumn(
+                        modifier = Modifier.fillMaxSize()
+                    ) {
+                        items(favoriteProjects) { project ->
+                            ProjectCard(
+                                project = project,
+                                onClick = {
+                                    navController.navigate("project_detail/${project.id}")
+                                },
+                                onToggleFavorite = {
+                                    viewModel.toggleFavorite(project.id, !project.isFavorite)
+                                }
+                            )
+                        }
+                    }
+                }
+
+                else -> {
                     Column(
                         modifier = Modifier
                             .fillMaxSize(),
@@ -69,22 +98,12 @@ fun FavoritesScreen(
                             text = "😢",
                             fontSize = 48.sp
                         )
-                    }
-                } else {
-                    LazyColumn(
-                        modifier = Modifier.fillMaxSize()
-                    ) {
-                        items(favoriteTasks) { task ->
-                            TaskCard(
-                                task = task,
-                                onToggleFavorite = { id -> viewModel.toggleFavorite(id) },
-                                navController = navController
-                            )
-                        }
+
                     }
                 }
             }
         }
     }
 }
+
 

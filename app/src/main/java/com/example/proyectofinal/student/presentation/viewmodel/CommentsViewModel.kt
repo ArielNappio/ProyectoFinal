@@ -13,14 +13,14 @@ import kotlinx.coroutines.launch
 
 class CommentsViewModel(
     private val audioRepositoryImpl: AudioRepositoryImpl,
-    private val audioPlayerManager: AudioPlayerManager
+    private val audioPlayerManager: AudioPlayerManager,
 ) : ViewModel() {
 
     private val _comments = MutableStateFlow<List<RecordedAudio>>(emptyList())
     val comments: StateFlow<List<RecordedAudio>> = _comments
 
     private val _currentlyPlayingPath = MutableStateFlow<String>("")
-    val currentlyPlayingPath : StateFlow<String> = _currentlyPlayingPath
+    val currentlyPlayingPath: StateFlow<String> = _currentlyPlayingPath
 
     private val _currentPosition = MutableStateFlow(0L)
     val currentPosition: StateFlow<Long> = _currentPosition
@@ -29,12 +29,6 @@ class CommentsViewModel(
 
     private val _isPlaying = MutableStateFlow(false)
     val isPlaying: StateFlow<Boolean> = _isPlaying
-
-    init {
-        viewModelScope.launch {
-            _comments.value = audioRepositoryImpl.getAllAudios()
-        }
-    }
 
     fun playAudio(filePath: String) {
         viewModelScope.launch {
@@ -80,7 +74,7 @@ class CommentsViewModel(
         }
     }
 
-    fun stopAudio(){
+    fun stopAudio() {
         audioPlayerManager.stop()
         _currentlyPlayingPath.value = ""
         _currentPosition.value = 0L
@@ -110,4 +104,12 @@ class CommentsViewModel(
             playAudio(path)
         }
     }
+
+    fun loadCommentsByTaskId(taskId: Int) {
+        viewModelScope.launch {
+            val comments = audioRepositoryImpl.getAudiosForTask(taskId.toString())
+            _comments.value = comments
+        }
+    }
 }
+

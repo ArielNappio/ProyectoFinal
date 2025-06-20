@@ -10,6 +10,7 @@ data class OrderEntity(
 //    val deliveryDate: String?,
     val studentId: String,
     val status: String,
+    val isFavorite: Boolean,
     val ordersJson: String, // JSON string de List<OrderStudent>
     val orderParagraphsJson: String // JSON string de List<OrderParagraph>
 )

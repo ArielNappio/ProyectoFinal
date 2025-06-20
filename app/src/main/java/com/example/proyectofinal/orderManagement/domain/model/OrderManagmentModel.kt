@@ -8,6 +8,7 @@ data class OrderDelivered(
     val status: String,
     val title: String,
     val orders: List<OrderStudent>,
+    val isFavorite: Boolean = false,
     val orderParagraphs: List<OrderParagraph>,
 )
 

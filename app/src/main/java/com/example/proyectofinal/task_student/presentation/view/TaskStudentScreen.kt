@@ -63,7 +63,6 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -91,11 +90,9 @@ fun TaskStudent(taskId: Int, navController: NavHostController) {
     val text by viewModel.textoPorPagina.collectAsState()
     val paragraphs by viewModel.paragraphs.collectAsState()
     val isSpeaking by viewModel.isSpeaking.collectAsState()
-    val isPaused by viewModel.isPaused.collectAsState()
     val currentPage by viewModel.currentPageIndex.collectAsState()
     val totalPages by viewModel.totalPages.collectAsState()
 
-    val showExtraButtons by viewModel.showExtraButton.collectAsState()
     val showDownloadDialog by viewModel.showDownloadDialog.collectAsState()
     val showFeedback by viewModel.showFeedback.collectAsState()
     val showFont by viewModel.showFont.collectAsState()
@@ -113,20 +110,15 @@ fun TaskStudent(taskId: Int, navController: NavHostController) {
 
     var rating by remember { mutableStateOf(0) }
 
-
-
     var isRecording by remember { mutableStateOf(false) }
     var hasRecording by remember { mutableStateOf(false) }
     var isPlaying by remember { mutableStateOf(false) }
     val recordedFilePath by viewModel.recordedFeedbackFilePath.collectAsState()
 
-
-    // Simula el tiempo grabado
-    val timer = rememberCoroutineScope()
-    var playbackTimeLeft by remember { mutableStateOf(0L) }
-
     LaunchedEffect(taskId) {
         viewModel.loadProject(taskId)
+        viewModel.saveTaskId(taskId)
+        viewModel.loadCommentsByTaskId(taskId)
         println("DEBUG de TEXT: $text")
     }
 

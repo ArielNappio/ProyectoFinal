@@ -9,6 +9,7 @@ import com.example.proyectofinal.orderManagement.data.repository.OrderRepository
 import com.example.proyectofinal.orderManagement.domain.provider.OrderManagementProvider
 import com.example.proyectofinal.orderManagement.domain.repository.OrderRepository
 import com.example.proyectofinal.orderManagement.domain.usecase.GetTaskGroupByStudentUseCase
+import com.example.proyectofinal.orderManagement.domain.usecase.UpdateFavoriteStatusUseCase
 import org.koin.dsl.module
 
 val orderDatabaseModule = module {
@@ -24,5 +25,6 @@ val orderDatabaseModule = module {
 val orderModule = module {
     single<OrderManagementProvider> { OrderManagementImpl(get(), get()) }
     factory { GetTaskGroupByStudentUseCase(get()) }
+    factory { UpdateFavoriteStatusUseCase(get()) }
     single <OrderRepository> { OrderRepositoryImpl(get(), get()) }
 }

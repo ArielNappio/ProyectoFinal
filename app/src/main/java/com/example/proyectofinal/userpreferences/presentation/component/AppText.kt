@@ -1,5 +1,6 @@
 package com.example.proyectofinal.userpreferences.presentation.component
 
+import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -19,7 +20,7 @@ fun AppText(
     text: String,
     modifier: Modifier = Modifier,
     isTitle: Boolean = false,
-    color: Color = Color.White,
+    color: Color = colorScheme.onBackground,
     fontWeight: FontWeight = FontWeight.Normal,
     textAlign: TextAlign? = null,
     maxLines: Int = Int.MAX_VALUE,

@@ -1,6 +1,5 @@
 package com.example.proyectofinal.navigation.presentation.view
 
-import com.example.proyectofinal.userpreferences.presentation.theme.LocalUserPreferences
 import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.Arrangement
@@ -27,6 +26,7 @@ import com.example.proyectofinal.navigation.presentation.viewmodel.MainScreenUiS
 import com.example.proyectofinal.navigation.presentation.viewmodel.MainViewModel
 import com.example.proyectofinal.navigation.util.showsBottomBar
 import com.example.proyectofinal.navigation.util.showsTopBar
+import com.example.proyectofinal.userpreferences.presentation.theme.LocalUserPreferences
 import com.example.proyectofinal.userpreferences.presentation.viewmodel.PreferencesViewModel
 import org.koin.androidx.compose.koinViewModel
 
@@ -57,7 +57,7 @@ fun Main(
 
         is MainScreenUiState.Authenticated -> {
             LaunchedEffect(Unit) {
-                navController.navigate(ScreensRoute.Home.route) {
+                navController.navigate(ScreensRoute.Preferences.route) {
                     popUpTo(ScreensRoute.Login.route) { inclusive = true }
                     popUpTo(ScreensRoute.Home.route) { inclusive = true }
                 }
