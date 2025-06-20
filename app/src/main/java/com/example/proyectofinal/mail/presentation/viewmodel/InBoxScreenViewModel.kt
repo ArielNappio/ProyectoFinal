@@ -9,9 +9,8 @@ import com.example.proyectofinal.mail.domain.model.MessageModel
 import com.example.proyectofinal.mail.domain.model.OutboxMessageModel
 import com.example.proyectofinal.mail.domain.usecase.DeleteMessageByIdUseCase
 import com.example.proyectofinal.mail.domain.usecase.GetDraftMessagesUseCase
-import com.example.proyectofinal.mail.domain.usecase.GetInboxMessagesUseCase
-import com.example.proyectofinal.mail.domain.usecase.GetOutboxMessagesUseCase
 import com.example.proyectofinal.mail.domain.usecase.ReceiveMessageUseCase
+import com.example.proyectofinal.users.domain.provider.usecase.GetUserUseCase
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -19,11 +18,10 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 
 class InboxViewModel(
-    private val getInboxMessagesUseCase: GetInboxMessagesUseCase,
-    private val getOutboxMessagesUseCase: GetOutboxMessagesUseCase,
     private val getDraftMessagesUseCase: GetDraftMessagesUseCase,
     private val deleteDraftUseCase: DeleteMessageByIdUseCase,
     private val receiveMessageUseCase: ReceiveMessageUseCase,
+    private val getUserUseCase: GetUserUseCase,
     private val tokenManager: TokenManager
 ) : ViewModel() {
 
@@ -36,10 +34,14 @@ class InboxViewModel(
     private val _draftMessages = MutableStateFlow<List<MessageModel>>(emptyList())
     val draftMessages: StateFlow<List<MessageModel>> = _draftMessages
 
-    private val _receivedMessages = MutableStateFlow<NetworkResponse<List<MessageModel>>>(NetworkResponse.Loading())
+    private val _receivedMessages =
+        MutableStateFlow<NetworkResponse<List<MessageModel>>>(NetworkResponse.Loading())
     val receivedMessages: StateFlow<NetworkResponse<List<MessageModel>>> = _receivedMessages
 
     private var currentUserId: String? = null
+
+    private val _userEmail = MutableStateFlow<String?>(null)
+    val userEmail: StateFlow<String?> = _userEmail
 
     init {
         viewModelScope.launch {
@@ -47,30 +49,7 @@ class InboxViewModel(
             currentUserId = userId
             Log.d("InboxViewModel", "UserId obtenido: $userId")
             setCurrentUserId(userId)
-        }
-    }
-
-    fun loadReceivedMessages() {
-        currentUserId?.let { id ->
-            viewModelScope.launch(Dispatchers.IO) {
-                Log.d("InboxViewModel", "Cargando mensajes recibidos para userId: $id")
-                receiveMessageUseCase(id).collect { response ->
-                    when (response) {
-                        is NetworkResponse.Success -> {
-                            Log.d("InboxViewModel", "Mensajes recibidos correctamente: ${response.data?.size ?: 0}")
-                        }
-                        is NetworkResponse.Failure -> {
-                            Log.e("InboxViewModel", "Error al cargar mensajes recibidos: ${response.error}")
-                        }
-                        is NetworkResponse.Loading -> {
-                            Log.d("InboxViewModel", "Cargando mensajes recibidos...")
-                        }
-                    }
-                    _receivedMessages.value = response
-                }
-            }
-        } ?: run {
-            Log.e("InboxViewModel", "currentUserId es null al cargar mensajes recibidos")
+            getEmailByUserId(userId.toString())
         }
     }
 
@@ -78,55 +57,54 @@ class InboxViewModel(
         if (userId == null) return
         currentUserId = userId
         Log.d("InboxViewModel", "setCurrentUserId: $userId")
-        loadInboxMessages()
-        loadOutboxMessages()
+        getEmailByUserId(userId)
+        getAllMessagesByCurrentId()
         loadDraftMessages()
-        loadReceivedMessages()
     }
 
-    private fun loadInboxMessages() {
+    fun getAllMessagesByCurrentId() {
         currentUserId?.let { id ->
-            viewModelScope.launch(Dispatchers.IO) {
-                val messages = getInboxMessagesUseCase(id)
-                _inboxMessages.value = messages
-            }
-        }
-    }
 
-    private fun loadOutboxMessages() {
-        currentUserId?.let { id ->
             viewModelScope.launch(Dispatchers.IO) {
-                val messages = getOutboxMessagesUseCase(id)
-                val outboxMessages = messages.map { message ->
-                    OutboxMessageModel(
-                        message = message,
-                        status = OutboxMessageModel.MessageStatus.NO_LEIDO
-                    )
+                Log.d("InboxViewModel", "Cargando mensajes para userId: $id")
+                receiveMessageUseCase(id).collect { response ->
+                    when (response) {
+                        is NetworkResponse.Success -> {
+                            val allMessages = response.data ?: emptyList()
+
+                            filterInboxMessages(allMessages, userEmail.value.toString(), id)
+                            filterOutboxMessages(allMessages, userEmail.value.toString(), id)
+
+                            _receivedMessages.value = response
+                        }
+
+                        is NetworkResponse.Failure -> {
+                            Log.e("InboxViewModel", "Error al cargar mensajes: ${response.error}")
+                            _receivedMessages.value = response
+                        }
+
+                        is NetworkResponse.Loading -> {
+                            Log.d("InboxViewModel", "Cargando mensajes...")
+                            _receivedMessages.value = response
+                        }
+                    }
                 }
-                _outboxMessages.value = outboxMessages.map { it.message }
             }
+        } ?: run {
+            Log.e("InboxViewModel", "currentUserId es null al cargar mensajes")
         }
     }
-
-
-    fun updateMessageStatus(messageId: Int, newStatus: OutboxMessageModel.MessageStatus) {
-
-    }
-
 
     private fun loadDraftMessages() {
-
         viewModelScope.launch(Dispatchers.IO) {
             val drafts: List<MessageModel> = getDraftMessagesUseCase()
-            if(drafts.isEmpty()){
-                println("ta vacio")
-            }
-            else{
-                println("algo cargo")
-            }
             _draftMessages.value = drafts
+            if (drafts.isEmpty()) {
+                println("Sin borradores")
+            } else {
+                println("Borradores cargados: ${drafts.size}")
+            }
         }
-
     }
 
     fun discardDraft(draftId: Int) {
@@ -135,4 +113,63 @@ class InboxViewModel(
             loadDraftMessages()
         }
     }
+
+    fun updateMessageStatus(messageId: Int, newStatus: OutboxMessageModel.MessageStatus) {
+        // Implementar si querés manejar estados de mensajes enviados
+    }
+
+    private fun filterInboxMessages(
+        messages: List<MessageModel>,
+        userEmail: String,
+        userId: String
+    ) {
+        getEmailByUserId(userId)
+        if (_userEmail.value != null) {
+            val inbox = messages.filter { it.sender == userEmail }
+            _inboxMessages.value = inbox
+            Log.d("InboxViewModel", "Mensajes de entrada: ${inbox.size}")
+        } else {
+            println("esta vacio :(")
+        }
+    }
+
+    private fun filterOutboxMessages(
+        messages: List<MessageModel>,
+        userEmail: String,
+        userId: String
+    ) {
+        getEmailByUserId(userId)
+        if (_userEmail.value != null) {
+            val outbox = messages.filter { it.sender != userEmail }
+            _outboxMessages.value = outbox
+            Log.d("InboxViewModel", "Mensajes de salida: ${outbox.size}")
+        } else {
+            println("esta vacio :(")
+        }
+    }
+
+    private fun getEmailByUserId(userId: String) {
+        viewModelScope.launch {
+            getUserUseCase().collect { response ->
+                when (response) {
+                    is NetworkResponse.Success -> {
+                        val user = response.data?.find { it.id == userId }
+                        _userEmail.value = user?.email
+                        Log.d("InboxViewModel", "Email encontrado: ${user?.email}")
+                        Log.d("InboxViewModel", "User encontrado: ${_userEmail.value}")
+                        Log.d("InboxViewModel", "response: ${response.data}")
+                    }
+
+                    is NetworkResponse.Failure -> {
+                        Log.e("InboxViewModel", "Error al buscar usuario: ${response.error}")
+                    }
+
+                    is NetworkResponse.Loading -> {
+                        Log.d("InboxViewModel", "Buscando usuario...")
+                    }
+                }
+            }
+        }
+    }
+
 }

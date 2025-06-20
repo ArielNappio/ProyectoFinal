@@ -24,6 +24,7 @@ import androidx.compose.material.icons.filled.Inbox
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
@@ -65,21 +66,22 @@ fun InboxScreen(
     val viewModel = koinViewModel<InboxViewModel>()
     val receivedState by viewModel.receivedMessages.collectAsState()
 
+    val inboxMessages by viewModel.inboxMessages.collectAsState()
+    val outboxMessages by viewModel.outboxMessages.collectAsState()
+    val draftMessages by viewModel.draftMessages.collectAsState()
+
     val messages = when (mailboxType) {
-        MailboxType.INBOX -> {
-            when (receivedState) {
-                is NetworkResponse.Success -> (receivedState as NetworkResponse.Success<List<MessageModel>>).data ?: emptyList()
-                else -> emptyList()
-            }
-        }
-        MailboxType.OUTBOX -> viewModel.outboxMessages.collectAsState().value
-        MailboxType.DRAFT -> viewModel.draftMessages.collectAsState().value
+        MailboxType.INBOX -> inboxMessages
+        MailboxType.OUTBOX -> outboxMessages
+        MailboxType.DRAFT -> draftMessages
     }
 
-
     Column(modifier = Modifier.fillMaxSize()) {
+
+        // Top Bar
         InboxScreenTopBar(navController, mailboxType)
 
+        // Botón de Redactar
         Button(
             onClick = { navController.navigate(ScreensRoute.Message.route) },
             modifier = Modifier
@@ -92,25 +94,58 @@ fun InboxScreen(
             Text("Redactar", color = Color.White, fontSize = 18.sp)
         }
 
-        MessageList(
-            messages = messages,
-            type = mailboxType,
-            onMessageClick = onMessageClick,
-            onReply = if (mailboxType == MailboxType.INBOX) { { message ->
-                navController.navigate("reply/${message.id}")
-            } } else null,
-            onMarkStatus = if (mailboxType == MailboxType.OUTBOX) { { message, status ->
-                viewModel.updateMessageStatus(message.id, OutboxMessageModel.MessageStatus.valueOf(status))
-            } } else null,
-            onDelete = if (mailboxType == MailboxType.DRAFT) { { id ->
-                viewModel.discardDraft(id.toInt())
-            } } else null,
-            onContinueEditing = if (mailboxType == MailboxType.DRAFT) { { message ->
-                navController.navigate("${ScreensRoute.Message.route}?draftId=${message.id}")
-            } } else null
-        )
+        // Indicador de carga o error
+        when (receivedState) {
+            is NetworkResponse.Loading -> {
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(top = 32.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    CircularProgressIndicator()
+                }
+            }
+
+            is NetworkResponse.Failure -> {
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(top = 32.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        text = "Error al cargar mensajes",
+                        color = Color.Red,
+                        fontSize = 16.sp
+                    )
+                }
+            }
+
+            is NetworkResponse.Success -> {
+                // Lista de mensajes
+                MessageList(
+                    messages = messages,
+                    type = mailboxType,
+                    onMessageClick = onMessageClick,
+                    onReply = if (mailboxType == MailboxType.INBOX) { { message ->
+                        navController.navigate("reply/${message.id}")
+                    } } else null,
+                    onMarkStatus = if (mailboxType == MailboxType.OUTBOX) { { message, status ->
+                        viewModel.updateMessageStatus(message.id, OutboxMessageModel.MessageStatus.valueOf(status))
+                    } } else null,
+                    onDelete = if (mailboxType == MailboxType.DRAFT) { { id ->
+                        viewModel.discardDraft(id.toInt())
+                    } } else null,
+                    onContinueEditing = if (mailboxType == MailboxType.DRAFT) { { message ->
+                        navController.navigate("${ScreensRoute.Message.route}?draftId=${message.id}")
+                    } } else null
+                )
+            }
+        }
     }
 }
+
 
 
 
