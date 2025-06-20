@@ -14,6 +14,7 @@ import com.example.proyectofinal.core.network.NetworkResponse
 import com.example.proyectofinal.orderManagement.domain.model.OrderDelivered
 import com.example.proyectofinal.orderManagement.domain.model.OrderParagraph
 import com.example.proyectofinal.orderManagement.domain.provider.OrderManagementProvider
+import com.example.proyectofinal.orderManagement.domain.repository.OrderRepository
 import com.example.proyectofinal.orderManagement.domain.usecase.GetTaskGroupByStudentUseCase
 import com.example.proyectofinal.task_student.presentation.tts.TextToSpeechManager
 import kotlinx.coroutines.Job
@@ -35,7 +36,8 @@ class TaskStudentViewModel(
     private val audioPlayerManager: AudioPlayerManager,
     private val audioRepositoryImpl: AudioRepository,
     private val getOrders: GetTaskGroupByStudentUseCase,
-    private val tokenManager: TokenManager
+    private val tokenManager: TokenManager,
+    private val orderRepository: OrderRepository
 ): ViewModel() {
 
     private val _projectState = MutableStateFlow<NetworkResponse<OrderDelivered>>(NetworkResponse.Loading())
@@ -313,6 +315,11 @@ class TaskStudentViewModel(
                     page = currentPageIndex.value,
                     date = "hoy"
                 )
+                val studentId = tokenManager.userId.first() ?: return@launch
+                val taskId = currentTaskId.value?.toString() ?: return@launch
+
+                orderRepository.markOrderAsCommented(studentId, taskId)
+
                 loadCommentsByTaskId(currentTaskId.value?: 0)
             }
         }
