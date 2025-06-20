@@ -20,6 +20,7 @@ import com.example.proyectofinal.core.network.NetworkResponse
 import com.example.proyectofinal.orderManagement.domain.model.OrderDelivered
 import com.example.proyectofinal.orderManagement.domain.model.OrderParagraph
 import com.example.proyectofinal.orderManagement.domain.provider.OrderManagementProvider
+import com.example.proyectofinal.orderManagement.domain.repository.OrderRepository
 import com.example.proyectofinal.orderManagement.domain.usecase.GetTaskGroupByStudentUseCase
 import com.example.proyectofinal.task_student.presentation.tts.TextToSpeechManager
 import kotlinx.coroutines.Dispatchers
@@ -46,7 +47,8 @@ class TaskStudentViewModel(
     private val downloadAsMp3UseCase: DownloadAsMp3UseCase,
     private val downloadAsTxtUseCase: DownloadAsTxtUseCase,
     private val getOrders: GetTaskGroupByStudentUseCase,
-    private val tokenManager: TokenManager
+    private val tokenManager: TokenManager,
+    private val orderRepository: OrderRepository
 ): ViewModel() {
 
     private val _projectState = MutableStateFlow<NetworkResponse<OrderDelivered>>(NetworkResponse.Loading())
@@ -84,15 +86,8 @@ class TaskStudentViewModel(
     private val _currentPageIndex = MutableStateFlow(0)
     val currentPageIndex = _currentPageIndex.asStateFlow()
 
-    val texto = currentPageIndex
-        .combine(_pages) { index, pages ->
-            pages.getOrNull(index) ?: ""
-        }.stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(5000),
-            initialValue = ""
-        )
-
+    private val _currentTaskId = MutableStateFlow<Int?>(null)
+    val currentTaskId = _currentTaskId.asStateFlow()
 
     private val _isFirstPage = MutableStateFlow(true)
     val isFirstPage = _isFirstPage.asStateFlow()
@@ -152,7 +147,6 @@ class TaskStudentViewModel(
 
     init {
         viewModelScope.launch {
-            _comments.value = audioRepositoryImpl.getAllAudios()
             ttsManager.isStoped.collect { stopped ->
                 _isStopped.value = stopped
                 if(_isStopped.value == true){
@@ -268,18 +262,6 @@ class TaskStudentViewModel(
         println("Start speech activado")
     }
 
-    fun pauseSpeech() {
-        print("Start speech pausado")
-        ttsManager.pause()
-        _isPaused.value = true
-    }
-
-    fun resumeSpeech() {
-        print("Start speech resumido")
-        ttsManager.resume()
-        _isPaused.value = false
-    }
-
     fun stopSpeech() {
         print("Start speech apagado")
         ttsManager.shutdown()
@@ -342,12 +324,17 @@ class TaskStudentViewModel(
             viewModelScope.launch {
                 audioRepositoryImpl.saveAudio(
                     path = file.absolutePath,
-                    taskId = "0",
+                    taskId = currentTaskId.value.toString(),
                     title = "audio_${currentPageIndex.value}_${System.currentTimeMillis()}",
                     page = currentPageIndex.value,
                     date = "hoy"
                 )
-                _comments.value = audioRepositoryImpl.getAllAudios()
+                val studentId = tokenManager.userId.first() ?: return@launch
+                val taskId = currentTaskId.value?.toString() ?: return@launch
+
+                orderRepository.markOrderAsCommented(studentId, taskId)
+
+                loadCommentsByTaskId(currentTaskId.value?: 0)
             }
         }
     }
@@ -463,6 +450,17 @@ class TaskStudentViewModel(
             } catch (e: Exception) {
                 _projectState.value = NetworkResponse.Failure(e.message ?: "Error desconocido")
             }
+        }
+    }
+
+    fun saveTaskId(taskId: Int){
+        _currentTaskId.value = taskId
+    }
+
+    fun loadCommentsByTaskId(taskId: Int) {
+        viewModelScope.launch {
+            val comments = audioRepositoryImpl.getAudiosForTask(taskId.toString())
+            _comments.value = comments
         }
     }
 

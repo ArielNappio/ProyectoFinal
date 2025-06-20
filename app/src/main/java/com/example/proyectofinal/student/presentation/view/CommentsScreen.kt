@@ -20,6 +20,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -44,6 +45,10 @@ fun CommentsScreen(
     val currentlyPlayingPath by viewModel.currentlyPlayingPath.collectAsState()
     val isPlaying by viewModel.isPlaying.collectAsState()
     val currentPosition by viewModel.currentPosition.collectAsState()
+
+    LaunchedEffect(taskId){
+        viewModel.loadCommentsByTaskId(taskId)
+    }
 
     Column(modifier = modifier.fillMaxSize()) {
         CommentsTopBar(

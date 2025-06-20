@@ -6,6 +6,7 @@ import com.example.proyectofinal.auth.data.tokenmanager.TokenManager
 import com.example.proyectofinal.core.network.NetworkResponse
 import com.example.proyectofinal.orderManagement.domain.model.OrderDelivered
 import com.example.proyectofinal.orderManagement.domain.usecase.GetTaskGroupByStudentUseCase
+import com.example.proyectofinal.orderManagement.domain.usecase.UpdateFavoriteStatusUseCase
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -14,7 +15,8 @@ import kotlinx.coroutines.launch
 
 class ProjectDetailViewModel(
     private val getOrders: GetTaskGroupByStudentUseCase,
-    private val tokenManager: TokenManager
+    private val tokenManager: TokenManager,
+    private val updateFavoriteStatusUseCase: UpdateFavoriteStatusUseCase
 ) : ViewModel() {
 
     private val _projectState = MutableStateFlow<NetworkResponse<OrderDelivered>>(NetworkResponse.Loading())
@@ -51,6 +53,19 @@ class ProjectDetailViewModel(
                 }
             } catch (e: Exception) {
                 _projectState.value = NetworkResponse.Failure(e.message ?: "Error desconocido")
+            }
+        }
+    }
+
+
+    fun toggleFavorite(orderId: String, isFavorite: Boolean) {
+        viewModelScope.launch {
+            updateFavoriteStatusUseCase(orderId, isFavorite)
+            val currentProject = (projectState.value as? NetworkResponse.Success)?.data
+            if (currentProject != null && currentProject.id == orderId) {
+                _projectState.value = NetworkResponse.Success(
+                    currentProject.copy(isFavorite = isFavorite)
+                )
             }
         }
     }

@@ -29,13 +29,14 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import com.example.proyectofinal.R
 import kotlinx.coroutines.delay
 import kotlin.random.Random
 
 @Composable
 fun LoadingWithImageBar(
     modifier: Modifier = Modifier,
-    imageResId: Int,
+    imageResId: Int = R.drawable.wirin50,
     loadingTexts: List<String> = listOf("Cargando...")
 ) {
 

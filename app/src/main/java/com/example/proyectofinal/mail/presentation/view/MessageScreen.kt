@@ -85,7 +85,8 @@ fun MessageScreen(
     val formPath by viewModel.formPath.collectAsState()
     val attachments by viewModel.attachments.collectAsState()
     val sendState by viewModel.sendMessageState.collectAsState()
-    val userId by viewModel.userId.collectAsState()
+    val currentUserId by viewModel.currentUserId.collectAsState()
+    val userDestinyId by viewModel.userToId.collectAsState()
     val draftSavedEvent = viewModel.draftSavedEvent
     val context = LocalContext.current
 
@@ -169,23 +170,22 @@ fun MessageScreen(
                 actions = {
                     Button(
                         onClick = {
-                            val newMessage = MessageModel(
-                                sender = to,
-                                subject = subject,
-                                content = message,
-                                formPath = formPath,
-                                attachments = attachments,
-                                date = Date.from(
-                                    LocalDateTime.now().atZone(ZoneId.systemDefault()).toInstant()
-                                ).toString(),
-                                id = 0,
-                                isDraft = false,
-                                isResponse = false,
-                                studentId = userId,
-                                userFromId = "0000"
-                            )
-                            viewModel.sendMessage(newMessage)
-                            Log.d("MessageScreen", "Message sent: $newMessage")
+//                            val newMessage = MessageModel(
+//                                sender = to,
+//                                subject = subject,
+//                                content = message,
+//                                formPath = formPath,
+//                                attachments = attachments,
+//                                date = Date.from(
+//                                    LocalDateTime.now().atZone(ZoneId.systemDefault()).toInstant()
+//                                ).toString(),
+//                                id = 0,
+//                                isDraft = false,
+//                                isResponse = false,
+//                                studentId = currentUserId,
+//                                userFromId = userDestinyId.toString()
+//                            )
+                            viewModel.sendMessage()
                         },
                         enabled = to.isNotBlank() && message.isNotBlank(),
                         colors = ButtonDefaults.buttonColors(containerColor = CustomGreen)
@@ -218,7 +218,10 @@ fun MessageScreen(
                 Text("Para:", modifier = Modifier.width(60.dp), color = Color.White)
                 TextField(
                     value = to,
-                    onValueChange = { viewModel.updateTo(it) },
+                    onValueChange = {
+                        viewModel.updateTo(it)
+                        viewModel.getUserIdByEmail(it)
+                    },
                     placeholder = { Text("Destinatario", color = Color.Gray) },
                     modifier = Modifier.weight(1f),
                     colors = TextFieldDefaults.colors(
@@ -328,14 +331,29 @@ fun MessageScreen(
                 attachments.forEach { path ->
                     val fileName = File(path).name
                     Row(
-                        modifier = Modifier.fillMaxWidth().padding(8.dp),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(8.dp),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Icon(imageVector = Icons.Default.AttachFile, contentDescription = "Adjunto", tint = GreenLight)
+                        Icon(
+                            imageVector = Icons.Default.AttachFile,
+                            contentDescription = "Adjunto",
+                            tint = GreenLight
+                        )
                         Spacer(modifier = Modifier.width(8.dp))
-                        Text(text = fileName, fontSize = 14.sp, color = Color.White, modifier = Modifier.weight(1f))
+                        Text(
+                            text = fileName,
+                            fontSize = 14.sp,
+                            color = Color.White,
+                            modifier = Modifier.weight(1f)
+                        )
                         IconButton(onClick = { viewModel.removeAttachment() }) {
-                            Icon(Icons.Default.Close, contentDescription = "Eliminar adjunto", tint = CustomRed)
+                            Icon(
+                                Icons.Default.Close,
+                                contentDescription = "Eliminar adjunto",
+                                tint = CustomRed
+                            )
                         }
                     }
                 }

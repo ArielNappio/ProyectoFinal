@@ -6,4 +6,6 @@ import kotlinx.coroutines.flow.Flow
 
 interface OrderRepository {
     fun getTasks(studentId: String): Flow<NetworkResponse<List<OrderDelivered>>>
+    suspend fun toggleFavorite(orderId: String, isFavorite: Boolean)
+    suspend fun markOrderAsCommented(studentId: String, orderId: String)
 }

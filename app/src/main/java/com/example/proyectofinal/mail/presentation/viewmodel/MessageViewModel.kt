@@ -11,8 +11,10 @@ import com.example.proyectofinal.core.network.NetworkResponse
 import com.example.proyectofinal.mail.domain.model.MessageModel
 import com.example.proyectofinal.mail.domain.usecase.DeleteMessageByIdUseCase
 import com.example.proyectofinal.mail.domain.usecase.GetDraftByIdUseCase
+import com.example.proyectofinal.mail.domain.usecase.GetInboxMessagesUseCase
 import com.example.proyectofinal.mail.domain.usecase.SaveDraftUseCase
 import com.example.proyectofinal.mail.domain.usecase.SendMessageUseCase
+import com.example.proyectofinal.users.domain.provider.usecase.GetUserUseCase
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -27,11 +29,16 @@ import java.time.LocalDateTime
 import java.time.ZoneId
 import java.util.Date
 
+object MessageEvents {
+    val messageSentEvent = MutableSharedFlow<Unit>()
+}
+
 class MessageViewModel(
     private val sendMessageUseCase: SendMessageUseCase,
     private val saveDraftUseCase: SaveDraftUseCase,
     private val getDraftByIdUseCase: GetDraftByIdUseCase,
     private val deleteDraftUseCase: DeleteMessageByIdUseCase,
+    private val getUserUseCase: GetUserUseCase,
     private val tokenManager: TokenManager
 ) : ViewModel() {
 
@@ -73,14 +80,26 @@ class MessageViewModel(
     private val _voiceToText = MutableStateFlow("")
     val voiceToText = _voiceToText.asStateFlow()
 
-    private val _userId = MutableStateFlow("")
-    val userId: StateFlow<String> = _userId
+    private val _currentUserId = MutableStateFlow("")
+    val currentUserId: StateFlow<String> = _currentUserId
+
+    private val _userToId = MutableStateFlow<String?>("")
+    val userToId: StateFlow<String?> = _userToId.asStateFlow()
 
     fun loadUserId() {
         viewModelScope.launch {
             val userIdValue = tokenManager.userId.first()
-            _userId.update { userIdValue.toString() }
-            println("${_userId.value} es el userid")
+            _currentUserId.update { userIdValue.toString() }
+            println("${_currentUserId.value} es el userid")
+        }
+    }
+
+    fun getUserIdByEmail(email: String) {
+        viewModelScope.launch {
+            getUserUseCase().collect { response ->
+                val user = response.data?.find { it.email == email }
+                _userToId.value = user?.id
+            }
         }
     }
 
@@ -123,12 +142,28 @@ class MessageViewModel(
         _message.value += " $newText"
     }
 
-    fun sendMessage(messageModel: MessageModel) {
+    fun sendMessage() {
         viewModelScope.launch {
             if (!isMessageValid()) {
                 _messageErrorEvent.emit("Por favor, completa todos los campos antes de enviar.")
                 return@launch
             }
+
+            val messageModel = MessageModel(
+                sender = to.value,
+                subject = subject.value,
+                content = message.value,
+                date = Date().toString(),
+                formPath = formPath.value,
+                attachments = attachments.value,
+                isDraft = false,
+                isResponse = false,
+                studentId = _currentUserId.value,
+                userFromId = _userToId.value.toString()       // <-- También completalo
+            )
+
+            Log.d("MessageViewModel", "Message sent: $messageModel")
+
             _sendMessageState.value = NetworkResponse.Loading()
             sendMessageUseCase(messageModel).collect { response ->
                 _sendMessageState.value = response

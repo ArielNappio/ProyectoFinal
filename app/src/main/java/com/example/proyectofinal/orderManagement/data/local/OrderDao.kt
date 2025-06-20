@@ -18,5 +18,11 @@ interface OrderDao {
 
     @Query("SELECT * FROM orders WHERE studentId = :studentId AND id = :orderId")
     fun getTaskById(studentId: String, orderId: String): Flow<OrderEntity>
-    
+
+    @Query("UPDATE orders SET isFavorite = :isFavorite WHERE id = :orderId")
+    suspend fun updateFavoriteStatus(orderId: String, isFavorite: Boolean)
+
+    @Query("SELECT * FROM orders WHERE studentId = :studentId AND id = :orderId LIMIT 1")
+    suspend fun getTaskByIdOnce(studentId: String, orderId: String): OrderEntity?
+
 }
