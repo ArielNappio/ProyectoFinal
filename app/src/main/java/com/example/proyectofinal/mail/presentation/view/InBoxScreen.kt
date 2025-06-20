@@ -30,7 +30,6 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -65,7 +64,6 @@ fun InboxScreen(
 ) {
     val viewModel = koinViewModel<InboxViewModel>()
     val receivedState by viewModel.receivedMessages.collectAsState()
-    val userId by viewModel.currentUserId.collectAsState()
 
     val messages = when (mailboxType) {
         MailboxType.INBOX -> {
@@ -78,15 +76,6 @@ fun InboxScreen(
         MailboxType.DRAFT -> viewModel.draftMessages.collectAsState().value
     }
 
-    LaunchedEffect(userId, mailboxType) {
-        userId?.let {
-            when (mailboxType) {
-                MailboxType.INBOX -> viewModel.loadReceivedMessages()
-                MailboxType.OUTBOX -> viewModel.loadSentMessages()
-                MailboxType.DRAFT -> {viewModel.draftMessages}
-            }
-        }
-    }
 
     Column(modifier = Modifier.fillMaxSize()) {
         InboxScreenTopBar(navController, mailboxType)

@@ -12,7 +12,6 @@ import com.example.proyectofinal.mail.domain.usecase.GetDraftMessagesUseCase
 import com.example.proyectofinal.mail.domain.usecase.GetInboxMessagesUseCase
 import com.example.proyectofinal.mail.domain.usecase.GetOutboxMessagesUseCase
 import com.example.proyectofinal.mail.domain.usecase.ReceiveMessageUseCase
-import com.example.proyectofinal.mail.domain.usecase.SendMessageUseCase
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -25,7 +24,6 @@ class InboxViewModel(
     private val getDraftMessagesUseCase: GetDraftMessagesUseCase,
     private val deleteDraftUseCase: DeleteMessageByIdUseCase,
     private val receiveMessageUseCase: ReceiveMessageUseCase,
-    private val sendMessageUseCase: SendMessageUseCase,
     private val tokenManager: TokenManager
 ) : ViewModel() {
 
@@ -41,18 +39,14 @@ class InboxViewModel(
     private val _receivedMessages = MutableStateFlow<NetworkResponse<List<MessageModel>>>(NetworkResponse.Loading())
     val receivedMessages: StateFlow<NetworkResponse<List<MessageModel>>> = _receivedMessages
 
-    private val _currentUserId = MutableStateFlow<String?>(null)
-    val currentUserId: StateFlow<String?> = _currentUserId
+    private var currentUserId: String? = null
 
     init {
         viewModelScope.launch {
             val userId = tokenManager.userId.first()
-            _currentUserId.value = userId
+            currentUserId = userId
             Log.d("InboxViewModel", "UserId obtenido: $userId")
             setCurrentUserId(userId)
-            MessageEvents.messageSentEvent.collect {
-                loadSentMessages()
-            }
         }
     }
 
@@ -60,7 +54,7 @@ class InboxViewModel(
         currentUserId?.let { id ->
             viewModelScope.launch(Dispatchers.IO) {
                 Log.d("InboxViewModel", "Cargando mensajes recibidos para userId: $id")
-                receiveMessageUseCase(id.toString()).collect { response ->
+                receiveMessageUseCase(id).collect { response ->
                     when (response) {
                         is NetworkResponse.Success -> {
                             Log.d("InboxViewModel", "Mensajes recibidos correctamente: ${response.data?.size ?: 0}")
@@ -80,60 +74,39 @@ class InboxViewModel(
         }
     }
 
-    fun loadSentMessages() {
+    fun setCurrentUserId(userId: String?) {
+        if (userId == null) return
+        currentUserId = userId
+        Log.d("InboxViewModel", "setCurrentUserId: $userId")
+        loadInboxMessages()
+        loadOutboxMessages()
+        loadDraftMessages()
+        loadReceivedMessages()
+    }
+
+    private fun loadInboxMessages() {
         currentUserId?.let { id ->
             viewModelScope.launch(Dispatchers.IO) {
-                try {
-                    Log.d("InboxViewModel", "Cargando mensajes enviados para userId: $id")
-                    val result = getInboxMessagesUseCase(id.toString())
-                    _inboxMessages.value = result
-                    Log.d("InboxViewModel", "Mensajes enviados cargados correctamente: ${result.size}")
-                } catch (e: Exception) {
-                    Log.e("InboxViewModel", "Error al cargar mensajes enviados: ${e.message}")
-                    _inboxMessages.value = emptyList()
-                }
+                val messages = getInboxMessagesUseCase(id)
+                _inboxMessages.value = messages
             }
-        } ?: run {
-            Log.e("InboxViewModel", "currentUserId es null al cargar mensajes enviados")
         }
     }
 
-
-
-    fun setCurrentUserId(userId: String?) {
-        if (userId == null) return
-        _currentUserId.value = userId
-        Log.d("InboxViewModel", "setCurrentUserId: $userId")
-//        loadInboxMessages()
-//        loadOutboxMessages()
-        loadDraftMessages()
-        loadReceivedMessages()
-        loadSentMessages()
+    private fun loadOutboxMessages() {
+        currentUserId?.let { id ->
+            viewModelScope.launch(Dispatchers.IO) {
+                val messages = getOutboxMessagesUseCase(id)
+                val outboxMessages = messages.map { message ->
+                    OutboxMessageModel(
+                        message = message,
+                        status = OutboxMessageModel.MessageStatus.NO_LEIDO
+                    )
+                }
+                _outboxMessages.value = outboxMessages.map { it.message }
+            }
+        }
     }
-
-//    private fun loadInboxMessages() {
-//        currentUserId?.let { id ->
-//            viewModelScope.launch(Dispatchers.IO) {
-//                val messages = getInboxMessagesUseCase(id)
-//                _inboxMessages.value = messages
-//            }
-//        }
-//    }
-
-//    private fun loadOutboxMessages() {
-//        currentUserId?.let { id ->
-//            viewModelScope.launch(Dispatchers.IO) {
-//                val messages = getOutboxMessagesUseCase(id)
-//                val outboxMessages = messages.map { message ->
-//                    OutboxMessageModel(
-//                        message = message,
-//                        status = OutboxMessageModel.MessageStatus.NO_LEIDO
-//                    )
-//                }
-//                _outboxMessages.value = outboxMessages.map { it.message }
-//            }
-//        }
-//    }
 
 
     fun updateMessageStatus(messageId: Int, newStatus: OutboxMessageModel.MessageStatus) {
@@ -143,16 +116,16 @@ class InboxViewModel(
 
     private fun loadDraftMessages() {
 
-            viewModelScope.launch(Dispatchers.IO) {
-                val drafts: List<MessageModel> = getDraftMessagesUseCase()
-                if(drafts.isEmpty()){
-                    println("ta vacio")
-                }
-                else{
-                    println("algo cargo")
-                }
-                _draftMessages.value = drafts
+        viewModelScope.launch(Dispatchers.IO) {
+            val drafts: List<MessageModel> = getDraftMessagesUseCase()
+            if(drafts.isEmpty()){
+                println("ta vacio")
             }
+            else{
+                println("algo cargo")
+            }
+            _draftMessages.value = drafts
+        }
 
     }
 
