@@ -5,6 +5,7 @@ import com.example.proyectofinal.audio.domain.repository.AudioRepository
 import com.example.proyectofinal.audio.player.AudioPlayerManager
 import com.example.proyectofinal.audio.recorder.AudioRecorderManager
 import com.example.proyectofinal.auth.data.tokenmanager.TokenManager
+import com.example.proyectofinal.orderManagement.domain.repository.OrderRepository
 import com.example.proyectofinal.orderManagement.domain.usecase.GetTaskGroupByStudentUseCase
 import com.example.proyectofinal.task_student.domain.usecase.DownloadAsMp3UseCase
 import com.example.proyectofinal.task_student.domain.usecase.DownloadAsPdfUseCase
@@ -20,6 +21,7 @@ import io.mockk.verify
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.resetMain
@@ -39,6 +41,7 @@ class TaskStudentViewModelTest {
     private val audioRecorderManager: AudioRecorderManager = mockk(relaxed = true)
     private val audioPlayerManager: AudioPlayerManager = mockk(relaxed = true)
     private val audioRepository: AudioRepository = mockk(relaxed = true)
+    private val orderRepository: OrderRepository = mockk(relaxed = true)
     private val getOrders: GetTaskGroupByStudentUseCase = mockk(relaxed = true)
     private val tokenManager: TokenManager = mockk(relaxed = true)
 
@@ -54,6 +57,7 @@ class TaskStudentViewModelTest {
 
         Dispatchers.setMain(testDispatcher)
         coEvery { ttsManager.isStoped } returns MutableStateFlow(true)
+        coEvery { tokenManager.userId } returns flowOf("example_id")
         viewModel = TaskStudentViewModel(
             ttsManager = ttsManager,
             audioRecorderManager = audioRecorderManager,
@@ -64,6 +68,7 @@ class TaskStudentViewModelTest {
             downloadAsPdfUseCase = DownloadAsPdfUseCase(),
             downloadAsMp3UseCase = DownloadAsMp3UseCase(),
             downloadAsTxtUseCase = DownloadAsTxtUseCase(),
+            orderRepository = orderRepository
         )
     }
 

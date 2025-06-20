@@ -11,6 +11,7 @@ import com.example.proyectofinal.mail.domain.usecase.GetDraftByIdUseCase
 import com.example.proyectofinal.mail.domain.usecase.SaveDraftUseCase
 import com.example.proyectofinal.mail.domain.usecase.SendMessageUseCase
 import com.example.proyectofinal.mail.presentation.viewmodel.MessageViewModel
+import com.example.proyectofinal.users.domain.provider.usecase.GetUserUseCase
 import io.mockk.Runs
 import io.mockk.coEvery
 import io.mockk.coVerify
@@ -36,8 +37,10 @@ class MessageViewModelTest {
     private lateinit var saveDraftUseCase: SaveDraftUseCase
     private lateinit var getDraftByIdUseCase: GetDraftByIdUseCase
     private lateinit var deleteDraftUseCase: DeleteMessageByIdUseCase
+    private lateinit var getUserUseCase: GetUserUseCase
     private lateinit var mailRepository: MailRepository
     private lateinit var mailProvider: MailProvider
+//    private lateinit var userProvider: UserProvider
     private val testDispatcher = StandardTestDispatcher()
     private val testScope = TestScope(testDispatcher)
     private lateinit var viewModel: MessageViewModel
@@ -73,12 +76,14 @@ class MessageViewModelTest {
         saveDraftUseCase = SaveDraftUseCase(mailRepository)
         getDraftByIdUseCase = GetDraftByIdUseCase(mailRepository)
         deleteDraftUseCase = DeleteMessageByIdUseCase(mailRepository)
+        getUserUseCase = GetUserUseCase(mockk())
 
         viewModel = MessageViewModel(
             sendMessageUseCase = sendMessageUseCase,
             saveDraftUseCase = saveDraftUseCase,
             getDraftByIdUseCase = getDraftByIdUseCase,
             deleteDraftUseCase = deleteDraftUseCase,
+            getUserUseCase = getUserUseCase,
             tokenManager = tokenManager
         )
     }
@@ -106,7 +111,7 @@ class MessageViewModelTest {
         viewModel.updateTo("test@example.com")
         viewModel.updateSubject("Test Subject")
         viewModel.updateMessage("Test Message")
-        viewModel.sendMessage(messageModelStub)
+        viewModel.sendMessage()
 
         testDispatcher.scheduler.advanceUntilIdle()
 

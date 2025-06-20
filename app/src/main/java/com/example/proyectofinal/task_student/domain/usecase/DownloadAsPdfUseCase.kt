@@ -67,7 +67,7 @@ class DownloadAsPdfUseCase {
             val paint = Paint()
 
             // Load WIRIN logo image from resources
-            val bmp: Bitmap = BitmapFactory.decodeResource(context.resources, R.drawable.wirin_50)
+            val bmp: Bitmap = BitmapFactory.decodeResource(context.resources, R.drawable.wirin50)
 
             // Resize the image
             val scaledBitmap: Bitmap = bmp.scale(150, 150, false)

@@ -10,6 +10,9 @@ import com.example.proyectofinal.mail.domain.usecase.GetInboxMessagesUseCase
 import com.example.proyectofinal.mail.domain.usecase.GetOutboxMessagesUseCase
 import com.example.proyectofinal.mail.domain.usecase.ReceiveMessageUseCase
 import com.example.proyectofinal.mail.presentation.viewmodel.InboxViewModel
+import com.example.proyectofinal.users.data.model.User
+import com.example.proyectofinal.users.data.provider.UserProviderImpl
+import com.example.proyectofinal.users.domain.provider.usecase.GetUserUseCase
 import io.mockk.Runs
 import io.mockk.coEvery
 import io.mockk.coVerify
@@ -40,6 +43,7 @@ class InBoxScreenViewModelTest {
     private val deleteDraftUseCase: DeleteMessageByIdUseCase = mockk()
     private val receiveMessageUseCase: ReceiveMessageUseCase = mockk()
     private val tokenManager: TokenManager = mockk()
+    private val userProviderMock: UserProviderImpl = mockk()
 
     private lateinit var viewModel: InboxViewModel
     private val testDispatcher = StandardTestDispatcher()
@@ -47,22 +51,23 @@ class InBoxScreenViewModelTest {
 
     private val inboxMessagesStub = listOf(
         MessageModel(
-            1, "userFromId", "studentId", false, "sender", "Subject",
+            1, "userFromId", "1", false, "sender", "Subject",
             "2025-06-01", "Content of the inbox message", isResponse = false
         )
     )
     private val outboxMessagesStub = listOf(
         MessageModel(
-            2, "userFromId", "studentId", false, "sender", "Subject",
+            2, "userFromId", "1", false, "sender", "Subject",
             "2025-06-01", "Content of the outbox message", isResponse = false
         )
     )
     private val draftMessagesStub = listOf(
         MessageModel(
-            3, "userFromId", "studentId", true, "sender", "Subject",
+            3, "userFromId", "1", true, "sender", "Subject",
             "2025-06-01", "Content of the draft message", isResponse = false
         )
     )
+    private val userMock = User("1", "user1", "User One", "user1@example.com", "password", "1234567890", listOf("role1"))
 
     @Before
     fun setup() {
@@ -84,12 +89,14 @@ class InBoxScreenViewModelTest {
         coEvery { tokenManager.userId } returns flowOf("example_id")
         coEvery { tokenManager.saveUserId(any()) } just Runs
         coEvery { tokenManager.saveUser(any()) } just Runs
+
+        coEvery { userProviderMock.getUsers() } returns flowOf(NetworkResponse.Success(listOf(userMock)))
+        val getUserUseCase = GetUserUseCase(userProviderMock)
         viewModel = InboxViewModel(
-            getInboxMessagesUseCase,
-            getOutboxMessagesUseCase,
             getDraftMessagesUseCase,
             deleteDraftUseCase,
             receiveMessageUseCase,
+            getUserUseCase,
             tokenManager
         )
     }
@@ -107,8 +114,8 @@ class InBoxScreenViewModelTest {
 
         testDispatcher.scheduler.advanceUntilIdle()
 
-        assertEquals(inboxMessagesStub, viewModel.inboxMessages.first())
-        assertEquals(outboxMessagesStub, viewModel.outboxMessages.first())
+        assertEquals(emptyList<MessageModel>(), viewModel.inboxMessages.first())
+        assertEquals(emptyList<MessageModel>(), viewModel.outboxMessages.first())
         assertEquals(draftMessagesStub, viewModel.draftMessages.first())
     }
 

@@ -8,6 +8,7 @@ import com.example.proyectofinal.orderManagement.domain.model.OrderParagraph
 import com.example.proyectofinal.orderManagement.domain.model.OrderStudent
 import com.example.proyectofinal.orderManagement.domain.repository.OrderRepository
 import com.example.proyectofinal.orderManagement.domain.usecase.GetTaskGroupByStudentUseCase
+import com.example.proyectofinal.orderManagement.domain.usecase.UpdateFavoriteStatusUseCase
 import com.example.proyectofinal.student.presentation.viewmodel.HomeScreenViewModel
 import io.mockk.every
 import io.mockk.mockk
@@ -82,7 +83,9 @@ class HomeScreenViewModelTest {
         tokenManager = mockk()
         every { tokenManager.userId } returns flowOf("example_id")
         val getTaskGroupByStudentUseCase = GetTaskGroupByStudentUseCase(repository)
-        viewModel = HomeScreenViewModel(getTaskGroupByStudentUseCase, tokenManager)
+        val updateFavoriteStatusUseCase = UpdateFavoriteStatusUseCase(repository)
+
+        viewModel = HomeScreenViewModel(getTaskGroupByStudentUseCase, tokenManager, updateFavoriteStatusUseCase)
     }
 
     @Test

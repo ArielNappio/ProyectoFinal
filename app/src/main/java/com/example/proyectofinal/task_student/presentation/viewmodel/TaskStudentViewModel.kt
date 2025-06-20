@@ -371,19 +371,19 @@ class TaskStudentViewModel(
                     DownloadType.PDF -> downloadAsPdfUseCase(
                         context,
                         _projectState.value.data!!.title,
-                        _pages.value,
+                        _paragraphs.value.map { it.paragraphText },
                         totalPages.value,
                         _fontSize.value.value
                     )
                     DownloadType.MP3 -> downloadAsMp3UseCase(
                         context,
                         _projectState.value.data!!.title,
-                        texto.value
+                        textoPorPagina.value
                     )
                     DownloadType.TXT -> downloadAsTxtUseCase(
                         context,
                         _projectState.value.data!!.title,
-                        texto.value
+                        textoPorPagina.value
                     )
                 }
                 resultMessage = "${type.friendlyName} downloaded successfully"
