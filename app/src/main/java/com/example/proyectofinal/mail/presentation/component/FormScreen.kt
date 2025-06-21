@@ -110,35 +110,24 @@ fun FormScreen(
         confirmButton = {
             Button(
                 onClick = {
-                    if (viewModel.isFormValid(career, subject, note, chapters, selectedDate)){
-                        val file = viewModel.saveFormToFile(
+                    if (viewModel.isFormValid(career, subject, note, chapters, selectedDate)) {
+                        viewModel.saveFormToFile(
                             context,
                             career,
                             subject,
                             note,
                             chapters,
                             selectedDate
-                        )
-                        Log.d("FormScreen", "Archivo guardado en: ${file.absolutePath}")
+                        ) { file ->
+                            Log.d("FormScreen", "Archivo guardado en: ${file.absolutePath}")
 
-                        viewModel.updateFormPath(file.absolutePath)
+                            viewModel.updateFormPath(file.absolutePath)
+                            viewModel.updateSubject("Solicitud de apunte")
 
-                        val message = MessageModel(
-                            id = 0,
-                            sender = "Usuario",
-                            subject = "Formulario Adjunto",
-                            date = Date.from(LocalDateTime.now().atZone(ZoneId.systemDefault()).toInstant()).toString(),
-                            content = "Se adjunta un formulario.",
-                            formPath = file.absolutePath,
-                            isDraft = false,
-                            isResponse = false,
-                            studentId = "",
-                            userFromId = ""
-                        )
-                        viewModel.sendMessage()
-                        onMessageSent()
-                    }
-                    else {
+                            viewModel.sendMessage()
+                            onMessageSent()
+                        }
+                    } else {
                         Toast.makeText(context, "Por favor completá todos los campos.", Toast.LENGTH_SHORT).show()
                     }
                 },

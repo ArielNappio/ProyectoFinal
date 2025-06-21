@@ -223,18 +223,44 @@ class MessageViewModel(
         subject: String,
         note: String,
         chapter: String,
-        date: String
-    ): File {
+        date: String,
+        onFileSaved: (File) -> Unit
+    ) {
         viewModelScope.launch {
             if (isFormValid(career, subject, note, chapter, date)) {
-                val file = saveFormToFile(context, career, subject, note, chapter, date)
+                val file = saveForm(context, career, subject, note, chapter, date)
+                _formPath.value = file.absolutePath
                 Log.d("SaveForm", "Archivo guardado en: ${file.absolutePath}")
+                onFileSaved(file)
             } else {
                 Log.e("SaveForm", "Formulario incompleto, no se guarda")
             }
         }
-        return File("")
     }
+
+    private fun saveForm(
+        context: Context,
+        career: String,
+        subject: String,
+        note: String,
+        chapter: String,
+        date: String
+    ): File {
+        val fileName = "form_${System.currentTimeMillis()}.txt"
+        val file = File(context.filesDir, fileName)
+        file.writeText(
+            """
+        Carrera: $career
+        Materia: $subject
+        Comisión: $note
+        Capítulo: $chapter
+        Fecha: $date
+        """.trimIndent()
+        )
+        return file
+    }
+
+
 
     fun removeAttachment() {
         _formPath.value = null
