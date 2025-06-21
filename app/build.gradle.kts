@@ -99,7 +99,8 @@ dependencies {
     implementation("com.google.code.gson:gson:2.10.1")
 
     // Coil
-    implementation(libs.coil.compose)
+    implementation ("io.coil-kt:coil-compose:2.7.0")
+
 
     //mockito
     testImplementation(libs.mockk)

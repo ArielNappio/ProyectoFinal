@@ -33,4 +33,19 @@ class PreferencesViewModel(
             repository.saveFontFamily(family)
         }
     }
+
+
+    fun updateProfileImageUri(email: String, uri: String) {
+        viewModelScope.launch {
+            repository.saveProfileImageUri(email, uri)
+        }
+    }
+
+    fun getProfileImageUri(email: String, onResult: (String?) -> Unit) {
+        viewModelScope.launch {
+            val uri = repository.getProfileImageUri(email)
+            onResult(uri)
+        }
+    }
+
 }
