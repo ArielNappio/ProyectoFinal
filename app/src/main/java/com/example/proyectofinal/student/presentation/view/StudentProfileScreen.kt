@@ -18,6 +18,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Switch
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -29,15 +30,28 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.proyectofinal.R
+import com.example.proyectofinal.auth.data.tokenmanager.TokenManager
 import com.example.proyectofinal.core.theme.LocalTheme
 import com.example.proyectofinal.core.ui.ThemeViewModel
 import com.example.proyectofinal.navigation.ScreensRoute
 import com.example.proyectofinal.userpreferences.presentation.component.AppText
 import org.koin.androidx.compose.koinViewModel
+import org.koin.compose.koinInject
+
 
 @Composable
-fun StudentProfileScreen(modifier: Modifier = Modifier, navController: NavController) {
+fun StudentProfileScreen(
+    modifier: Modifier = Modifier,
+    navController: NavController,
+) {
     val themeViewModel = koinViewModel<ThemeViewModel>()
+    val tokenManager: TokenManager = koinInject()
+
+    val user = tokenManager.user.collectAsState(initial = null).value
+
+
+
+
 
     Column(
         modifier = modifier
@@ -63,9 +77,9 @@ fun StudentProfileScreen(modifier: Modifier = Modifier, navController: NavContro
             Spacer(modifier = Modifier.width(24.dp))
             // Placeholder for user info
             Column {
-                AppText("Información de usuario", isTitle = true, fontWeight = FontWeight.Bold)
+                AppText(user?.email.toString(), isTitle = true, fontWeight = FontWeight.Bold)
                 Spacer(modifier = Modifier.height(4.dp))
-                AppText("Ana Fernández")
+                AppText(user?.fullName.toString())
             }
         }
 
