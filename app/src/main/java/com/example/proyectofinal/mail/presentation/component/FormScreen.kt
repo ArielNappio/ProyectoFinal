@@ -35,12 +35,8 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import com.example.proyectofinal.core.theme.BlackGray
 import com.example.proyectofinal.core.theme.CustomGreen
-import com.example.proyectofinal.mail.domain.model.MessageModel
 import com.example.proyectofinal.mail.presentation.viewmodel.MessageViewModel
-import java.time.LocalDateTime
-import java.time.ZoneId
 import java.util.Calendar
-import java.util.Date
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
@@ -124,7 +120,6 @@ fun FormScreen(
                             viewModel.updateFormPath(file.absolutePath)
                             viewModel.updateSubject("Solicitud de apunte")
 
-                            viewModel.sendMessage()
                             onMessageSent()
                         }
                     } else {
