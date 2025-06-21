@@ -39,65 +39,89 @@ class InboxViewModel(
     val receivedMessages: StateFlow<NetworkResponse<List<MessageModel>>> = _receivedMessages
 
     private var currentUserId: String? = null
-
     private val _userEmail = MutableStateFlow<String?>(null)
     val userEmail: StateFlow<String?> = _userEmail
 
     init {
-        viewModelScope.launch {
-            val userId = tokenManager.userId.first()
-            currentUserId = userId
-            Log.d("InboxViewModel", "UserId obtenido: $userId")
-            setCurrentUserId(userId)
-            getEmailByUserId(userId.toString())
-        }
+        initInbox()
     }
 
     fun setCurrentUserId(userId: String?) {
         if (userId == null) return
         currentUserId = userId
         Log.d("InboxViewModel", "setCurrentUserId: $userId")
-        getEmailByUserId(userId)
-        getAllMessagesByCurrentId()
+        initInbox() // recargar todo
         loadDraftMessages()
     }
 
-    fun getAllMessagesByCurrentId() {
-        currentUserId?.let { id ->
+    private fun initInbox() {
+        viewModelScope.launch {
+            val userId = tokenManager.userId.first()
+            currentUserId = userId
+            Log.d("InboxViewModel", "UserId obtenido: $userId")
 
-            viewModelScope.launch(Dispatchers.IO) {
-                Log.d("InboxViewModel", "Cargando mensajes para userId: $id")
-                receiveMessageUseCase(id).collect { response ->
-                    when (response) {
-                        is NetworkResponse.Success -> {
-                            val allMessages = response.data ?: emptyList()
+            getUserUseCase().collect { response ->
+                when (response) {
+                    is NetworkResponse.Success -> {
+                        val user = response.data?.find { it.id == userId }
+                        val email = user?.email
+                        _userEmail.value = email
+                        Log.d("InboxViewModel", "Email encontrado: $email")
 
-                            filterInboxMessages(allMessages, userEmail.value.toString(), id)
-                            filterOutboxMessages(allMessages, userEmail.value.toString(), id)
-
-                            _receivedMessages.value = response
+                        if (email != null) {
+                            loadMessages(userId.toString(), email)
                         }
+                    }
 
-                        is NetworkResponse.Failure -> {
-                            Log.e("InboxViewModel", "Error al cargar mensajes: ${response.error}")
-                            _receivedMessages.value = response
-                        }
+                    is NetworkResponse.Failure -> {
+                        Log.e("InboxViewModel", "Error al buscar usuario: ${response.error}")
+                    }
 
-                        is NetworkResponse.Loading -> {
-                            Log.d("InboxViewModel", "Cargando mensajes...")
-                            _receivedMessages.value = response
-                        }
+                    is NetworkResponse.Loading -> {
+                        Log.d("InboxViewModel", "Buscando usuario...")
                     }
                 }
             }
-        } ?: run {
-            Log.e("InboxViewModel", "currentUserId es null al cargar mensajes")
+        }
+    }
+
+    private fun loadMessages(userId: String, email: String) {
+        viewModelScope.launch(Dispatchers.IO) {
+            Log.d("InboxViewModel", "Cargando mensajes para userId: $userId y email: $email")
+
+            receiveMessageUseCase(userId).collect { response ->
+                when (response) {
+                    is NetworkResponse.Success -> {
+                        val allMessages = response.data ?: emptyList()
+                        _receivedMessages.value = response
+
+                        val inbox = allMessages.filter { it.sender == email && it.studentId == userId }
+                        val outbox = allMessages.filter { it.sender != email && it.studentId == userId }
+
+                        _inboxMessages.value = inbox
+                        _outboxMessages.value = outbox
+
+                        Log.d("InboxViewModel", "Mensajes de entrada: ${inbox.size}")
+                        Log.d("InboxViewModel", "Mensajes de salida: ${outbox.size}")
+                    }
+
+                    is NetworkResponse.Failure -> {
+                        Log.e("InboxViewModel", "Error al cargar mensajes: ${response.error}")
+                        _receivedMessages.value = response
+                    }
+
+                    is NetworkResponse.Loading -> {
+                        Log.d("InboxViewModel", "Cargando mensajes...")
+                        _receivedMessages.value = response
+                    }
+                }
+            }
         }
     }
 
     private fun loadDraftMessages() {
         viewModelScope.launch(Dispatchers.IO) {
-            val drafts: List<MessageModel> = getDraftMessagesUseCase()
+            val drafts = getDraftMessagesUseCase()
             _draftMessages.value = drafts
             if (drafts.isEmpty()) {
                 println("Sin borradores")
@@ -113,63 +137,5 @@ class InboxViewModel(
             loadDraftMessages()
         }
     }
-
-    fun updateMessageStatus(messageId: Int, newStatus: OutboxMessageModel.MessageStatus) {
-        // Implementar si querés manejar estados de mensajes enviados
-    }
-
-    private fun filterInboxMessages(
-        messages: List<MessageModel>,
-        userEmail: String,
-        userId: String
-    ) {
-        getEmailByUserId(userId)
-        if (_userEmail.value != null) {
-            val inbox = messages.filter { it.sender == userEmail }
-            _inboxMessages.value = inbox
-            Log.d("InboxViewModel", "Mensajes de entrada: ${inbox.size}")
-        } else {
-            println("esta vacio :(")
-        }
-    }
-
-    private fun filterOutboxMessages(
-        messages: List<MessageModel>,
-        userEmail: String,
-        userId: String
-    ) {
-        getEmailByUserId(userId)
-        if (_userEmail.value != null) {
-            val outbox = messages.filter { it.sender != userEmail }
-            _outboxMessages.value = outbox
-            Log.d("InboxViewModel", "Mensajes de salida: ${outbox.size}")
-        } else {
-            println("esta vacio :(")
-        }
-    }
-
-    private fun getEmailByUserId(userId: String) {
-        viewModelScope.launch {
-            getUserUseCase().collect { response ->
-                when (response) {
-                    is NetworkResponse.Success -> {
-                        val user = response.data?.find { it.id == userId }
-                        _userEmail.value = user?.email
-                        Log.d("InboxViewModel", "Email encontrado: ${user?.email}")
-                        Log.d("InboxViewModel", "User encontrado: ${_userEmail.value}")
-                        Log.d("InboxViewModel", "response: ${response.data}")
-                    }
-
-                    is NetworkResponse.Failure -> {
-                        Log.e("InboxViewModel", "Error al buscar usuario: ${response.error}")
-                    }
-
-                    is NetworkResponse.Loading -> {
-                        Log.d("InboxViewModel", "Buscando usuario...")
-                    }
-                }
-            }
-        }
-    }
-
 }
+

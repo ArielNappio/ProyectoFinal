@@ -132,7 +132,7 @@ fun InboxScreen(
                         navController.navigate("reply/${message.id}")
                     } } else null,
                     onMarkStatus = if (mailboxType == MailboxType.OUTBOX) { { message, status ->
-                        viewModel.updateMessageStatus(message.id, OutboxMessageModel.MessageStatus.valueOf(status))
+//                        viewModel.updateMessageStatus(message.id, OutboxMessageModel.MessageStatus.valueOf(status))
                     } } else null,
                     onDelete = if (mailboxType == MailboxType.DRAFT) { { id ->
                         viewModel.discardDraft(id.toInt())
