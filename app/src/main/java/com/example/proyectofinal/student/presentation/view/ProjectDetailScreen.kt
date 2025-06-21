@@ -228,7 +228,7 @@ fun TaskItemCard(
                 horizontalArrangement = Arrangement.SpaceEvenly
             ) {
                 // 📝 Botón de anotaciones (solo si tiene)
-                if (!task.hasComments) {
+                if (task.hasComments) {
                     Column(
                         modifier = Modifier
                             .clickable { onViewAnnotations() }

@@ -39,6 +39,41 @@ fun OrderDto.toDomain(): OrderStudent {
     )
 }
 
+fun OrderDto.toDomain(
+    hasCommentsAnteriores: Map<String, Boolean> = emptyMap()
+): OrderStudent {
+    return OrderStudent(
+        id = id,
+        name = name,
+        description = description,
+        isFavorite = false,
+        lastRead = "0",
+        pageCount = rangePage.split("-").let {
+            if (it.size == 2) it[1].toInt() - it[0].toInt() + 1 else 0
+        },
+        hasComments = hasCommentsAnteriores[id.toString()] ?: false,
+        subject = subject,
+        authorName = authorName,
+        rangePage = rangePage,
+        status = status,
+        voluntarioId = voluntarioId,
+        alumnoId = alumnoId
+    )
+}
+
+fun OrderDeliveredDto.toDomain(
+    hasCommentsAnteriores: Map<String, Boolean> = emptyMap()
+): OrderDelivered = OrderDelivered(
+    studentId = studentId,
+    id = id.toString(),
+    status = status,
+    title = title,
+    orders = orders.map { it.toDomain(hasCommentsAnteriores) },
+    orderParagraphs = orderParagraphs.map { it.toDomain() }
+)
+
+
+
 fun OrderParagraphDto.toDomain(): OrderParagraph = OrderParagraph(
     orderId = orderId,
     paragraphText = paragraphText,
