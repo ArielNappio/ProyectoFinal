@@ -1,5 +1,6 @@
 package com.example.proyectofinal.mail.presentation.view
 
+import android.net.Uri
 import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.Image
@@ -33,14 +34,18 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -56,7 +61,9 @@ import com.example.proyectofinal.mail.domain.model.MessageModel
 import com.example.proyectofinal.mail.domain.model.OutboxMessageModel
 import com.example.proyectofinal.mail.presentation.component.MessageItem
 import com.example.proyectofinal.mail.presentation.viewmodel.InboxViewModel
+import com.example.proyectofinal.mail.presentation.viewmodel.MessageViewModel
 import com.example.proyectofinal.navigation.ScreensRoute
+import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 
 @RequiresApi(Build.VERSION_CODES.O)
@@ -67,8 +74,8 @@ fun InboxScreen(
     onMessageClick: (MessageModel) -> Unit
 ) {
     val viewModel = koinViewModel<InboxViewModel>()
-    val receivedState by viewModel.receivedMessages.collectAsState()
 
+    val receivedState by viewModel.receivedMessages.collectAsState()
     val inboxMessages by viewModel.inboxMessages.collectAsState()
     val outboxMessages by viewModel.outboxMessages.collectAsState()
     val draftMessages by viewModel.draftMessages.collectAsState()
@@ -80,30 +87,27 @@ fun InboxScreen(
     }
 
     Column(modifier = Modifier.fillMaxSize()) {
-
-        // Top Bar
         InboxScreenTopBar(navController, mailboxType)
 
-        // Botón de Redactar
         Button(
             onClick = { navController.navigate(ScreensRoute.Message.route) },
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = 16.dp, vertical = 8.dp),
-            colors = ButtonDefaults.buttonColors(containerColor = CustomGreen, contentColor = Color.White)
+            colors = ButtonDefaults.buttonColors(
+                containerColor = CustomGreen,
+                contentColor = Color.White
+            )
         ) {
             Icon(Icons.Filled.Add, contentDescription = "Redactar", tint = Color.White)
             Spacer(Modifier.width(6.dp))
             Text("Redactar", color = Color.White, fontSize = 18.sp)
         }
 
-        // Indicador de carga o error
         when (receivedState) {
             is NetworkResponse.Loading -> {
                 Box(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(top = 32.dp),
+                    modifier = Modifier.fillMaxSize().padding(top = 32.dp),
                     contentAlignment = Alignment.Center
                 ) {
                     CircularProgressIndicator()
@@ -112,9 +116,7 @@ fun InboxScreen(
 
             is NetworkResponse.Failure -> {
                 Box(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(top = 32.dp),
+                    modifier = Modifier.fillMaxSize().padding(top = 32.dp),
                     contentAlignment = Alignment.Center
                 ) {
                     Text(
@@ -126,29 +128,37 @@ fun InboxScreen(
             }
 
             is NetworkResponse.Success -> {
-                // Lista de mensajes
                 MessageList(
                     messages = messages,
                     type = mailboxType,
                     onMessageClick = onMessageClick,
-                    onReply = if (mailboxType == MailboxType.INBOX) { { message ->
-                        navController.navigate("reply/${message.id}")
-                    } } else null,
-                    onMarkStatus = if (mailboxType == MailboxType.OUTBOX) { { message, status ->
-//                        viewModel.updateMessageStatus(message.id, OutboxMessageModel.MessageStatus.valueOf(status))
-                    } } else null,
-                    onDelete = if (mailboxType == MailboxType.DRAFT) { { id ->
-                        viewModel.discardDraft(id.toInt())
-                    } } else null,
-                    onContinueEditing = if (mailboxType == MailboxType.DRAFT) { { message ->
-                        navController.navigate("${ScreensRoute.Message.route}?draftId=${message.id}")
-                    } } else null
+                    onReply = if (mailboxType == MailboxType.INBOX) {
+                        { message ->
+                            navController.navigate(
+                                "${ScreensRoute.Message.route}?draftId=-1&replyToSubject=${
+                                    Uri.encode(message.subject)
+                                }&fromUserId=${message.userFromId}"
+                            )
+                        }
+                    } else null,
+                    onMarkStatus = if (mailboxType == MailboxType.OUTBOX) {
+                        { message, status ->
+                            // Si lo necesitás
+                        }
+                    } else null,
+                    onDelete = if (mailboxType == MailboxType.DRAFT) {
+                        { id -> viewModel.discardDraft(id.toInt()) }
+                    } else null,
+                    onContinueEditing = if (mailboxType == MailboxType.DRAFT) {
+                        { message ->
+                            navController.navigate("${ScreensRoute.Message.route}?draftId=${message.id}")
+                        }
+                    } else null
                 )
             }
         }
     }
 }
-
 
 
 
@@ -176,7 +186,9 @@ fun InboxScreenTopBar(
                 ),
                 contentDescription = "Logo de Wirin",
                 modifier = Modifier.size(48.dp),
-                colorFilter = if (LocalTheme.current.isDark) ColorFilter.tint(Color.White) else ColorFilter.tint(Color.Black)
+                colorFilter = if (LocalTheme.current.isDark) ColorFilter.tint(Color.White) else ColorFilter.tint(
+                    Color.Black
+                )
             )
         }
 
@@ -242,7 +254,11 @@ fun InboxScreenTopBar(
                             navController.navigate(ScreensRoute.Message.route)
                         },
                         leadingIcon = {
-                            Icon(Icons.Filled.Add, contentDescription = "Nuevo mensaje", modifier = Modifier.size(24.dp))
+                            Icon(
+                                Icons.Filled.Add,
+                                contentDescription = "Nuevo mensaje",
+                                modifier = Modifier.size(24.dp)
+                            )
                         }
                     )
                     DropdownMenuItem(
@@ -252,7 +268,11 @@ fun InboxScreenTopBar(
                             navController.navigate("mail/inbox")
                         },
                         leadingIcon = {
-                            Icon(Icons.Filled.Inbox, contentDescription = "Bandeja de Entrada", modifier = Modifier.size(24.dp))
+                            Icon(
+                                Icons.Filled.Inbox,
+                                contentDescription = "Bandeja de Entrada",
+                                modifier = Modifier.size(24.dp)
+                            )
                         }
                     )
                     DropdownMenuItem(
@@ -262,7 +282,11 @@ fun InboxScreenTopBar(
                             navController.navigate("mail/outbox")
                         },
                         leadingIcon = {
-                            Icon(Icons.AutoMirrored.Filled.Send, contentDescription = "Bandeja de Salida", modifier = Modifier.size(24.dp))
+                            Icon(
+                                Icons.AutoMirrored.Filled.Send,
+                                contentDescription = "Bandeja de Salida",
+                                modifier = Modifier.size(24.dp)
+                            )
                         }
                     )
                     DropdownMenuItem(
@@ -272,7 +296,11 @@ fun InboxScreenTopBar(
                             navController.navigate("mail/drafts")
                         },
                         leadingIcon = {
-                            Icon(Icons.Filled.Drafts, contentDescription = "Borradores", modifier = Modifier.size(24.dp))
+                            Icon(
+                                Icons.Filled.Drafts,
+                                contentDescription = "Borradores",
+                                modifier = Modifier.size(24.dp)
+                            )
                         }
                     )
                 }
@@ -280,7 +308,6 @@ fun InboxScreenTopBar(
         }
     }
 }
-
 
 
 @Composable

@@ -73,6 +73,8 @@ import java.util.Date
 @Composable
 fun MessageScreen(
     draftId: Int,
+    replyToSubject: String? = null,
+    fromUserId: String?,
     onSendComplete: () -> Unit,
     onCancel: () -> Unit,
     onDraftSaved: () -> Unit,
@@ -121,6 +123,22 @@ fun MessageScreen(
             speechRecognizerManager.stopListening()
         }
     }
+
+    LaunchedEffect(Unit) {
+        replyToSubject?.let {
+            if (it.isNotBlank()) {
+                viewModel.updateSubject("RE: $it")
+            }
+        }
+
+        fromUserId?.let {
+            if (it.isNotBlank()) {
+                val email = viewModel.getEmailByUserId(it)
+                viewModel.updateTo(email.toString())
+            }
+        }
+    }
+
 
     LaunchedEffect(Unit) {
         viewModel.draftErrorEvent.collect { errorMessage ->

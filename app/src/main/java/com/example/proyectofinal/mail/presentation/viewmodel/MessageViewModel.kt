@@ -83,8 +83,8 @@ class MessageViewModel(
     private val _currentUserId = MutableStateFlow("")
     val currentUserId: StateFlow<String> = _currentUserId
 
-    private val _userToId = MutableStateFlow<String?>("")
-    val userToId: StateFlow<String?> = _userToId.asStateFlow()
+    private val _userToId = MutableStateFlow("")
+    val userToId: StateFlow<String> get() = _userToId
 
     fun loadUserId() {
         viewModelScope.launch {
@@ -98,7 +98,16 @@ class MessageViewModel(
         viewModelScope.launch {
             getUserUseCase().collect { response ->
                 val user = response.data?.find { it.email == email }
-                _userToId.value = user?.id
+                _userToId.value = user?.id ?: ""
+            }
+        }
+    }
+
+    fun getEmailByUserId(userId: String) {
+        viewModelScope.launch {
+            getUserUseCase().collect { response ->
+                val user = response.data?.find { it.id == userId }
+                _to.value = user?.email ?: ""
             }
         }
     }
