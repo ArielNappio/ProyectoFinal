@@ -4,6 +4,8 @@ package com.example.proyectofinal.task_student.presentation.viewmodel
 import android.content.Context
 import android.util.Log
 import android.widget.Toast
+import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -11,10 +13,6 @@ import com.example.proyectofinal.audio.domain.model.RecordedAudio
 import com.example.proyectofinal.audio.domain.repository.AudioRepository
 import com.example.proyectofinal.audio.player.AudioPlayerManager
 import com.example.proyectofinal.audio.recorder.AudioRecorderManager
-import com.example.proyectofinal.task_student.domain.usecase.DownloadAsMp3UseCase
-import com.example.proyectofinal.task_student.domain.usecase.DownloadAsPdfUseCase
-import com.example.proyectofinal.task_student.domain.model.DownloadType
-import com.example.proyectofinal.task_student.domain.usecase.DownloadAsTxtUseCase
 import com.example.proyectofinal.auth.data.tokenmanager.TokenManager
 import com.example.proyectofinal.core.network.NetworkResponse
 import com.example.proyectofinal.orderManagement.domain.model.OrderDelivered
@@ -22,7 +20,12 @@ import com.example.proyectofinal.orderManagement.domain.model.OrderParagraph
 import com.example.proyectofinal.orderManagement.domain.provider.OrderManagementProvider
 import com.example.proyectofinal.orderManagement.domain.repository.OrderRepository
 import com.example.proyectofinal.orderManagement.domain.usecase.GetTaskGroupByStudentUseCase
+import com.example.proyectofinal.task_student.domain.model.DownloadType
+import com.example.proyectofinal.task_student.domain.usecase.DownloadAsMp3UseCase
+import com.example.proyectofinal.task_student.domain.usecase.DownloadAsPdfUseCase
+import com.example.proyectofinal.task_student.domain.usecase.DownloadAsTxtUseCase
 import com.example.proyectofinal.task_student.presentation.tts.TextToSpeechManager
+import com.example.proyectofinal.task_student.util.htmlToAnnotatedStringFormatted
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -94,6 +97,18 @@ class TaskStudentViewModel(
 
     private val _isLastPage = MutableStateFlow(false)
     val isLastPage = _isLastPage.asStateFlow()
+
+    private val _annotatedParagraphs = MutableStateFlow<List<Pair<Int, AnnotatedString>>>(emptyList())
+    val annotatedParagraphs: StateFlow<List<Pair<Int, AnnotatedString>>> = _annotatedParagraphs.asStateFlow()
+
+    val annotatedTextPerPage = combine(currentPageIndex, annotatedParagraphs) { index, paragraphs ->
+        buildAnnotatedString {
+            paragraphs.filter { it.first == index + 1 }.forEachIndexed { i, (_, span) ->
+                append(span)
+                if (i != paragraphs.size - 1) append("\n\n")
+            }
+        }
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), AnnotatedString(""))
 
     // Estado de reproducción
     private val _isSpeaking = MutableStateFlow(false)
@@ -431,6 +446,9 @@ class TaskStudentViewModel(
                                     // Podés guardar también matchingParagraphs si querés exponerlo en otro StateFlow
                                     _projectState.value = NetworkResponse.Success(matchingOrderDelivered)
                                     _paragraphs.value = matchingParagraphs // <- si querés mostrar solo esos párrafos
+
+                                    val parsed = matchingParagraphs.map { it.pageNumber to htmlToAnnotatedStringFormatted(it.paragraphText) }
+                                    _annotatedParagraphs.value = parsed
                                 } else {
                                     _projectState.value = NetworkResponse.Failure("Proyecto no encontrado")
                                 }

@@ -157,7 +157,8 @@ fun ChatButton(navController: NavController, iconSize: Dp) {
         Icon(
             Icons.Outlined.Email,
             contentDescription = "Correo",
-            tint = Color.White,
+            tint = if (LocalTheme.current.isDark) Color.White else
+                Color.Black,
             modifier = Modifier.size(iconSize)
         )
     }

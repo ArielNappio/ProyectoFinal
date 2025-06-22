@@ -70,6 +70,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -80,6 +81,7 @@ import com.example.proyectofinal.task_student.presentation.component.DownloadOpt
 import com.example.proyectofinal.task_student.presentation.component.MicControl
 import com.example.proyectofinal.task_student.presentation.component.MicPermissionWrapper
 import com.example.proyectofinal.task_student.presentation.viewmodel.TaskStudentViewModel
+import com.example.proyectofinal.task_student.util.htmlToAnnotatedStringFormatted
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import org.koin.androidx.compose.koinViewModel
 
@@ -92,7 +94,6 @@ fun TaskStudent(taskId: Int, navController: NavHostController) {
     val paragraphs by viewModel.paragraphs.collectAsState()
     val isSpeaking by viewModel.isSpeaking.collectAsState()
     val isDownloading by viewModel.isDownloadInProgress.collectAsState()
-    val isPaused by viewModel.isPaused.collectAsState()
     val currentPage by viewModel.currentPageIndex.collectAsState()
     val totalPages by viewModel.totalPages.collectAsState()
 
@@ -105,6 +106,13 @@ fun TaskStudent(taskId: Int, navController: NavHostController) {
     val currentPageIndex by viewModel.currentPageIndex.collectAsState()
     val isFirstPage by viewModel.isFirstPage.collectAsState()
     val isLastPage by viewModel.isLastPage.collectAsState()
+
+    val annotatedText: AnnotatedString = remember(paragraphs, currentPageIndex) {
+        val currentPage = currentPageIndex + 1
+        val currentParagraphs = paragraphs.filter { it.pageNumber == currentPage }
+        val fullText = currentParagraphs.joinToString("\n\n") { it.paragraphText }
+        htmlToAnnotatedStringFormatted(fullText)
+    }
 
     val comments = viewModel.comments.collectAsState().value
     val filteredComments = comments.filter { it.page == currentPageIndex }
@@ -215,7 +223,7 @@ fun TaskStudent(taskId: Int, navController: NavHostController) {
                     .padding(16.dp)
             ) {
                 Text(
-                    text = text,
+                    text = annotatedText,
                     fontSize = fontSize,
                     lineHeight = fontSize * 1.5f,
                 )
