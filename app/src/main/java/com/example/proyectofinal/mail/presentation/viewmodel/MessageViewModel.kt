@@ -11,7 +11,6 @@ import com.example.proyectofinal.core.network.NetworkResponse
 import com.example.proyectofinal.mail.domain.model.MessageModel
 import com.example.proyectofinal.mail.domain.usecase.DeleteMessageByIdUseCase
 import com.example.proyectofinal.mail.domain.usecase.GetDraftByIdUseCase
-import com.example.proyectofinal.mail.domain.usecase.GetInboxMessagesUseCase
 import com.example.proyectofinal.mail.domain.usecase.SaveDraftUseCase
 import com.example.proyectofinal.mail.domain.usecase.SendMessageUseCase
 import com.example.proyectofinal.users.domain.provider.usecase.GetUserUseCase
@@ -163,18 +162,18 @@ class MessageViewModel(
                 subject = subject.value,
                 content = message.value,
                 date = Date().toString(),
-                formPath = formPath.value,
-                attachments = attachments.value,
+                file = formPath.value?:"",
                 isDraft = false,
                 isResponse = false,
-                studentId = _currentUserId.value,
-                userFromId = _userToId.value.toString()       // <-- También completalo
+                userToId = _userToId.value.toString(),
+                userFromId = _currentUserId.value.toString()      // <-- También completalo
             )
 
             Log.d("MessageViewModel", "Message sent: $messageModel")
 
             _sendMessageState.value = NetworkResponse.Loading()
             sendMessageUseCase(messageModel).collect { response ->
+                Log.d("SendMessageDebug", "Response: $response")
                 _sendMessageState.value = response
             }
         }
@@ -189,10 +188,10 @@ class MessageViewModel(
                 content = message.value,
                 date = Date.from(LocalDateTime.now().atZone(ZoneId.systemDefault()).toInstant()).toString(),
                 id = draftId.value,
-                formPath = formPath.value,
+                file = formPath.value,
                 isDraft = true,
                 isResponse = false,
-                studentId = "",
+                userToId = "",
                 userFromId = ""
             )
             if (isDraftValid()) {

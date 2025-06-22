@@ -17,10 +17,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
-import java.time.LocalDateTime
-import java.time.ZonedDateTime
-import java.time.format.DateTimeFormatter
-import java.util.Locale
 
 @RequiresApi(Build.VERSION_CODES.O)
 class InboxViewModel(
@@ -105,12 +101,12 @@ class InboxViewModel(
                         _receivedMessages.value = response
 
                         val inbox = allMessages
-                            .filter { it.sender == email && it.studentId == userId }
-                            .sortedByDescending { parseDate(it.date) }
+                            .filter { it.userToId == userId }
+//                            .sortedByDescending { parseDate(it.date) }
 
                         val outbox = allMessages
-                            .filter { it.sender != email && it.studentId == userId }
-                            .sortedByDescending { parseDate(it.date) }
+                            .filter { it.userToId != userId }
+//                            .sortedByDescending { parseDate(it.date) }
 
                         _inboxMessages.value = inbox
                         _outboxMessages.value = outbox
@@ -133,16 +129,15 @@ class InboxViewModel(
         }
     }
 
-    @RequiresApi(Build.VERSION_CODES.O)
-    private fun parseDate(dateString: String): LocalDateTime {
-        return try {
-            val formatter = DateTimeFormatter.ofPattern("EEE MMM dd HH:mm:ss z yyyy", Locale.ENGLISH)
-            ZonedDateTime.parse(dateString, formatter).toLocalDateTime()
-        } catch (e: Exception) {
-            Log.e("InboxViewModel", "Error parseando fecha: $dateString", e)
-            LocalDateTime.MIN
-        }
-    }
+//    @RequiresApi(Build.VERSION_CODES.O)
+//    private fun parseDate(dateString: String): LocalDateTime {
+//        return try {
+//            Instant.parse(dateString).atZone(ZoneId.systemDefault()).toLocalDateTime()
+//        } catch (e: Exception) {
+//            Log.e("InboxViewModel", "Error parseando fecha: $dateString", e)
+//            LocalDateTime.MIN
+//        }
+//    }
 
 
     private fun loadDraftMessages() {

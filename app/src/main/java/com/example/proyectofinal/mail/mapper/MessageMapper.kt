@@ -10,10 +10,10 @@ fun MessageEntity.toDomain(): MessageModel {
         subject = subject,
         date = date,
         content = content,
-        formPath = filePath,
+        file = filePath,
         isDraft = isDraft,
         isResponse = isResponse,
-        studentId = userToId,
+        userToId = this@toDomain.userToId,
         userFromId = userFromId,
         responseText = responseText
     )
@@ -25,11 +25,11 @@ fun MessageModel.toEntity(): MessageEntity {
         subject = subject,
         date = date,
         content = content,
-        filePath = formPath,
+        filePath = file,
         userFromId = userFromId,
         isDraft = isDraft,
         isResponse = isResponse,
         responseText = responseText,
-        userToId = studentId,
+        userToId = userToId,
     )
 }

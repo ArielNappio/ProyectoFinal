@@ -129,10 +129,10 @@ fun FormScreen(
                             subject = "Formulario Adjunto",
                             date = Date.from(LocalDateTime.now().atZone(ZoneId.systemDefault()).toInstant()).toString(),
                             content = "Se adjunta un formulario.",
-                            formPath = file.absolutePath,
+                            file = file.absolutePath,
                             isDraft = false,
                             isResponse = false,
-                            studentId = "",
+                            userToId = "",
                             userFromId = ""
                         )
                         viewModel.sendMessage()

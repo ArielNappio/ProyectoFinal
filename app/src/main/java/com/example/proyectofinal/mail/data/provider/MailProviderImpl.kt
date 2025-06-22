@@ -14,14 +14,11 @@ import io.ktor.client.request.put
 import io.ktor.client.request.setBody
 import io.ktor.client.statement.HttpResponse
 import io.ktor.http.ContentType
-import io.ktor.http.Headers
-import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpStatusCode
 import io.ktor.http.contentType
 import io.ktor.http.isSuccess
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
-import java.io.File
 
 class MailProviderImpl(private val ktorClient: HttpClient) : MailProvider {
     override fun sendMessage(message: MessageModel): Flow<NetworkResponse<MessageModel>> = flow {
@@ -30,25 +27,19 @@ class MailProviderImpl(private val ktorClient: HttpClient) : MailProvider {
 
             val formData = formData {
                 append("userFromId", message.userFromId)
-                append("studentId", message.studentId)
+                append("userToId", message.userToId)
                 append("isDraft", message.isDraft.toString())
                 append("sender", message.sender)
                 append("subject", message.subject)
                 append("date", message.date)
                 append("content", message.content)
                 append("responded", message.isResponse.toString())
+                append("file", message.file.toString())
                 message.responseText?.let { append("responseText", it) }
 
-                if (message.attachments.isNotEmpty()) {
-                    val file = File(message.attachments.first())
-                    val fileBytes = file.readBytes()
-                    append("file", fileBytes, Headers.build {
-                        append(HttpHeaders.ContentDisposition, "filename=${file.name}")
-                    })
-                }
             }
 
-            val response = ktorClient.post(ApiUrls.SEND_MESSAGE) {
+            val response = ktorClient.post(ApiUrls.SEND_MESSAGE_WITH_FILE) {
                 setBody(MultiPartFormDataContent(formData))
             }
 
