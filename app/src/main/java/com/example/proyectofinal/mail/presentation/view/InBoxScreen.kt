@@ -1,5 +1,7 @@
 package com.example.proyectofinal.mail.presentation.view
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -57,6 +59,7 @@ import com.example.proyectofinal.mail.presentation.viewmodel.InboxViewModel
 import com.example.proyectofinal.navigation.ScreensRoute
 import org.koin.androidx.compose.koinViewModel
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun InboxScreen(
     navController: NavController,
@@ -132,7 +135,7 @@ fun InboxScreen(
                         navController.navigate("reply/${message.id}")
                     } } else null,
                     onMarkStatus = if (mailboxType == MailboxType.OUTBOX) { { message, status ->
-                        viewModel.updateMessageStatus(message.id, OutboxMessageModel.MessageStatus.valueOf(status))
+//                        viewModel.updateMessageStatus(message.id, OutboxMessageModel.MessageStatus.valueOf(status))
                     } } else null,
                     onDelete = if (mailboxType == MailboxType.DRAFT) { { id ->
                         viewModel.discardDraft(id.toInt())

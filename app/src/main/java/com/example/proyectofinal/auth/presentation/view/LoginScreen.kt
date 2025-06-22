@@ -1,6 +1,7 @@
 package com.example.proyectofinal.auth.presentation.view
 
 import LoadingWithImageBar
+import android.graphics.BitmapFactory
 import android.view.animation.OvershootInterpolator
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.tween
@@ -30,10 +31,13 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.onFocusChanged
-import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.graphics.painter.BitmapPainter
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
+import androidx.core.graphics.scale
 import androidx.navigation.NavController
 import com.example.proyectofinal.R
 import com.example.proyectofinal.auth.presentation.viewmodel.LoginViewModel
@@ -189,11 +193,51 @@ fun AnimatedLogo(modifier: Modifier = Modifier) {
         }
     }
 
+    val context = LocalContext.current
+    val scaledBitmap = remember {
+        val originalBitmap = BitmapFactory.decodeResource(context.resources, R.drawable.wirin_logo_dark)
+        val aspectRatio = originalBitmap.width.toFloat() / originalBitmap.height
+        val targetWidth = 256
+        val targetHeight = (targetWidth / aspectRatio).toInt()
+        originalBitmap.scale(targetWidth, targetHeight)
+    }
+
     Image(
-        painter = painterResource(id = R.drawable.wirin_logo_dark),
+        painter = BitmapPainter(scaledBitmap.asImageBitmap()),
         contentDescription = "Logo",
         modifier = modifier
-            .size(width = 256.dp, height = 256.dp)
+            .size(256.dp)
             .offset(y = imageOffsetY.value.dp)
     )
 }
+
+
+//@Composable
+//fun AnimatedLogo(modifier: Modifier = Modifier) {
+//    val imageOffsetY = remember { Animatable(-350f) }
+//    var animationPlayed by rememberSaveable { mutableStateOf(false) }
+//
+//    LaunchedEffect(Unit) {
+//        if (!animationPlayed) {
+//            animationPlayed = true
+//            delay(500)
+//            imageOffsetY.animateTo(
+//                targetValue = 0f,
+//                animationSpec = tween(
+//                    durationMillis = 2000,
+//                    easing = {
+//                        OvershootInterpolator(2f).getInterpolation(it)
+//                    }
+//                )
+//            )
+//        }
+//    }
+//
+//    Image(
+//        painter = painterResource(id = R.drawable.wirin_logo_dark),
+//        contentDescription = "Logo",
+//        modifier = modifier
+//            .size(width = 256.dp, height = 256.dp)
+//            .offset(y = imageOffsetY.value.dp)
+//    )
+//}
