@@ -28,6 +28,7 @@ fun HomeScreen(navController: NavController, modifier: Modifier = Modifier) {
     val orderState by viewModel.orderManagementState.collectAsState()
     val orders by viewModel.orders.collectAsState()
     val isLoading by viewModel.isLoading.collectAsState()
+    val iconSize by viewModel.iconSize.collectAsState()
 
     Log.d("HomeScreen", "OrderState: $orderState")
 
@@ -37,7 +38,6 @@ fun HomeScreen(navController: NavController, modifier: Modifier = Modifier) {
                 .fillMaxSize()
                 .padding(16.dp)
         ) {
-            Spacer(modifier = Modifier.height(16.dp))
 
             when {
                 isLoading -> {
@@ -64,7 +64,8 @@ fun HomeScreen(navController: NavController, modifier: Modifier = Modifier) {
                                 },
                                 onToggleFavorite = {
                                     viewModel.toggleFavorite(project.id, !project.isFavorite)
-                                }
+                                },
+                                iconSize = iconSize
                             )
                             Spacer(modifier = Modifier.height(8.dp))
                         }

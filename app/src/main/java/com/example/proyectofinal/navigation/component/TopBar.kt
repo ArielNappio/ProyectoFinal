@@ -1,16 +1,20 @@
 package com.example.proyectofinal.navigation.component
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.Send
@@ -26,8 +30,8 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -36,86 +40,91 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import androidx.navigation.compose.currentBackStackEntryAsState
 import coil.compose.rememberAsyncImagePainter
 import com.example.proyectofinal.R
 import com.example.proyectofinal.core.theme.LocalTheme
 import com.example.proyectofinal.navigation.ScreensRoute
-import com.example.proyectofinal.navigation.util.showBackButton
+import com.example.proyectofinal.userpreferences.domain.model.UserPreferences
+import com.example.proyectofinal.userpreferences.domain.repository.UserPreferencesRepository
+import org.koin.compose.koinInject
 
 @Composable
 fun TopBar(navController: NavController) {
-    val navBackStackEntry by navController.currentBackStackEntryAsState()
+    val prefsRepo = koinInject<UserPreferencesRepository>()
+    val prefs by prefsRepo.getUserPreferences()
+        .collectAsState(initial = UserPreferences(16f, "Default", iconSize = 24f))
+
+    val iconSize = prefs.iconSize.dp
+    val barHeight = 64.dp
+    val sideSlotWidth = (iconSize.value * 2).dp // espacio para los laterales
 
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(top = 30.dp)
-            .padding(horizontal = 16.dp)
-            .height(56.dp),
+            .height(barHeight)
+            .background(if (LocalTheme.current.isDark) Color.Black else Color.White)
+            .padding(horizontal = 16.dp),
         contentAlignment = Alignment.Center
     ) {
-        WirinIcon()
         Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween,
+            modifier = Modifier.fillMaxSize(),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            if (navBackStackEntry?.showBackButton() == true) {
-                BackButton(navController)
-            } else {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 0.dp),
-                    horizontalArrangement = Arrangement.Start,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    IconButton(onClick = {
-                        navController.navigate(ScreensRoute.Search.route)
-                    }) {
-                        Icon(
-                            imageVector = Icons.Filled.Search,
-                            contentDescription = "Buscar",
-                            tint = if (LocalTheme.current.isDark) Color.White else Color.Black
-                        )
-                    }
-                }
-
-                Image(
-                    painter = painterResource(
-                        id = R.drawable.wirin_25
-                    ),
-                    contentDescription = "Logo de Wirin",
-                    modifier = Modifier.size(56.dp),
-                    colorFilter = if (LocalTheme.current.isDark) ColorFilter.tint(Color.White) else ColorFilter.tint(
-                        Color.Black
+            // LADO IZQUIERDO
+            Box(
+                modifier = Modifier
+                    .width(sideSlotWidth)
+                    .fillMaxHeight(),
+                contentAlignment = Alignment.CenterStart
+            ) {
+                Column(horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Center){
+                    Icon(
+                        imageVector = Icons.Filled.Search,
+                        contentDescription = "Buscar",
+                        tint = if (LocalTheme.current.isDark) Color.White else Color.Black,
+                        modifier = Modifier
+                            .size(iconSize)
+                            .clickable { navController.navigate(ScreensRoute.Search.route) }
                     )
-                )
-
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 0.dp),
-                    horizontalArrangement = Arrangement.End,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    if (navController.currentDestination?.route == ScreensRoute.Mail.route) {
-                        InboxMenuIcon(navController)
-                    } else {
-                        ChatButton(navController)
-                    }
                 }
+            }
+
+            // CENTRO - LOGO
+            Box(
+                modifier = Modifier
+                    .weight(1f)
+                    .fillMaxHeight()
+                    .size(iconSize * 1.7f),
+                contentAlignment = Alignment.Center
+            ) {
+                Image(
+                    painter = painterResource(id = R.drawable.wirin_25),
+                    contentDescription = "Logo de Wirin",
+                    colorFilter = if (LocalTheme.current.isDark) ColorFilter.tint(Color.White)
+                    else ColorFilter.tint(Color.Black)
+                )
+            }
+
+            // LADO DERECHO - BOTÓN DE CORREO
+            Box(
+                modifier = Modifier
+                    .width(sideSlotWidth)
+                    .fillMaxHeight(),
+                contentAlignment = Alignment.CenterEnd
+            ) {
+                ChatButton(navController, iconSize)
             }
         }
     }
 }
 
 @Composable
-fun BackButton(navController: NavController) =
+fun BackButton(navController: NavController, iconSize: Dp) =
     Column(
         modifier = Modifier
             .clickable { navController.popBackStack() }
@@ -126,7 +135,7 @@ fun BackButton(navController: NavController) =
         Icon(
             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
             contentDescription = "Volver",
-            modifier = Modifier.size(36.dp),
+            modifier = Modifier.size(iconSize),
             tint = MaterialTheme.colorScheme.primary
         )
         Spacer(modifier = Modifier.height(2.dp))
@@ -138,30 +147,35 @@ fun BackButton(navController: NavController) =
     }
 
 @Composable
-fun ChatButton(navController: NavController) =
-    TextButton(onClick = { navController.navigate(ScreensRoute.Mail.route) }) {
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            Icon(
-                Icons.Outlined.Email,
-                contentDescription = "Correo",
-                tint = Color(0xFF0084FF)
-            )
-            Text("Correo", color = Color(0xFF0084FF))
-        }
+fun ChatButton(navController: NavController, iconSize: Dp) {
+    Column(
+        modifier = Modifier
+            .clickable { navController.navigate(ScreensRoute.Mail.route) },
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
+    ) {
+        Icon(
+            Icons.Outlined.Email,
+            contentDescription = "Correo",
+            tint = Color.White,
+            modifier = Modifier.size(iconSize)
+        )
     }
+}
 
 @Composable
-fun WirinIcon() =
+fun WirinIcon(iconSize: Dp) {
+    val scaledIconSize = iconSize.value * 2f
+    println("Icon size: $scaledIconSize")
     Image(
         painter = rememberAsyncImagePainter(model = R.drawable.wirin_25),
         contentDescription = "Logo de Wirin",
-        modifier = Modifier.size(56.dp),
+        modifier = Modifier.size(scaledIconSize.dp),
         colorFilter = if (LocalTheme.current.isDark) ColorFilter.tint(Color.White) else ColorFilter.tint(
             Color.Black
         )
     )
+}
 
 @Composable
 fun InboxMenuIcon(navController: NavController) {

@@ -34,6 +34,7 @@ fun FavoritesScreen(
     val viewModel = koinViewModel<HomeScreenViewModel>()
     val orders by viewModel.orders.collectAsState()
     val isLoading by viewModel.isLoading.collectAsState()
+    val iconSize by viewModel.iconSize.collectAsState()
 
     val favoriteProjects = orders.filter { it.isFavorite }
 
@@ -42,8 +43,9 @@ fun FavoritesScreen(
     ) { innerPadding ->
         Column(
             modifier = Modifier
-                .padding(innerPadding)
+                .padding(16.dp)
                 .fillMaxSize()
+
         ) {
             when {
                 isLoading == true -> {
@@ -74,7 +76,8 @@ fun FavoritesScreen(
                                 },
                                 onToggleFavorite = {
                                     viewModel.toggleFavorite(project.id, !project.isFavorite)
-                                }
+                                },
+                                iconSize = iconSize
                             )
                         }
                     }

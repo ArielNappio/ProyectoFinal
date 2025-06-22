@@ -1,5 +1,7 @@
 package com.example.proyectofinal.student.presentation.viewmodel
 
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.proyectofinal.auth.data.tokenmanager.TokenManager
@@ -7,6 +9,7 @@ import com.example.proyectofinal.core.network.NetworkResponse
 import com.example.proyectofinal.orderManagement.domain.model.OrderDelivered
 import com.example.proyectofinal.orderManagement.domain.usecase.GetTaskGroupByStudentUseCase
 import com.example.proyectofinal.orderManagement.domain.usecase.UpdateFavoriteStatusUseCase
+import com.example.proyectofinal.userpreferences.domain.repository.UserPreferencesRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -16,11 +19,24 @@ import kotlinx.coroutines.launch
 class ProjectDetailViewModel(
     private val getOrders: GetTaskGroupByStudentUseCase,
     private val tokenManager: TokenManager,
-    private val updateFavoriteStatusUseCase: UpdateFavoriteStatusUseCase
+    private val updateFavoriteStatusUseCase: UpdateFavoriteStatusUseCase,
+    private val repository: UserPreferencesRepository
 ) : ViewModel() {
 
     private val _projectState = MutableStateFlow<NetworkResponse<OrderDelivered>>(NetworkResponse.Loading())
     val projectState: StateFlow<NetworkResponse<OrderDelivered>> = _projectState.asStateFlow()
+
+    private val _iconSize = MutableStateFlow(24.dp)
+    val iconSize: StateFlow<Dp> = _iconSize.asStateFlow()
+
+    init {
+        viewModelScope.launch {
+            repository.getUserPreferences().collect { prefs ->
+                _iconSize.value = prefs.iconSize.dp
+                println("Icon size updated to del projectDetailViewModel: ${iconSize.value}")
+            }
+        }
+    }
 
     fun loadProject(projectId: String) {
         viewModelScope.launch {

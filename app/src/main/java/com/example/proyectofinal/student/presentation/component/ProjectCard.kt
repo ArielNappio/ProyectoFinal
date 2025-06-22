@@ -23,6 +23,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.example.proyectofinal.orderManagement.domain.model.OrderDelivered
 import com.example.proyectofinal.userpreferences.presentation.component.AppText
@@ -32,7 +33,8 @@ import com.example.proyectofinal.userpreferences.presentation.component.AppText
 fun ProjectCard(
     project: OrderDelivered,
     onClick: () -> Unit,
-    onToggleFavorite: () -> Unit
+    onToggleFavorite: () -> Unit,
+    iconSize: Dp
 ) {
     val formattedTitle = project.title.replace(Regex(""" (\S+)$"""), "\u00A0$1")
     println("ProjectCard: ${project.isFavorite}")
@@ -73,6 +75,7 @@ fun ProjectCard(
                 Icon(
                     imageVector = Icons.Default.Description,
                     contentDescription = "Cantidad de tareas",
+                    modifier = Modifier.size(iconSize),
                     tint = Color(0xFFFFC107)
                 )
                 Spacer(modifier = Modifier.width(6.dp))
@@ -87,7 +90,7 @@ fun ProjectCard(
                 IconButton(onClick = { onToggleFavorite() }) {
                     Icon(
                         imageVector = Icons.Default.Star,
-                        modifier = Modifier.size(36.dp),
+                        modifier = Modifier.size(iconSize),
                         contentDescription = "Favorito de ${project.title}",
                         tint = if (project.isFavorite) Color(0xFFFFC107) else Color.Gray
                     )

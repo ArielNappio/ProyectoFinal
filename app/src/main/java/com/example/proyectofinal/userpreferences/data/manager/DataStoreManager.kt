@@ -21,17 +21,15 @@ class DataStoreManager(private val context: Context) {
         val FONT_FAMILY_KEY = stringPreferencesKey("font_family")
         val PROFILE_IMAGE_URI_KEY = stringPreferencesKey("profile_image_uri")
         fun profileImageKey(email: String) = stringPreferencesKey("profile_image_uri_$email")
-
-
+        val ICON_SIZE_KEY = floatPreferencesKey("icon_size")
     }
 
     val preferencesFlow: Flow<UserPreferences> = context.dataStore.data.map { prefs ->
         UserPreferences(
             fontSize = prefs[FONT_SIZE_KEY] ?: 16f,
             fontFamily = prefs[FONT_FAMILY_KEY] ?: ATKINSON_HYPERLEGIBLE_FAMILY_NAME,
-            profileImageUri = prefs[PROFILE_IMAGE_URI_KEY]
-
-
+            profileImageUri = prefs[PROFILE_IMAGE_URI_KEY],
+            iconSize = prefs[ICON_SIZE_KEY] ?: 24f
         )
     }
 
@@ -44,6 +42,12 @@ class DataStoreManager(private val context: Context) {
     suspend fun saveFontFamily(family: String) {
         context.dataStore.edit { prefs ->
             prefs[FONT_FAMILY_KEY] = family
+        }
+    }
+
+    suspend fun saveIconSize(size: Float) {
+        context.dataStore.edit { prefs ->
+            prefs[ICON_SIZE_KEY] = size
         }
     }
 

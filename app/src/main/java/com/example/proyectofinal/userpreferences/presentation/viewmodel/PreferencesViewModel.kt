@@ -13,7 +13,7 @@ class PreferencesViewModel(
     private val repository: UserPreferencesRepository
 ) : ViewModel() {
 
-    private val _preferences = MutableStateFlow(UserPreferences(16f, "Default"))
+    private val _preferences = MutableStateFlow(UserPreferences(16f, "Default", "",56f))
     val preferences: StateFlow<UserPreferences> = _preferences.asStateFlow()
 
     init {
@@ -25,6 +25,15 @@ class PreferencesViewModel(
     fun updateFontSize(size: Float) {
         viewModelScope.launch {
             repository.saveFontSize(size)
+            when (size) {
+                26f -> repository.saveIconSize(32f)
+                30f -> repository.saveIconSize(36f)
+                34f -> repository.saveIconSize(40f)
+                38f -> repository.saveIconSize(48f)
+                42f -> repository.saveIconSize(52f)
+                46f -> repository.saveIconSize(56f)
+                else -> repository.saveIconSize(80f)
+            }
         }
     }
 

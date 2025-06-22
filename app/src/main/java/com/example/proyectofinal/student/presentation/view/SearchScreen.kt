@@ -48,6 +48,7 @@ fun SearchScreen(navController: NavController) {
     val context = LocalContext.current
     val orderState by viewModel.orderManagementState.collectAsState()
     val searchText by viewModel.searchText.collectAsState()
+    val iconSize by viewModel.iconSize.collectAsState()
 
     val speechRecognizerManager = remember {
         SpeechRecognizerManager(
@@ -148,7 +149,8 @@ fun SearchScreen(navController: NavController) {
                                     onClick = {
                                         navController.navigate("project_detail/${project.id}")
                                     },
-                                    onToggleFavorite = {}
+                                    onToggleFavorite = {},
+                                    iconSize = 24.dp
                                 )
                                 Spacer(modifier = Modifier.height(8.dp))
                             }

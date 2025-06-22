@@ -44,6 +44,6 @@ fun AppText(
         textAlign = textAlign,
         maxLines = maxLines,
         overflow = overflow,
-        lineHeight = lineHeight?.sp ?: (fontSize * 1.2).sp
+        lineHeight = lineHeight?.sp ?: (fontSize * 1.2).sp,
     )
 }

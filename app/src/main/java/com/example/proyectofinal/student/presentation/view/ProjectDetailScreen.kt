@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -39,6 +40,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.proyectofinal.core.network.NetworkResponse
@@ -59,6 +61,7 @@ fun ProjectDetailScreen(
 ) {
     val viewModel = koinViewModel<ProjectDetailViewModel>()
     val projectState by viewModel.projectState.collectAsState()
+    val iconSize by viewModel.iconSize.collectAsState()
 
     LaunchedEffect(projectId) {
         viewModel.loadProject(projectId)
@@ -79,7 +82,7 @@ fun ProjectDetailScreen(
         Box(
             modifier = modifier
                 .fillMaxSize()
-                .padding(paddingValues)
+                .padding(top = 50.dp)
         ) {
             when (val project = projectState) {
                 is NetworkResponse.Loading -> {
@@ -108,7 +111,8 @@ fun ProjectDetailScreen(
                                     project.data.id.toString(),
                                     !project.data.isFavorite
                                 )
-                            }
+                            },
+                            iconSize = iconSize
                         )
                     }
                 }
@@ -142,7 +146,8 @@ private fun ProjectDetailContent(
     project: OrderDelivered,
     onViewInApp: (Int) -> Unit,
     onViewAnnotations: (Int) -> Unit,
-    onToggleFavorite: (String, Boolean) -> Unit
+    onToggleFavorite: (String, Boolean) -> Unit,
+    iconSize: Dp
 ) {
     LazyColumn(
         modifier = Modifier
@@ -153,13 +158,14 @@ private fun ProjectDetailContent(
         item {
             ProjectCard(project = project,
                 onClick = {},
-                onToggleFavorite ={ onToggleFavorite(project.id.toString(), project.isFavorite) })
+                onToggleFavorite ={ onToggleFavorite(project.id.toString(), project.isFavorite) },
+            iconSize = iconSize
+            )
         }
 
         item {
-            Text(
+            AppText(
                 text = "Tareas del Proyecto",
-                style = MaterialTheme.typography.headlineSmall,
                 fontWeight = FontWeight.Bold,
                 modifier = Modifier.padding(vertical = 8.dp)
             )
@@ -169,7 +175,8 @@ private fun ProjectDetailContent(
             TaskItemCard(
                 task = task,
                 onViewInApp = { onViewInApp(task.id) },
-                onViewAnnotations = { onViewAnnotations(task.id) }
+                onViewAnnotations = { onViewAnnotations(task.id) },
+                iconSize = iconSize
             )
         }
     }
@@ -178,7 +185,8 @@ private fun ProjectDetailContent(
 fun TaskItemCard(
     task: OrderStudent,
     onViewInApp: () -> Unit,
-    onViewAnnotations: () -> Unit
+    onViewAnnotations: () -> Unit,
+    iconSize: Dp
 ) {
     Card(
         modifier = Modifier
@@ -204,12 +212,17 @@ fun TaskItemCard(
             // 🟣 Páginas leídas
             Row(
                 modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically
             ){
                 Icon(
                     imageVector = Icons.Default.Description,
                     contentDescription = "Paginas",
-                    tint = Color(0xFFFFC107)
+                    tint = Color(0xFFFFC107),
+                    modifier = Modifier
+                        .size(iconSize)
+                        .align(Alignment.CenterVertically)
                 )
+                Spacer(modifier = Modifier.width(2.dp))
                 AppText(
                     text = "${task.lastRead ?: 0}/${task.pageCount ?: 0} Leídas",
                     color = MaterialTheme.colorScheme.onSurfaceVariant
@@ -227,8 +240,7 @@ fun TaskItemCard(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceEvenly
             ) {
-                // 📝 Botón de anotaciones (solo si tiene)
-                if (task.hasComments) {
+
                     Column(
                         modifier = Modifier
                             .clickable { onViewAnnotations() }
@@ -239,10 +251,9 @@ fun TaskItemCard(
                             imageVector = Icons.Default.AudioFile, // ✏️
                             contentDescription = "Ver anotaciones",
                             tint = colorScheme.onBackground,
-                            modifier = Modifier.size(42.dp)
+                            modifier = Modifier.size(iconSize)
                         )
                     }
-                }
 
                 // ▶️ Botón de ver en app
                 Column(
@@ -255,7 +266,7 @@ fun TaskItemCard(
                         imageVector = Icons.Default.PlayArrow,
                         contentDescription = "Ver en app",
                         tint = colorScheme.onBackground,
-                        modifier = Modifier.size(42.dp)
+                        modifier = Modifier.size(iconSize)
                     )
                 }
             }
