@@ -28,6 +28,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
@@ -61,6 +62,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -136,8 +138,9 @@ fun TaskStudent(taskId: Int, navController: NavHostController) {
 
     val currentContext = LocalContext.current
 
-    val font = getFontFamilyFromString(selectedFontFamily)
-
+    val fontFamily = remember(selectedFontFamily) {
+        getFontFamilyFromString(selectedFontFamily ?: ATKINSON_HYPERLEGIBLE_FAMILY_NAME)
+    }
 
     LaunchedEffect(taskId) {
         viewModel.loadProject(taskId)
@@ -153,6 +156,11 @@ fun TaskStudent(taskId: Int, navController: NavHostController) {
         }
     }
 
+    DisposableEffect(Unit) {
+        onDispose {
+            viewModel.saveLastPage(taskId, currentPage+1)
+        }
+    }
 
     Column(
         modifier = Modifier
@@ -188,7 +196,10 @@ fun TaskStudent(taskId: Int, navController: NavHostController) {
                 AccessibleIconButton(
                     icon = Icons.AutoMirrored.Filled.ArrowBack,
                     label = "Volver",
-                    onClick = { navController.popBackStack() }
+                    onClick = {
+                        navController.popBackStack()
+                        viewModel.saveLastPage(taskId, currentPage+1)
+                    }
                 )
                 AccessibleIconButton(
                     icon = Icons.Default.FileDownload,
@@ -236,7 +247,7 @@ fun TaskStudent(taskId: Int, navController: NavHostController) {
                 Text(
                     text = annotatedText,
                     fontSize = fontSize,
-                    fontFamily = font,
+                    fontFamily = fontFamily,
                     lineHeight = fontSize * 1.5f
                 )
             }
@@ -488,7 +499,12 @@ fun TaskStudent(taskId: Int, navController: NavHostController) {
     }
 
     if(showFontsMenu){
-        Box {
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(end = 16.dp, top = 16.dp) // Separación de bordes
+                .wrapContentSize(Alignment.TopEnd)
+        ) {
             AccessibleIconButton(
                 icon = Icons.Default.FontDownload,
                 label = "Fuente",
@@ -498,19 +514,20 @@ fun TaskStudent(taskId: Int, navController: NavHostController) {
 
             DropdownMenu(
                 expanded = showFontsMenu,
-                onDismissRequest = { viewModel.closeFontMenu() }
+                onDismissRequest = { viewModel.closeFontMenu() },
+                modifier = Modifier.background(MaterialTheme.colorScheme.surface)
             ) {
                 val fonts = listOf("Sans", "Serif", "Monospace", ATKINSON_HYPERLEGIBLE_FAMILY_NAME, OPEN_DYSLEXIC_FAMILY_NAME)
-                fonts.forEach { font ->
+                fonts.forEach { fontName ->
                     DropdownMenuItem(
                         text = {
                             Text(
-                                text = font,
-                                fontWeight = if (font == selectedFontFamily) FontWeight.Bold else FontWeight.Normal
+                                text = fontName,
+                                fontWeight = if (fontName == selectedFontFamily) FontWeight.Bold else FontWeight.Normal
                             )
                         },
                         onClick = {
-                            viewModel.setFontFamily(font)
+                            viewModel.setFontFamily(fontName)
                             viewModel.closeFontMenu()
                         }
                     )

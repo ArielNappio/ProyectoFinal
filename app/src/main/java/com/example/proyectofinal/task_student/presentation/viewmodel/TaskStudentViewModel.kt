@@ -15,7 +15,7 @@ import com.example.proyectofinal.audio.player.AudioPlayerManager
 import com.example.proyectofinal.audio.recorder.AudioRecorderManager
 import com.example.proyectofinal.auth.data.tokenmanager.TokenManager
 import com.example.proyectofinal.core.network.NetworkResponse
-import com.example.proyectofinal.core.theme.ATKINSON_HYPERLEGIBLE_FAMILY_NAME
+import com.example.proyectofinal.orderManagement.data.repository.LastReadRepository
 import com.example.proyectofinal.orderManagement.domain.model.OrderDelivered
 import com.example.proyectofinal.orderManagement.domain.model.OrderParagraph
 import com.example.proyectofinal.orderManagement.domain.provider.OrderManagementProvider
@@ -54,7 +54,8 @@ class TaskStudentViewModel(
     private val getOrders: GetTaskGroupByStudentUseCase,
     private val tokenManager: TokenManager,
     private val orderRepository: OrderRepository,
-    private val userPreferences: DataStoreManager
+    private val userPreferences: DataStoreManager,
+    private val lastReadRepository: LastReadRepository
 ): ViewModel() {
 
     private val _projectState = MutableStateFlow<NetworkResponse<OrderDelivered>>(NetworkResponse.Loading())
@@ -139,11 +140,10 @@ class TaskStudentViewModel(
     private val _fontSize = MutableStateFlow(MIN_FONT_SIZE)
     val fontSize = _fontSize.asStateFlow()
 
-    private val _selectedFontFamily = MutableStateFlow(ATKINSON_HYPERLEGIBLE_FAMILY_NAME)
-    val selectedFontFamily: StateFlow<String> = _selectedFontFamily
+    private val _selectedFontFamily = MutableStateFlow<String?>(null)
+    val selectedFontFamily: StateFlow<String?> = _selectedFontFamily
 
     private var minFontSize = 0f
-
 
     private val _totalPages = _paragraphs.map { paragraphs ->
         paragraphs.map { it.pageNumber }
@@ -423,6 +423,12 @@ class TaskStudentViewModel(
                     Toast.makeText(context, resultMessage, Toast.LENGTH_SHORT).show()
                 }
             }
+        }
+    }
+
+    fun saveLastPage(orderId: Int, page: Int) {
+        viewModelScope.launch {
+            lastReadRepository.saveLastReadPage(orderId, page)
         }
     }
 
