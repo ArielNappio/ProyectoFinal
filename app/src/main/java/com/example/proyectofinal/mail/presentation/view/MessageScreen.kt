@@ -7,7 +7,9 @@ import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -27,6 +29,8 @@ import androidx.compose.material.icons.filled.Mic
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -59,14 +63,10 @@ import com.example.proyectofinal.core.theme.BlueDark
 import com.example.proyectofinal.core.theme.CustomGreen
 import com.example.proyectofinal.core.theme.CustomRed
 import com.example.proyectofinal.core.theme.GreenLight
-import com.example.proyectofinal.mail.domain.model.MessageModel
 import com.example.proyectofinal.mail.presentation.component.FormScreen
 import com.example.proyectofinal.mail.presentation.viewmodel.MessageViewModel
 import org.koin.androidx.compose.koinViewModel
 import java.io.File
-import java.time.LocalDateTime
-import java.time.ZoneId
-import java.util.Date
 
 @RequiresApi(Build.VERSION_CODES.O)
 @OptIn(ExperimentalMaterial3Api::class)
@@ -86,6 +86,7 @@ fun MessageScreen(
     val message by viewModel.message.collectAsState()
     val formPath by viewModel.formPath.collectAsState()
     val attachments by viewModel.attachments.collectAsState()
+    val librarianEmails by viewModel.librarianEmails.collectAsState()
     val sendState by viewModel.sendMessageState.collectAsState()
     val currentUserId by viewModel.currentUserId.collectAsState()
     val userDestinyId by viewModel.userToId.collectAsState()
@@ -118,6 +119,11 @@ fun MessageScreen(
         )
     }
 
+    LaunchedEffect(Unit) {
+        viewModel.loadUserId()
+        viewModel.getLibrarianEmails()
+    }
+
     DisposableEffect(Unit) {
         onDispose {
             speechRecognizerManager.stopListening()
@@ -130,15 +136,13 @@ fun MessageScreen(
                 viewModel.updateSubject("RE: $it")
             }
         }
-
-        fromUserId?.let {
-            if (it.isNotBlank()) {
-                val email = viewModel.getEmailByUserId(it)
+        fromUserId?.let { userId ->
+            if (userId.isNotBlank()) {
+                val email = viewModel.getEmailByUserId(userId)
                 viewModel.updateTo(email.toString())
             }
         }
     }
-
 
     LaunchedEffect(Unit) {
         viewModel.draftErrorEvent.collect { errorMessage ->
@@ -187,24 +191,7 @@ fun MessageScreen(
                 },
                 actions = {
                     Button(
-                        onClick = {
-//                            val newMessage = MessageModel(
-//                                sender = to,
-//                                subject = subject,
-//                                content = message,
-//                                formPath = formPath,
-//                                attachments = attachments,
-//                                date = Date.from(
-//                                    LocalDateTime.now().atZone(ZoneId.systemDefault()).toInstant()
-//                                ).toString(),
-//                                id = 0,
-//                                isDraft = false,
-//                                isResponse = false,
-//                                studentId = currentUserId,
-//                                userFromId = userDestinyId.toString()
-//                            )
-                            viewModel.sendMessage()
-                        },
+                        onClick = { viewModel.sendMessage() },
                         enabled = to.isNotBlank() && message.isNotBlank(),
                         colors = ButtonDefaults.buttonColors(containerColor = CustomGreen)
                     ) {
@@ -234,25 +221,17 @@ fun MessageScreen(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text("Para:", modifier = Modifier.width(60.dp), color = Color.White)
-                TextField(
+                LibrarianEmailDropdown(
                     value = to,
                     onValueChange = {
                         viewModel.updateTo(it)
                         viewModel.getUserIdByEmail(it)
                     },
-                    placeholder = { Text("Destinatario", color = Color.Gray) },
-                    modifier = Modifier.weight(1f),
-                    colors = TextFieldDefaults.colors(
-                        focusedContainerColor = Color.Transparent,
-                        unfocusedContainerColor = Color.Transparent,
-                        disabledContainerColor = Color.Transparent,
-                        focusedIndicatorColor = Color.Transparent,
-                        unfocusedIndicatorColor = Color.Transparent,
-                        disabledIndicatorColor = Color.Transparent,
-                        focusedTextColor = Color.White,
-                        unfocusedTextColor = Color.White,
-                        disabledTextColor = Color.LightGray
-                    )
+                    librarianEmails = librarianEmails,
+                    onEmailSelected = { selectedEmail ->
+                        viewModel.updateTo(selectedEmail)
+                        viewModel.getUserIdByEmail(selectedEmail)
+                    }
                 )
             }
             HorizontalDivider(color = Color.Gray)
@@ -505,6 +484,65 @@ fun MessageScreen(
                     onDismiss = { isDialogOpen = false },
                     onMessageSent = { isDialogOpen = false })
             }
+        }
+    }
+}
+
+@Composable
+fun LibrarianEmailDropdown(
+    value: String,
+    onValueChange: (String) -> Unit,
+    librarianEmails: List<String>,
+    onEmailSelected: (String) -> Unit
+) {
+    var expanded by remember { mutableStateOf(false) }
+
+    Box {
+        TextField(
+            value = value,
+            onValueChange = {
+                onValueChange(it)
+                expanded = it.isNotBlank()
+            },
+            placeholder = { Text("Destinatario", color = Color.Gray) },
+            modifier = Modifier.fillMaxWidth(),
+            colors = TextFieldDefaults.colors(
+                focusedContainerColor = Color.Transparent,
+                unfocusedContainerColor = Color.Transparent,
+                disabledContainerColor = Color.Transparent,
+                focusedIndicatorColor = Color.Transparent,
+                unfocusedIndicatorColor = Color.Transparent,
+                disabledIndicatorColor = Color.Transparent,
+                focusedTextColor = Color.White,
+                unfocusedTextColor = Color.White,
+                disabledTextColor = Color.LightGray
+            )
+        )
+
+        DropdownMenu(
+            expanded = expanded && librarianEmails.isNotEmpty(),
+            onDismissRequest = { expanded = false },
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(Color(0xFF1E1E1E))
+        ) {
+            librarianEmails
+                .filter { it.contains(value, ignoreCase = true) }
+                .forEach { email ->
+                    DropdownMenuItem(
+                        text = {
+                            Text(
+                                text = email,
+                                color = Color.White,
+                                fontSize = 16.sp
+                            )
+                        },
+                        onClick = {
+                            onEmailSelected(email)
+                            expanded = false
+                        }
+                    )
+                }
         }
     }
 }

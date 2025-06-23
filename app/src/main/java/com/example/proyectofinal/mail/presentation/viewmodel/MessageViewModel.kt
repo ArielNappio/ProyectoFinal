@@ -28,10 +28,6 @@ import java.time.LocalDateTime
 import java.time.ZoneId
 import java.util.Date
 
-object MessageEvents {
-    val messageSentEvent = MutableSharedFlow<Unit>()
-}
-
 class MessageViewModel(
     private val sendMessageUseCase: SendMessageUseCase,
     private val saveDraftUseCase: SaveDraftUseCase,
@@ -41,9 +37,11 @@ class MessageViewModel(
     private val tokenManager: TokenManager
 ) : ViewModel() {
 
-    init {
-        loadUserId()
-    }
+//    init {
+//        loadUserId()
+//        println("cargo el userID")
+//        getLibrarianEmails()
+//    }
 
     private val _to = MutableStateFlow("")
     val to: StateFlow<String> = _to
@@ -85,10 +83,13 @@ class MessageViewModel(
     private val _userToId = MutableStateFlow("")
     val userToId: StateFlow<String> get() = _userToId
 
+    private val _librarianEmails = MutableStateFlow<List<String>>(emptyList())
+    val librarianEmails: StateFlow<List<String>> = _librarianEmails
+
     fun loadUserId() {
         viewModelScope.launch {
             val userIdValue = tokenManager.userId.first()
-            _currentUserId.update { userIdValue.toString() }
+            _currentUserId.value = userIdValue.toString()
             println("${_currentUserId.value} es el userid")
         }
     }
@@ -107,6 +108,21 @@ class MessageViewModel(
             getUserUseCase().collect { response ->
                 val user = response.data?.find { it.id == userId }
                 _to.value = user?.email ?: ""
+            }
+        }
+    }
+
+    fun getLibrarianEmails() {
+        viewModelScope.launch {
+            getUserUseCase().collect { response ->
+                val librarians = response.data
+                    ?.filter { it.roles.contains("Bibliotecario") }
+                    ?.map { it.email }
+                    ?: emptyList()
+
+                Log.d("MessageViewModel", "Librarian emails found: $librarians")
+
+                _librarianEmails.value = librarians
             }
         }
     }
@@ -157,16 +173,21 @@ class MessageViewModel(
                 return@launch
             }
 
+            if (to.value !in _librarianEmails.value) {
+                _messageErrorEvent.emit("El destinatario debe ser un bibliotecario.")
+                return@launch
+            }
+
             val messageModel = MessageModel(
                 sender = to.value,
                 subject = subject.value,
                 content = message.value,
                 date = Date().toString(),
-                file = formPath.value?:"",
+                file = formPath.value ?: "",
                 isDraft = false,
                 isResponse = false,
-                userToId = _userToId.value.toString(),
-                userFromId = _currentUserId.value.toString()      // <-- También completalo
+                userToId = _userToId.value,
+                userFromId = _currentUserId.value
             )
 
             Log.d("MessageViewModel", "Message sent: $messageModel")
@@ -209,12 +230,10 @@ class MessageViewModel(
     fun loadDraft(id: Int) {
         viewModelScope.launch {
             val draft = getDraftByIdUseCase(id)
-            draft.let {
-                _to.value = it.sender
-                _subject.value = it.subject
-                _message.value = it.content
-                _draftId.value = it.id
-            }
+            _to.value = draft.sender
+            _subject.value = draft.subject
+            _message.value = draft.content
+            _draftId.value = draft.id
         }
     }
 
@@ -234,7 +253,6 @@ class MessageViewModel(
     ): File {
         viewModelScope.launch {
             if (isFormValid(career, subject, note, chapter, date)) {
-//                val file = saveFormToFile(context, career, subject, note, chapter, date) // FIXME: LOOP INFINITO
                 val file = File("")
                 Log.d("SaveFormDraft", "Archivo guardado en: ${file.absolutePath}")
             } else {
@@ -254,5 +272,4 @@ class MessageViewModel(
         currentAttachments.add(filePath)
         _attachments.value = currentAttachments
     }
-
 }

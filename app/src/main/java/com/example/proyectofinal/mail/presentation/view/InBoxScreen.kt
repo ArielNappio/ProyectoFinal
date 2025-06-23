@@ -84,7 +84,7 @@ fun InboxScreen(
         InboxScreenTopBar(navController, mailboxType)
 
         Button(
-            onClick = { navController.navigate(ScreensRoute.Message.route) },
+            onClick = { navController.navigate("${ScreensRoute.Message.route}?draftId=-1&replyToSubject=&fromUserId=") },
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = 16.dp, vertical = 8.dp),
