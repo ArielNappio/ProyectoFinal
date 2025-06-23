@@ -13,18 +13,35 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.compose.rememberNavController
+import com.example.proyectofinal.auth.data.tokenmanager.TokenManager
 import com.example.proyectofinal.core.theme.CurrentTheme
 import com.example.proyectofinal.core.theme.LocalTheme
 import com.example.proyectofinal.core.theme.ProyectoFinalTheme
 import com.example.proyectofinal.core.ui.ThemeViewModel
 import com.example.proyectofinal.navigation.presentation.view.Main
+import com.example.proyectofinal.notifications.scheduleOneTimeWorker
+import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 
 class MainActivity : ComponentActivity() {
+    private lateinit var tokenManager: TokenManager
+
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        tokenManager = TokenManager(this)
+
+        lifecycleScope.launch {
+            tokenManager.userId.collect { userId ->
+                userId?.let {
+                    scheduleOneTimeWorker(this@MainActivity, it)
+                }
+            }
+        }
+
         enableEdgeToEdge()
 
         setContent {
