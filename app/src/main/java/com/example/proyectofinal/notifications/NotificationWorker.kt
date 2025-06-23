@@ -9,6 +9,7 @@ import androidx.core.app.NotificationCompat
 import androidx.core.content.edit
 import androidx.work.Worker
 import androidx.work.WorkerParameters
+import com.example.proyectofinal.R
 import com.example.proyectofinal.core.network.ApiUrls
 import com.example.proyectofinal.mail.domain.model.MessageModel
 import io.ktor.client.HttpClient
@@ -43,7 +44,7 @@ class NotificationWorker(context: Context, workerParams: WorkerParameters) : Wor
                 if (newData != lastData) {
                     Log.d("NotificationWorker", "Sending notification for new messages: $newData")
                     sharedPreferences.edit { putString("last_data", newData) }
-                    sendNotification(newData)
+                    sendNotification()
                 }
 
                 Result.success()
@@ -58,7 +59,7 @@ class NotificationWorker(context: Context, workerParams: WorkerParameters) : Wor
         return workerResult
     }
 
-    private fun sendNotification(ids: String) {
+    private fun sendNotification() {
         val channelId = "updates_channel"
         val notificationManager = applicationContext.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
 
@@ -69,8 +70,8 @@ class NotificationWorker(context: Context, workerParams: WorkerParameters) : Wor
 
         val notification = NotificationCompat.Builder(applicationContext, channelId)
             .setContentTitle("Nuevo mensaje")
-            .setContentText("Tenés nuevos mensajes en tu bandeja de entrada con ids: $ids")
-            .setSmallIcon(android.R.drawable.ic_dialog_info)
+            .setContentText("Tenés nuevos mensajes en tu bandeja de entrada.")
+            .setSmallIcon(R.drawable.wirin50)
             .setPriority(NotificationCompat.PRIORITY_DEFAULT)
             .build()
 
