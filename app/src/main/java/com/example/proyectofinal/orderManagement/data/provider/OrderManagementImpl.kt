@@ -1,5 +1,6 @@
 package com.example.proyectofinal.orderManagement.data.provider
 
+import android.util.Log
 import com.example.proyectofinal.auth.data.tokenmanager.TokenManager
 import com.example.proyectofinal.core.network.ApiUrls
 import com.example.proyectofinal.core.network.NetworkResponse
@@ -38,18 +39,21 @@ class OrderManagementImpl(
                 header("Authorization", "Bearer $token")
             }
             val bodyText = response.bodyAsText()
-            println("DEBUG JSON: $bodyText")
+            Log.d("OrderManagementImpl", "DEBUG JSON: $bodyText")
 
             if (response.status == HttpStatusCode.OK) {
                 val responseBody = response.body<List<OrderDeliveredDto>>()
                 val orderDelivered = responseBody.map { it.toDomain() }
                 emit(NetworkResponse.Success(data = orderDelivered))
-                println("se supone que todo ok y q la trajo")
+                Log.d("OrderManagementImpl", "Request successfully processed with body: $bodyText")
             } else {
+                Log.d("OrderManagementImpl", "Request returned error: ${response.status}")
                 emit(NetworkResponse.Failure(error = "Error: ${response.status}"))
             }
 
         } catch (e: Exception) {
+            e.printStackTrace()
+            Log.d("OrderManagementImpl", "Error processing request: ${e.message}")
             emit(NetworkResponse.Failure(error = e.localizedMessage ?: "Unknown error"))
         }
     }
