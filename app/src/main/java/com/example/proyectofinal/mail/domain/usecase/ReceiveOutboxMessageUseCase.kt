@@ -1,0 +1,7 @@
+package com.example.proyectofinal.mail.domain.usecase
+
+import com.example.proyectofinal.mail.domain.provider.MailProvider
+
+class ReceiveOutboxMessageUseCase (private val mailRemoteProvider: MailProvider) {
+    operator fun invoke() = mailRemoteProvider.receiveMessageOutbox()
+}

@@ -11,18 +11,24 @@ import com.example.proyectofinal.mail.domain.model.MessageModel
 import com.example.proyectofinal.mail.domain.usecase.DeleteMessageByIdUseCase
 import com.example.proyectofinal.mail.domain.usecase.GetDraftMessagesUseCase
 import com.example.proyectofinal.mail.domain.usecase.ReceiveMessageUseCase
+import com.example.proyectofinal.mail.domain.usecase.ReceiveOutboxMessageUseCase
 import com.example.proyectofinal.users.domain.provider.usecase.GetUserUseCase
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
+import java.time.LocalDateTime
+import java.time.ZonedDateTime
+import java.time.format.DateTimeFormatter
+import java.util.Locale
 
 @RequiresApi(Build.VERSION_CODES.O)
 class InboxViewModel(
     private val getDraftMessagesUseCase: GetDraftMessagesUseCase,
     private val deleteDraftUseCase: DeleteMessageByIdUseCase,
     private val receiveMessageUseCase: ReceiveMessageUseCase,
+    private val receiveOutboxMessagesUseCase: ReceiveOutboxMessageUseCase,
     private val getUserUseCase: GetUserUseCase,
     private val tokenManager: TokenManager
 ) : ViewModel() {
@@ -36,9 +42,13 @@ class InboxViewModel(
     private val _draftMessages = MutableStateFlow<List<MessageModel>>(emptyList())
     val draftMessages: StateFlow<List<MessageModel>> = _draftMessages
 
-    private val _receivedMessages =
+    private val _receivedInboxMessages =
         MutableStateFlow<NetworkResponse<List<MessageModel>>>(NetworkResponse.Loading())
-    val receivedMessages: StateFlow<NetworkResponse<List<MessageModel>>> = _receivedMessages
+    val receivedInboxMessages: StateFlow<NetworkResponse<List<MessageModel>>> = _receivedInboxMessages
+
+    private val _receivedOutboxMessages =
+        MutableStateFlow<NetworkResponse<List<MessageModel>>>(NetworkResponse.Loading())
+    val receivedOutboxMessages: StateFlow<NetworkResponse<List<MessageModel>>> = _receivedOutboxMessages
 
     private var currentUserId: String? = null
     private val _userEmail = MutableStateFlow<String?>(null)
@@ -89,7 +99,6 @@ class InboxViewModel(
         }
     }
 
-    @RequiresApi(Build.VERSION_CODES.O)
     private fun loadMessages(userId: String, email: String) {
         viewModelScope.launch(Dispatchers.IO) {
             Log.d("InboxViewModel", "Cargando mensajes para userId: $userId y email: $email")
@@ -98,46 +107,101 @@ class InboxViewModel(
                 when (response) {
                     is NetworkResponse.Success -> {
                         val allMessages = response.data ?: emptyList()
-                        _receivedMessages.value = response
+                        _receivedInboxMessages.value = response
+                        Log.d("InboxViewModel", "Response completa:\n${response.data}")
 
                         val inbox = allMessages
                             .filter { it.userToId == userId }
-//                            .sortedByDescending { parseDate(it.date) }
+                            .sortedByDescending { parseDate(it.date) }
 
-                        val outbox = allMessages
-                            .filter { it.userToId != userId }
-//                            .sortedByDescending { parseDate(it.date) }
+                        val inboxFormatted = inbox.map { message ->
+                            val parsedDate = parseDate(message.date)
+                            val formattedDate = formatDateTimeForDisplay(parsedDate)
+                            message.copy(date = formattedDate) // si querés sobreescribir date para mostrarlo
+                        }
 
-                        _inboxMessages.value = inbox
-                        _outboxMessages.value = outbox
+                        _inboxMessages.value = inboxFormatted
 
                         Log.d("InboxViewModel", "Mensajes de entrada: ${inbox.size}")
-                        Log.d("InboxViewModel", "Mensajes de salida: ${outbox.size}")
                     }
 
                     is NetworkResponse.Failure -> {
-                        Log.e("InboxViewModel", "Error al cargar mensajes: ${response.error}")
-                        _receivedMessages.value = response
+                        Log.e("InboxViewModel", "Error al cargar mensajes inbox: ${response.error}")
+                        _receivedOutboxMessages.value = response
                     }
 
                     is NetworkResponse.Loading -> {
-                        Log.d("InboxViewModel", "Cargando mensajes...")
-                        _receivedMessages.value = response
+                        Log.d("InboxViewModel", "Cargando mensajes inbox...")
+                        _receivedOutboxMessages.value = response
                     }
                 }
+            }
+
+            receiveOutboxMessagesUseCase().collect { response ->
+                when (response) {
+                    is NetworkResponse.Success -> {
+                        val allMessages = response.data ?: emptyList()
+                        _receivedOutboxMessages.value = response
+                        Log.d("InboxViewModel", "Response completa del outbox:\n${response.data}")
+
+                        val outbox = allMessages
+                            .filter { it.userFromId == userId }
+                            .sortedByDescending { parseDate(it.date) }
+
+                        val outboxFormatted = outbox.map { message ->
+                            val parsedDate = parseDate(message.date)
+                            val formattedDate = formatDateTimeForDisplay(parsedDate)
+                            message.copy(date = formattedDate) // si querés sobreescribir date para mostrarlo
+                        }
+
+                        _outboxMessages.value = outboxFormatted
+                        Log.d("InboxViewModel", "Mensajes de salida outbox: ${outbox.size}")
+                    }
+
+                    is NetworkResponse.Failure -> {
+                        Log.e("InboxViewModel", "Error al cargar mensajes outbox: ${response.error}")
+                        _receivedOutboxMessages.value = response
+                    }
+
+                    is NetworkResponse.Loading -> {
+                        Log.d("InboxViewModel", "Cargando mensajes outbox...")
+                        _receivedOutboxMessages.value = response
+                    }
+                }
+
             }
         }
     }
 
-//    @RequiresApi(Build.VERSION_CODES.O)
-//    private fun parseDate(dateString: String): LocalDateTime {
-//        return try {
-//            Instant.parse(dateString).atZone(ZoneId.systemDefault()).toLocalDateTime()
-//        } catch (e: Exception) {
-//            Log.e("InboxViewModel", "Error parseando fecha: $dateString", e)
-//            LocalDateTime.MIN
-//        }
-//    }
+    private fun parseDate(dateString: String): LocalDateTime {
+        val formatters = listOf(
+            DateTimeFormatter.ISO_DATE_TIME, // 2025-06-22T22:00:43.164Z
+            DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSSSSX"), // 2025-06-22T22:47:39.775730Z
+            DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSX"),    // 2025-06-22T22:47:39.775Z
+            DateTimeFormatter.ofPattern("EEE MMM dd HH:mm:ss z yyyy", Locale.ENGLISH) // Sun Jun 22 22:42:10 GMT 2025
+        )
+
+        for (formatter in formatters) {
+            try {
+                return try {
+                    ZonedDateTime.parse(dateString, formatter).toLocalDateTime()
+                } catch (_: Exception) {
+                    LocalDateTime.parse(dateString, formatter)
+                }
+            } catch (_: Exception) {
+                // pasa al siguiente formatter
+            }
+        }
+
+        Log.e("InboxViewModel", "Error parseando fecha: $dateString")
+        return LocalDateTime.MIN
+    }
+
+    // Esta función devuelve un string con el formato "EEE dd MMM yyyy HH:mm" (ejemplo: "Sun 22 Jun 2025 23:09")
+    private fun formatDateTimeForDisplay(dateTime: LocalDateTime): String {
+        val formatter = DateTimeFormatter.ofPattern("EEE dd MMM yyyy HH:mm", Locale.ENGLISH)
+        return dateTime.format(formatter)
+    }
 
 
     private fun loadDraftMessages() {

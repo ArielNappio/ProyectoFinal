@@ -34,18 +34,14 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -58,12 +54,9 @@ import com.example.proyectofinal.core.theme.CustomGreen
 import com.example.proyectofinal.core.theme.LocalTheme
 import com.example.proyectofinal.mail.domain.model.MailboxType
 import com.example.proyectofinal.mail.domain.model.MessageModel
-import com.example.proyectofinal.mail.domain.model.OutboxMessageModel
 import com.example.proyectofinal.mail.presentation.component.MessageItem
 import com.example.proyectofinal.mail.presentation.viewmodel.InboxViewModel
-import com.example.proyectofinal.mail.presentation.viewmodel.MessageViewModel
 import com.example.proyectofinal.navigation.ScreensRoute
-import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 
 @RequiresApi(Build.VERSION_CODES.O)
@@ -75,7 +68,8 @@ fun InboxScreen(
 ) {
     val viewModel = koinViewModel<InboxViewModel>()
 
-    val receivedState by viewModel.receivedMessages.collectAsState()
+    val receivedInboxState by viewModel.receivedInboxMessages.collectAsState()
+    val receivedOutboxState by viewModel.receivedOutboxMessages.collectAsState()
     val inboxMessages by viewModel.inboxMessages.collectAsState()
     val outboxMessages by viewModel.outboxMessages.collectAsState()
     val draftMessages by viewModel.draftMessages.collectAsState()
@@ -104,7 +98,7 @@ fun InboxScreen(
             Text("Redactar", color = Color.White, fontSize = 18.sp)
         }
 
-        when (receivedState) {
+        when (receivedInboxState) {
             is NetworkResponse.Loading -> {
                 Box(
                     modifier = Modifier.fillMaxSize().padding(top = 32.dp),

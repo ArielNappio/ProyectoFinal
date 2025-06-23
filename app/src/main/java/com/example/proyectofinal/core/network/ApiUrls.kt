@@ -11,8 +11,10 @@ object ApiUrls {
     const val TASKS = "${BASE_URL}api/Task"
     const val TASK = "${BASE_URL}api/Task/{id}"
     const val MESSAGE = "${BASE_URL}api/Message/{id}"
-    const val EXAMPLE_PDF_URL = "https://research.cocos.capital/informe%20semanal%2026%20MAYO%201.pdf?lid=59pi4z1jojfp" // TODO replace with actual URL
-    const val MESSAGES = "${BASE_URL}api/Message/byUserId/{userId}"
+    const val EXAMPLE_PDF_URL = "https:" + "//research.cocos.capital/informe%20semanal%2026%20MAYO%201.pdf?lid=59pi4z1jojfp" // TODO replace with actual URL
+    const val MESSAGES_INBOX_BY_ID = "${BASE_URL}api/Message/byStudentId/{userId}"
+    const val MESSAGES_OUTBOX = "${BASE_URL}api/Message/sended"
+
     const val UPDATE_MESSAGE = "${BASE_URL}api/Message/updateMessage"
     const val SEND_MESSAGE = "${BASE_URL}api/Message"
     const val ORDERS_BY_STUDENT = "${BASE_URL}api/OrderDelivery/WithOrders/{studentId}"

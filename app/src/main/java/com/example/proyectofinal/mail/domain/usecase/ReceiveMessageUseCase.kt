@@ -3,5 +3,5 @@ package com.example.proyectofinal.mail.domain.usecase
 import com.example.proyectofinal.mail.domain.provider.MailProvider
 
 class ReceiveMessageUseCase (private val mailRemoteProvider: MailProvider) {
-    operator fun invoke(userId: String) = mailRemoteProvider.receiveMessage(userId)
+    operator fun invoke(userId: String) = mailRemoteProvider.receiveMessageByUserId(userId)
 }

@@ -7,7 +7,7 @@ import kotlinx.coroutines.flow.Flow
 interface MailProvider {
 
     fun sendMessage(message: MessageModel): Flow<NetworkResponse<MessageModel>>
-    fun receiveMessage(userId: String): Flow<NetworkResponse<List<MessageModel>>>
+    fun receiveMessageByUserId(userId: String): Flow<NetworkResponse<List<MessageModel>>>
     fun updateMessage(message: MessageModel): Flow<NetworkResponse<Unit>>
-
+    fun receiveMessageOutbox(): Flow<NetworkResponse<List<MessageModel>>>
 }

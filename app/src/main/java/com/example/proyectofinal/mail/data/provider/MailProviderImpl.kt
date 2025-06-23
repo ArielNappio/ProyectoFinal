@@ -1,5 +1,6 @@
 package com.example.proyectofinal.mail.data.provider
 
+import com.example.proyectofinal.auth.data.tokenmanager.TokenManager
 import com.example.proyectofinal.core.network.ApiUrls
 import com.example.proyectofinal.core.network.NetworkResponse
 import com.example.proyectofinal.mail.domain.model.MessageModel
@@ -9,18 +10,25 @@ import io.ktor.client.call.body
 import io.ktor.client.request.forms.MultiPartFormDataContent
 import io.ktor.client.request.forms.formData
 import io.ktor.client.request.get
+import io.ktor.client.request.header
 import io.ktor.client.request.post
 import io.ktor.client.request.put
 import io.ktor.client.request.setBody
 import io.ktor.client.statement.HttpResponse
+import io.ktor.client.statement.bodyAsText
 import io.ktor.http.ContentType
 import io.ktor.http.HttpStatusCode
 import io.ktor.http.contentType
 import io.ktor.http.isSuccess
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flow
 
-class MailProviderImpl(private val ktorClient: HttpClient) : MailProvider {
+class MailProviderImpl(
+    private val ktorClient: HttpClient,
+    private val tokenManager: TokenManager
+) : MailProvider {
+
     override fun sendMessage(message: MessageModel): Flow<NetworkResponse<MessageModel>> = flow {
         try {
             emit(NetworkResponse.Loading())
@@ -54,11 +62,11 @@ class MailProviderImpl(private val ktorClient: HttpClient) : MailProvider {
         }
     }
 
-    override fun receiveMessage(userId: String): Flow<NetworkResponse<List<MessageModel>>> = flow {
+    override fun receiveMessageByUserId(userId: String): Flow<NetworkResponse<List<MessageModel>>> = flow {
         try {
             emit(NetworkResponse.Loading())
 
-            val url = ApiUrls.MESSAGES.replace("{userId}", userId)
+            val url = ApiUrls.MESSAGES_INBOX_BY_ID.replace("{userId}", userId)
 
             val response: HttpResponse = ktorClient.get(url)
 
@@ -67,6 +75,36 @@ class MailProviderImpl(private val ktorClient: HttpClient) : MailProvider {
                 emit(NetworkResponse.Success(messages))
             } else {
                 emit(NetworkResponse.Failure("Error ${response.status.value}"))
+            }
+        } catch (e: Exception) {
+            emit(NetworkResponse.Failure(error = e.toString()))
+        }
+    }
+
+    override fun receiveMessageOutbox(): Flow<NetworkResponse<List<MessageModel>>> = flow {
+        try {
+            emit(NetworkResponse.Loading())
+
+            val url = ApiUrls.MESSAGES_OUTBOX
+
+            val token = tokenManager.token.firstOrNull()
+
+            if (token.isNullOrEmpty()) {
+                emit(NetworkResponse.Failure("No auth token found"))
+                return@flow
+            }
+
+            val response = ktorClient.get(url) {
+                header("Authorization", "Bearer $token")
+            }
+            val bodyText = response.bodyAsText()
+            println("DEBUG JSON: $bodyText")
+
+            if (response.status == HttpStatusCode.OK) {
+                val messages = response.body<List<MessageModel>>()
+                emit(NetworkResponse.Success(messages))
+            } else {
+                emit(NetworkResponse.Failure("Error en get outbox: ${response.status.value}"))
             }
         } catch (e: Exception) {
             emit(NetworkResponse.Failure(error = e.toString()))
