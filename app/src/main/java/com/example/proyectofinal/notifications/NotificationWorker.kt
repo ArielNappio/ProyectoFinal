@@ -69,8 +69,8 @@ class NotificationWorker(context: Context, workerParams: WorkerParameters) : Wor
         }
 
         val notification = NotificationCompat.Builder(applicationContext, channelId)
-            .setContentTitle("Nuevo mensaje")
-            .setContentText("Tenés nuevos mensajes en tu bandeja de entrada.")
+            .setContentTitle("Tenés nuevo mensaje")
+            .setContentText("Revisá tu bandeja de entrada para verlos.")
             .setSmallIcon(R.drawable.wirin50)
             .setPriority(NotificationCompat.PRIORITY_DEFAULT)
             .build()
