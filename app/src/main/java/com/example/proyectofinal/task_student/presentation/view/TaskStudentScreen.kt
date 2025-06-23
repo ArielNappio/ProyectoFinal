@@ -54,6 +54,8 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -71,10 +73,13 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
+import com.example.proyectofinal.core.theme.ATKINSON_HYPERLEGIBLE_FAMILY_NAME
+import com.example.proyectofinal.core.theme.OPEN_DYSLEXIC_FAMILY_NAME
 import com.example.proyectofinal.student.presentation.component.CommentAudioCard
 import com.example.proyectofinal.task_student.presentation.component.AccessibleIconButton
 import com.example.proyectofinal.task_student.presentation.component.DownloadOption
@@ -82,6 +87,7 @@ import com.example.proyectofinal.task_student.presentation.component.MicControl
 import com.example.proyectofinal.task_student.presentation.component.MicPermissionWrapper
 import com.example.proyectofinal.task_student.presentation.viewmodel.TaskStudentViewModel
 import com.example.proyectofinal.task_student.util.htmlToAnnotatedStringFormatted
+import com.example.proyectofinal.userpreferences.util.getFontFamilyFromString
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import org.koin.androidx.compose.koinViewModel
 
@@ -101,6 +107,8 @@ fun TaskStudent(taskId: Int, navController: NavHostController) {
     val showFeedback by viewModel.showFeedback.collectAsState()
     val showFont by viewModel.showFont.collectAsState()
     val showAnnotations by viewModel.showAnnotations.collectAsState()
+    val showFontsMenu by viewModel.showFontsMenu.collectAsState()
+    val selectedFontFamily by viewModel.selectedFontFamily.collectAsState()
     val fontSize by viewModel.fontSize.collectAsState()
 
     val currentPageIndex by viewModel.currentPageIndex.collectAsState()
@@ -127,6 +135,9 @@ fun TaskStudent(taskId: Int, navController: NavHostController) {
     val recordedFilePath by viewModel.recordedFeedbackFilePath.collectAsState()
 
     val currentContext = LocalContext.current
+
+    val font = getFontFamilyFromString(selectedFontFamily)
+
 
     LaunchedEffect(taskId) {
         viewModel.loadProject(taskId)
@@ -225,7 +236,8 @@ fun TaskStudent(taskId: Int, navController: NavHostController) {
                 Text(
                     text = annotatedText,
                     fontSize = fontSize,
-                    lineHeight = fontSize * 1.5f,
+                    fontFamily = font,
+                    lineHeight = fontSize * 1.5f
                 )
             }
         }
@@ -450,7 +462,7 @@ fun TaskStudent(taskId: Int, navController: NavHostController) {
                         icon = Icons.Default.FontDownload,
                         label = "Fuente",
                         onClick = {
-
+                            viewModel.toggleFontMenu()
                         },
                         iconSize = 56.dp
                     )
@@ -474,6 +486,39 @@ fun TaskStudent(taskId: Int, navController: NavHostController) {
             }
         }
     }
+
+    if(showFontsMenu){
+        Box {
+            AccessibleIconButton(
+                icon = Icons.Default.FontDownload,
+                label = "Fuente",
+                onClick = { viewModel.toggleFontMenu() },
+                iconSize = 56.dp
+            )
+
+            DropdownMenu(
+                expanded = showFontsMenu,
+                onDismissRequest = { viewModel.closeFontMenu() }
+            ) {
+                val fonts = listOf("Sans", "Serif", "Monospace", ATKINSON_HYPERLEGIBLE_FAMILY_NAME, OPEN_DYSLEXIC_FAMILY_NAME)
+                fonts.forEach { font ->
+                    DropdownMenuItem(
+                        text = {
+                            Text(
+                                text = font,
+                                fontWeight = if (font == selectedFontFamily) FontWeight.Bold else FontWeight.Normal
+                            )
+                        },
+                        onClick = {
+                            viewModel.setFontFamily(font)
+                            viewModel.closeFontMenu()
+                        }
+                    )
+                }
+            }
+        }
+    }
+
 
     // DIALOG DE DESCARGAS
 

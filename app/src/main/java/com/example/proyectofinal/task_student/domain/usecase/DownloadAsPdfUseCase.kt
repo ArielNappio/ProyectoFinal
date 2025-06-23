@@ -44,7 +44,6 @@ class DownloadAsPdfUseCase {
         val title = Paint().apply {
             typeface = Typeface.create(Typeface.DEFAULT, Typeface.NORMAL)
             textSize = 50F
-
             color = Color.Black.toArgb()
         }
 
@@ -85,9 +84,20 @@ class DownloadAsPdfUseCase {
             // Draw text onto the PDF
             canvas.drawText(documentTitle, 250F, 140F, title)
 
-            documentContent[pageNumber].split("\n").forEachIndexed { index, line ->
-                canvas.drawText(line, 100F, 300F + (index * fontSize * 1.5F), content)
-            }
+            val startY = 300F
+            val x = 100F
+            val maxWidth = pageWidth - 200F
+            val lineSpacing = fontSize * 1.5f
+
+            drawMultilineText(
+                canvas = canvas,
+                text = documentContent[pageNumber],
+                paint = content,
+                x = x,
+                startY = startY,
+                maxWidth = maxWidth,
+                lineSpacing = lineSpacing
+            )
 
             canvas.drawText(
                 "Documento generado automaticamente por WIRIN.",
@@ -131,5 +141,30 @@ class DownloadAsPdfUseCase {
         } finally {
             pdfDocument.close()
         }
+    }
+
+    fun drawMultilineText(
+        canvas: Canvas,
+        text: String,
+        paint: Paint,
+        x: Float,
+        startY: Float,
+        maxWidth: Float,
+        lineSpacing: Float
+    ): Float {
+        var y = startY
+        val lines = text.split("\n")
+
+        for (line in lines) {
+            var currentLine = line
+            while (currentLine.isNotEmpty()) {
+                val charsToFit = paint.breakText(currentLine, true, maxWidth, null)
+                val lineToDraw = currentLine.substring(0, charsToFit)
+                canvas.drawText(lineToDraw, x, y, paint)
+                currentLine = currentLine.substring(charsToFit)
+                y += lineSpacing
+            }
+        }
+        return y
     }
 }
