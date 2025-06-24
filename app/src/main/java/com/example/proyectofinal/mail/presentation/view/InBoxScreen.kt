@@ -50,7 +50,6 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.proyectofinal.R
 import com.example.proyectofinal.core.network.NetworkResponse
-import com.example.proyectofinal.core.theme.CustomGreen
 import com.example.proyectofinal.core.theme.LocalTheme
 import com.example.proyectofinal.mail.domain.model.MailboxType
 import com.example.proyectofinal.mail.domain.model.MessageModel
@@ -89,7 +88,7 @@ fun InboxScreen(
                 .fillMaxWidth()
                 .padding(horizontal = 16.dp, vertical = 8.dp),
             colors = ButtonDefaults.buttonColors(
-                containerColor = CustomGreen,
+                containerColor = Color(0xff2e7d32),
                 contentColor = Color.White
             )
         ) {

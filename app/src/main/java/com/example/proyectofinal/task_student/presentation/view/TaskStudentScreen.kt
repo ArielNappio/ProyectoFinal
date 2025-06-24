@@ -797,7 +797,7 @@ fun TaskStudent(taskId: Int, navController: NavHostController) {
                                 .weight(1f)
                                 .focusRequester(focusRequester),
                             textStyle = TextStyle(
-                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                                color = MaterialTheme.colorScheme.onBackground
                             ),
                             decorationBox = { innerTextField ->
                                 Box(
@@ -828,7 +828,7 @@ fun TaskStudent(taskId: Int, navController: NavHostController) {
                             modifier = Modifier
                                 .size(48.dp)
                                 .clip(CircleShape)
-                                .background(Color(0xFF4CAF50))
+                                .background(Color(0xff2e7d32))
                                 .pointerInput(Unit) {
                                     detectTapGestures(
                                         onPress = {
@@ -863,7 +863,7 @@ fun TaskStudent(taskId: Int, navController: NavHostController) {
                             viewModel.showFeedback()
                         },
                         modifier = Modifier.fillMaxWidth(),
-                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF4CAF50))
+                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xff2e7d32))
                     ) {
                         Text(text = "Enviar opinión", color = Color.White)
                     }

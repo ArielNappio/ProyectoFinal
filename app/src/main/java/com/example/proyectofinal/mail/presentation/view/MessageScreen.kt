@@ -60,7 +60,6 @@ import androidx.compose.ui.unit.sp
 import com.example.proyectofinal.audio.speechrecognizer.SpeechRecognizerManager
 import com.example.proyectofinal.core.network.NetworkResponse
 import com.example.proyectofinal.core.theme.BlueDark
-import com.example.proyectofinal.core.theme.CustomGreen
 import com.example.proyectofinal.core.theme.CustomRed
 import com.example.proyectofinal.core.theme.GreenLight
 import com.example.proyectofinal.mail.presentation.component.FormScreen
@@ -193,7 +192,7 @@ fun MessageScreen(
                     Button(
                         onClick = { viewModel.sendMessage() },
                         enabled = to.isNotBlank() && message.isNotBlank(),
-                        colors = ButtonDefaults.buttonColors(containerColor = CustomGreen)
+                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xff2e7d32))
                     ) {
                         Icon(
                             Icons.AutoMirrored.Filled.Send,
