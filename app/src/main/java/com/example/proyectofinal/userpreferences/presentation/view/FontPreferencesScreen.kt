@@ -7,6 +7,8 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
@@ -115,7 +117,6 @@ fun FontPreferencesScreen(onDone: () -> Unit) {
 
             }
             item {
-
                 Text(
                     text = "Tipo:",
                     color = Color.White,
@@ -133,6 +134,7 @@ fun FontPreferencesScreen(onDone: () -> Unit) {
                                 containerColor = if (prefs.fontFamily == font.key) CustomBlue else BlueGray
                             ),
                             modifier = Modifier
+                                .wrapContentSize()
                                 .fillMaxWidth()
                                 .semantics { contentDescription = "Botón fuente $font" },
                             onClick = { viewModel.updateFontFamily(font.key) }
@@ -145,6 +147,7 @@ fun FontPreferencesScreen(onDone: () -> Unit) {
                                 horizontalArrangement = Arrangement.SpaceBetween
                             ) {
                                 Text(
+                                    modifier = Modifier.weight(1f).padding(end = 16.dp),
                                     text = font.key,
                                     fontFamily = font.value,
                                     color = Color.White,
@@ -153,6 +156,7 @@ fun FontPreferencesScreen(onDone: () -> Unit) {
                                 )
                                 if (prefs.fontFamily == font.key) {
                                     Icon(
+                                        modifier = Modifier.size(prefs.iconSize.dp),
                                         imageVector = Icons.Default.Check,
                                         contentDescription = "Fuente seleccionada",
                                         tint = Color.White
