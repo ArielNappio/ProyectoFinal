@@ -6,7 +6,7 @@ import com.example.proyectofinal.orderFeedback.data.entity.FeedbackEntity
 
 @Database(
     entities = [FeedbackEntity::class],
-    version = 4,
+    version = 5,
     exportSchema = false
 )
 abstract class FeedbackDatabase : RoomDatabase(){

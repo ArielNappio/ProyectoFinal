@@ -87,6 +87,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextAlign
@@ -710,7 +711,7 @@ fun TaskStudent(taskId: Int, navController: NavHostController) {
                     Spacer(modifier = Modifier.height(20.dp))
 
                     Text(
-                        text = "Mandanos un audio con tu opinión!",
+                        text = "Mandanos tu opinión!",
                         style = MaterialTheme.typography.titleMedium,
                         textAlign = TextAlign.Center,
                         modifier = Modifier.fillMaxWidth()
@@ -795,6 +796,9 @@ fun TaskStudent(taskId: Int, navController: NavHostController) {
                             modifier = Modifier
                                 .weight(1f)
                                 .focusRequester(focusRequester),
+                            textStyle = TextStyle(
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            ),
                             decorationBox = { innerTextField ->
                                 Box(
                                     modifier = Modifier
@@ -804,7 +808,7 @@ fun TaskStudent(taskId: Int, navController: NavHostController) {
                                     if (feedbackText.isBlank()) {
                                         Text(
                                             text = "Escribí tu opinión acá...",
-                                            color = Color.Gray
+                                            color = MaterialTheme.colorScheme.onBackground
                                         )
                                     }
                                     innerTextField()

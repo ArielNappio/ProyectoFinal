@@ -9,3 +9,8 @@ data class OrderFeedback(
     val stars: Int,
     val orderId: Int
 )
+
+@Serializable
+data class FeedbackRequestWrapper(
+    val request: OrderFeedback
+)
