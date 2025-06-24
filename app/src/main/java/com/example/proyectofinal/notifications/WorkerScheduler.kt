@@ -1,24 +1,10 @@
 package com.example.proyectofinal.notifications
 
 import android.content.Context
-import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.OneTimeWorkRequestBuilder
-import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
 import androidx.work.workDataOf
 import java.util.concurrent.TimeUnit
-
-fun scheduleNotificationWorker(context: Context, userId: String) {
-    val workRequest = PeriodicWorkRequestBuilder<NotificationWorker>(15, TimeUnit.MINUTES)
-        .setInputData(workDataOf("userId" to userId))
-        .build()
-
-    WorkManager.getInstance(context).enqueueUniquePeriodicWork(
-        "NotificationWorker",
-        ExistingPeriodicWorkPolicy.REPLACE,
-        workRequest
-    )
-}
 
 fun scheduleOneTimeWorker(context: Context, userId: String) {
     val workRequest = OneTimeWorkRequestBuilder<NotificationWorker>()

@@ -41,7 +41,7 @@ class NotificationWorker(context: Context, workerParams: WorkerParameters) : Wor
                 val lastData = sharedPreferences.getString("last_data", null)
                 Log.d("NotificationWorker", "Old Inbox messages IDs: $lastData")
 
-                if (newData != lastData) {
+                if (lastData != null && newData != lastData) {
                     Log.d("NotificationWorker", "Sending notification for new messages: $newData")
                     sharedPreferences.edit { putString("last_data", newData) }
                     sendNotification()
