@@ -21,12 +21,12 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.io.File
 import java.time.LocalDateTime
 import java.time.ZoneId
 import java.util.Date
+import java.util.UUID
 
 class MessageViewModel(
     private val sendMessageUseCase: SendMessageUseCase,
@@ -179,6 +179,7 @@ class MessageViewModel(
             }
 
             val messageModel = MessageModel(
+                id = UUID.randomUUID().hashCode(),
                 sender = to.value,
                 subject = subject.value,
                 content = message.value,

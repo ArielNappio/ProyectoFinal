@@ -1,11 +1,10 @@
 package com.example.proyectofinal.mail.domain.model
 
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.Transient
 
 @Serializable
 data class MessageModel(
-    @Transient val id: Int = 0,
+    val id: Int,
     val userFromId: String,
     val userToId: String,
     val isDraft: Boolean,
