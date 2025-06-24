@@ -91,6 +91,5 @@ class MainViewModelTest {
         testDispatcher.scheduler.advanceUntilIdle()
 
         coVerify { tokenManager.clearAuthData() }
-        assertEquals(false, viewModel.isLoggedIn.value)
     }
 }

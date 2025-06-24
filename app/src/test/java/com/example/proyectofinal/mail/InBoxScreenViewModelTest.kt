@@ -9,6 +9,7 @@ import com.example.proyectofinal.mail.domain.usecase.GetDraftMessagesUseCase
 import com.example.proyectofinal.mail.domain.usecase.GetInboxMessagesUseCase
 import com.example.proyectofinal.mail.domain.usecase.GetOutboxMessagesUseCase
 import com.example.proyectofinal.mail.domain.usecase.ReceiveMessageUseCase
+import com.example.proyectofinal.mail.domain.usecase.ReceiveOutboxMessageUseCase
 import com.example.proyectofinal.mail.presentation.viewmodel.InboxViewModel
 import com.example.proyectofinal.users.data.model.User
 import com.example.proyectofinal.users.data.provider.UserProviderImpl
@@ -40,7 +41,8 @@ class InBoxScreenViewModelTest {
     private val getInboxMessagesUseCase: GetInboxMessagesUseCase = mockk()
     private val getOutboxMessagesUseCase: GetOutboxMessagesUseCase = mockk()
     private val getDraftMessagesUseCase: GetDraftMessagesUseCase = mockk()
-    private val deleteDraftUseCase: DeleteMessageByIdUseCase = mockk()
+    private val deleteMessageByIdUseCase: DeleteMessageByIdUseCase = mockk()
+    private val receiveOutboxMessagesUseCase: ReceiveOutboxMessageUseCase = mockk()
     private val receiveMessageUseCase: ReceiveMessageUseCase = mockk()
     private val tokenManager: TokenManager = mockk()
     private val userProviderMock: UserProviderImpl = mockk()
@@ -80,7 +82,7 @@ class InBoxScreenViewModelTest {
         coEvery { getInboxMessagesUseCase(any()) } returns inboxMessagesStub
         coEvery { getOutboxMessagesUseCase(any()) } returns outboxMessagesStub
         coEvery { getDraftMessagesUseCase() } returns draftMessagesStub
-        coEvery { deleteDraftUseCase(any()) } returns Unit
+        coEvery { deleteMessageByIdUseCase(any()) } returns Unit
         coEvery { receiveMessageUseCase(any()) } returns flowOf(
             NetworkResponse.Success(listOf())
         )
@@ -94,8 +96,9 @@ class InBoxScreenViewModelTest {
         val getUserUseCase = GetUserUseCase(userProviderMock)
         viewModel = InboxViewModel(
             getDraftMessagesUseCase,
-            deleteDraftUseCase,
+            deleteMessageByIdUseCase,
             receiveMessageUseCase,
+            receiveOutboxMessagesUseCase,
             getUserUseCase,
             tokenManager
         )
@@ -127,7 +130,7 @@ class InBoxScreenViewModelTest {
 
         testDispatcher.scheduler.advanceUntilIdle()
 
-        coVerify { deleteDraftUseCase(draftId) }
+        coVerify { deleteMessageByIdUseCase(draftId) }
         coVerify { getDraftMessagesUseCase() }
         assertEquals(draftMessagesStub, viewModel.draftMessages.first())
     }

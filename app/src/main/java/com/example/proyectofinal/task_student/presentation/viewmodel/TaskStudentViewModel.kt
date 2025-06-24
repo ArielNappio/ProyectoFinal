@@ -509,7 +509,6 @@ class TaskStudentViewModel(
 
             // 2. Convertir a texto plano
             return HtmlCompat.fromHtml(cleaned, HtmlCompat.FROM_HTML_MODE_LEGACY).toString()
-
     }
 
     fun setFontFamily(font: String) {

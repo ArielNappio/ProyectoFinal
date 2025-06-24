@@ -33,25 +33,27 @@ class PreferencesViewModelTest {
     fun setup() {
         Dispatchers.setMain(testDispatcher)
         repository = mockk()
-        coEvery { repository.getUserPreferences() } returns flowOf(UserPreferences(16f, "Default"))
+        coEvery { repository.getUserPreferences() } returns flowOf(UserPreferences(26f, "Default", iconSize = 32f))
         viewModel = PreferencesViewModel(repository)
     }
 
     @Test
     fun `when initialized, preferences are loaded`() = runTest {
         testDispatcher.scheduler.advanceUntilIdle()
-        assertEquals(UserPreferences(16f, "Default"), viewModel.preferences.value)
+        assertEquals(UserPreferences(26f, "Default", iconSize = 32f), viewModel.preferences.value)
     }
 
     @Test
     fun `updateFontSize updates the font size in repository`() = runTest {
-        val newSize = 18f
+        val newSize = 26f
         coEvery { repository.saveFontSize(newSize) } just Runs
+        coEvery { repository.saveIconSize(32f) } just Runs
 
         viewModel.updateFontSize(newSize)
         testDispatcher.scheduler.advanceUntilIdle()
 
         coVerify { repository.saveFontSize(newSize) }
+        coVerify { repository.saveIconSize(32f) }
     }
 
     @Test
@@ -63,6 +65,31 @@ class PreferencesViewModelTest {
         testDispatcher.scheduler.advanceUntilIdle()
 
         coVerify { repository.saveFontFamily(newFamily) }
+    }
+
+    @Test
+    fun `updateProfileImageUri saves the profile image URI in repository`() = runTest {
+        val email = "test@example.com"
+        val uri = "image_uri"
+        coEvery { repository.saveProfileImageUri(email, uri) } just Runs
+
+        viewModel.updateProfileImageUri(email, uri)
+        testDispatcher.scheduler.advanceUntilIdle()
+
+        coVerify { repository.saveProfileImageUri(email, uri) }
+    }
+
+    @Test
+    fun `getProfileImageUri retrieves the profile image URI from repository`() = runTest {
+        val email = "test@example.com"
+        val uri = "image_uri"
+        coEvery { repository.getProfileImageUri(email) } returns uri
+
+        var result: String? = null
+        viewModel.getProfileImageUri(email) { result = it }
+        testDispatcher.scheduler.advanceUntilIdle()
+
+        assertEquals(uri, result)
     }
 
     @After

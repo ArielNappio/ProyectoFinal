@@ -4,4 +4,4 @@ import androidx.compose.runtime.compositionLocalOf
 import com.example.proyectofinal.userpreferences.domain.model.UserPreferences
 
 val LocalUserPreferences =
-    compositionLocalOf { UserPreferences(fontSize = 16f, fontFamily = "Default", iconSize = 32f) }
+    compositionLocalOf { UserPreferences(fontSize = 26f, fontFamily = "Default", iconSize = 32f) }

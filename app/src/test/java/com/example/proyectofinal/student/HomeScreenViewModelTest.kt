@@ -10,6 +10,8 @@ import com.example.proyectofinal.orderManagement.domain.repository.OrderReposito
 import com.example.proyectofinal.orderManagement.domain.usecase.GetTaskGroupByStudentUseCase
 import com.example.proyectofinal.orderManagement.domain.usecase.UpdateFavoriteStatusUseCase
 import com.example.proyectofinal.student.presentation.viewmodel.HomeScreenViewModel
+import com.example.proyectofinal.userpreferences.domain.model.UserPreferences
+import com.example.proyectofinal.userpreferences.domain.repository.UserPreferencesRepository
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.mockkStatic
@@ -32,6 +34,7 @@ class HomeScreenViewModelTest {
 
     private lateinit var viewModel: HomeScreenViewModel
     private lateinit var repository: OrderRepository
+    private lateinit var userPreferencesRepository: UserPreferencesRepository
     private lateinit var tokenManager: TokenManager
 
     private val testDispatcher = StandardTestDispatcher()
@@ -78,6 +81,8 @@ class HomeScreenViewModelTest {
         every { Log.e(any(), any()) } returns 0
 
         Dispatchers.setMain(testDispatcher)
+        userPreferencesRepository = mockk()
+        every { userPreferencesRepository.getUserPreferences() } returns flowOf(UserPreferences(26f, "Default", iconSize = 32f))
         repository = mockk()
         every { repository.getTasks(any()) } returns flowOf(NetworkResponse.Success(mockTasks))
         tokenManager = mockk()
@@ -85,7 +90,7 @@ class HomeScreenViewModelTest {
         val getTaskGroupByStudentUseCase = GetTaskGroupByStudentUseCase(repository)
         val updateFavoriteStatusUseCase = UpdateFavoriteStatusUseCase(repository)
 
-        viewModel = HomeScreenViewModel(getTaskGroupByStudentUseCase, tokenManager, updateFavoriteStatusUseCase)
+        viewModel = HomeScreenViewModel(getTaskGroupByStudentUseCase, tokenManager, updateFavoriteStatusUseCase, userPreferencesRepository)
     }
 
     @Test

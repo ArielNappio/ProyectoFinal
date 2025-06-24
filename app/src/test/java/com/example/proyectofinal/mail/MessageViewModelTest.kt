@@ -11,6 +11,8 @@ import com.example.proyectofinal.mail.domain.usecase.GetDraftByIdUseCase
 import com.example.proyectofinal.mail.domain.usecase.SaveDraftUseCase
 import com.example.proyectofinal.mail.domain.usecase.SendMessageUseCase
 import com.example.proyectofinal.mail.presentation.viewmodel.MessageViewModel
+import com.example.proyectofinal.users.data.model.User
+import com.example.proyectofinal.users.domain.provider.UserProvider
 import com.example.proyectofinal.users.domain.provider.usecase.GetUserUseCase
 import io.mockk.Runs
 import io.mockk.coEvery
@@ -40,7 +42,7 @@ class MessageViewModelTest {
     private lateinit var getUserUseCase: GetUserUseCase
     private lateinit var mailRepository: MailRepository
     private lateinit var mailProvider: MailProvider
-//    private lateinit var userProvider: UserProvider
+    private lateinit var userProvider: UserProvider
     private val testDispatcher = StandardTestDispatcher()
     private val testScope = TestScope(testDispatcher)
     private lateinit var viewModel: MessageViewModel
@@ -49,6 +51,15 @@ class MessageViewModelTest {
     private val messageModelStub = MessageModel(
         1, "userFromId", "studentId", false, "sender", "Subject",
         "2025-06-01", "Content of the inbox message", isResponse = false
+    )
+
+    private val librarianUser = User(
+        id = "1",
+        userName = "userName",
+        fullName = "fullName",
+        email = "test@example.com",
+        phoneNumber = "1234567890",
+        roles = listOf("Bibliotecario")
     )
 
     @Before
@@ -66,6 +77,9 @@ class MessageViewModelTest {
         mailProvider = mockk()
         coEvery { mailProvider.sendMessage(any()) } returns flowOf(NetworkResponse.Success(messageModelStub))
 
+        userProvider = mockk()
+        coEvery { userProvider.getUsers() } returns flowOf(NetworkResponse.Success(listOf(librarianUser)))
+
         coEvery { tokenManager.token } returns flowOf(null)
         coEvery { tokenManager.saveToken(any()) } just Runs
         coEvery { tokenManager.saveUserId(any()) } just Runs
@@ -76,7 +90,7 @@ class MessageViewModelTest {
         saveDraftUseCase = SaveDraftUseCase(mailRepository)
         getDraftByIdUseCase = GetDraftByIdUseCase(mailRepository)
         deleteDraftUseCase = DeleteMessageByIdUseCase(mailRepository)
-        getUserUseCase = GetUserUseCase(mockk())
+        getUserUseCase = GetUserUseCase(userProvider)
 
         viewModel = MessageViewModel(
             sendMessageUseCase = sendMessageUseCase,
@@ -111,9 +125,11 @@ class MessageViewModelTest {
         viewModel.updateTo("test@example.com")
         viewModel.updateSubject("Test Subject")
         viewModel.updateMessage("Test Message")
-        viewModel.sendMessage()
-
+        viewModel.getLibrarianEmails()
         testDispatcher.scheduler.advanceUntilIdle()
+        viewModel.sendMessage()
+        testDispatcher.scheduler.advanceUntilIdle()
+
 
         coVerify { sendMessageUseCase(any()) }
     }
@@ -123,26 +139,19 @@ class MessageViewModelTest {
         viewModel.updateTo("test@example.com")
         viewModel.updateSubject("Test Subject")
         viewModel.updateMessage("Test Message")
-
         viewModel.saveDraft()
-
 
         testDispatcher.scheduler.advanceUntilIdle()
         coVerify { saveDraftUseCase(any()) }
     }
 
-    // TODO: Ver por qué falla
-//    @Test
-//    fun `when loading draft, state is updated`() = testScope.runTest {
-//        viewModel.loadDraft(1)
-//        testDispatcher.scheduler.advanceUntilIdle()
-//
-//        coVerify { getDraftByIdUseCase(1) }
-//
-//        assertEquals(messageModelStub.sender, viewModel.to.value)
-//        assertEquals(messageModelStub.subject, viewModel.subject.value)
-//        assertEquals(messageModelStub.content, viewModel.message.value)
-//    }
+    @Test
+    fun `when loading draft, state is updated`() = testScope.runTest {
+        viewModel.loadDraft(1)
+        testDispatcher.scheduler.advanceUntilIdle()
+
+        coVerify { mailRepository.getDraftById(1) }
+    }
 
     @Test
     fun `when discarding draft, use case is executed`() = runTest {

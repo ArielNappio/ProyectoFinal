@@ -1,10 +1,12 @@
 package com.example.proyectofinal.task_student
 
 import android.util.Log
+import androidx.core.text.HtmlCompat
 import com.example.proyectofinal.audio.domain.repository.AudioRepository
 import com.example.proyectofinal.audio.player.AudioPlayerManager
 import com.example.proyectofinal.audio.recorder.AudioRecorderManager
 import com.example.proyectofinal.auth.data.tokenmanager.TokenManager
+import com.example.proyectofinal.orderManagement.data.repository.LastReadRepository
 import com.example.proyectofinal.orderManagement.domain.repository.OrderRepository
 import com.example.proyectofinal.orderManagement.domain.usecase.GetTaskGroupByStudentUseCase
 import com.example.proyectofinal.task_student.domain.usecase.DownloadAsMp3UseCase
@@ -12,6 +14,7 @@ import com.example.proyectofinal.task_student.domain.usecase.DownloadAsPdfUseCas
 import com.example.proyectofinal.task_student.domain.usecase.DownloadAsTxtUseCase
 import com.example.proyectofinal.task_student.presentation.tts.TextToSpeechManager
 import com.example.proyectofinal.task_student.presentation.viewmodel.TaskStudentViewModel
+import com.example.proyectofinal.userpreferences.data.manager.DataStoreManager
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.every
@@ -44,6 +47,8 @@ class TaskStudentViewModelTest {
     private val orderRepository: OrderRepository = mockk(relaxed = true)
     private val getOrders: GetTaskGroupByStudentUseCase = mockk(relaxed = true)
     private val tokenManager: TokenManager = mockk(relaxed = true)
+    private val userPreferences: DataStoreManager = mockk(relaxed = true)
+    private val lastReadRepository: LastReadRepository = mockk(relaxed = true)
 
     private lateinit var viewModel: TaskStudentViewModel
     private val testDispatcher = StandardTestDispatcher()
@@ -54,6 +59,9 @@ class TaskStudentViewModelTest {
         mockkStatic(Log::class)
         every { Log.d(any(), any()) } returns 0
         every { Log.e(any(), any()) } returns 0
+
+        mockkStatic(HtmlCompat::class)
+        every { HtmlCompat.fromHtml(any(), HtmlCompat.FROM_HTML_MODE_LEGACY).toString() } returns "Test HTML Content"
 
         Dispatchers.setMain(testDispatcher)
         coEvery { ttsManager.isStoped } returns MutableStateFlow(true)
@@ -68,7 +76,9 @@ class TaskStudentViewModelTest {
             downloadAsPdfUseCase = DownloadAsPdfUseCase(),
             downloadAsMp3UseCase = DownloadAsMp3UseCase(),
             downloadAsTxtUseCase = DownloadAsTxtUseCase(),
-            orderRepository = orderRepository
+            orderRepository = orderRepository,
+            userPreferences = userPreferences,
+            lastReadRepository = lastReadRepository
         )
     }
 
