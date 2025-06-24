@@ -57,6 +57,7 @@ fun LoginScreen(
     val passwordError by viewmodel.passwordError.collectAsState()
     val loginState by viewmodel.loginState.collectAsState()
     val navigateToMain by viewmodel.navigateToMain.collectAsState()
+    val navigateToPreferences by viewmodel.navigateToPreferences.collectAsState()
     val isLoading by viewmodel.isLoading.collectAsState()
 
     val showErrorDialog by viewmodel.showErrorDialog.collectAsState()
@@ -80,6 +81,14 @@ fun LoginScreen(
     }
 
     if (navigateToMain) {
+        LaunchedEffect(Unit) {
+            navController.navigate(ScreensRoute.Home.route) {
+                popUpTo(ScreensRoute.Login.route) { inclusive = true }
+            }
+        }
+    }
+
+    if (navigateToPreferences) {
         LaunchedEffect(Unit) {
             navController.navigate(ScreensRoute.Preferences.route) {
                 popUpTo(ScreensRoute.Login.route) { inclusive = true }
@@ -210,34 +219,3 @@ fun AnimatedLogo(modifier: Modifier = Modifier) {
             .offset(y = imageOffsetY.value.dp)
     )
 }
-
-
-//@Composable
-//fun AnimatedLogo(modifier: Modifier = Modifier) {
-//    val imageOffsetY = remember { Animatable(-350f) }
-//    var animationPlayed by rememberSaveable { mutableStateOf(false) }
-//
-//    LaunchedEffect(Unit) {
-//        if (!animationPlayed) {
-//            animationPlayed = true
-//            delay(500)
-//            imageOffsetY.animateTo(
-//                targetValue = 0f,
-//                animationSpec = tween(
-//                    durationMillis = 2000,
-//                    easing = {
-//                        OvershootInterpolator(2f).getInterpolation(it)
-//                    }
-//                )
-//            )
-//        }
-//    }
-//
-//    Image(
-//        painter = painterResource(id = R.drawable.wirin_logo_dark),
-//        contentDescription = "Logo",
-//        modifier = modifier
-//            .size(width = 256.dp, height = 256.dp)
-//            .offset(y = imageOffsetY.value.dp)
-//    )
-//}

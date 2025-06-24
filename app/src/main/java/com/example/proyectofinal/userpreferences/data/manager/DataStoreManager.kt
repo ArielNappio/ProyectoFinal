@@ -26,10 +26,10 @@ class DataStoreManager(private val context: Context) {
 
     val preferencesFlow: Flow<UserPreferences> = context.dataStore.data.map { prefs ->
         UserPreferences(
-            fontSize = prefs[FONT_SIZE_KEY] ?: 16f,
+            fontSize = prefs[FONT_SIZE_KEY] ?: 26f,
             fontFamily = prefs[FONT_FAMILY_KEY] ?: ATKINSON_HYPERLEGIBLE_FAMILY_NAME,
             profileImageUri = prefs[PROFILE_IMAGE_URI_KEY],
-            iconSize = prefs[ICON_SIZE_KEY] ?: 24f
+            iconSize = prefs[ICON_SIZE_KEY] ?: 32f
         )
     }
 

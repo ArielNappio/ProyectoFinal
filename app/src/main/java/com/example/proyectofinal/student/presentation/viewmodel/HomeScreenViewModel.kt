@@ -39,7 +39,6 @@ class HomeScreenViewModel(
     private val _iconSize = MutableStateFlow(24.dp)
     val iconSize: StateFlow<Dp> = _iconSize.asStateFlow()
 
-
     init {
         getOrdersManagements()
 

@@ -62,8 +62,8 @@ class TokenManager(private val context: Context) {
 
     suspend fun clearAuthData() {
         context.dataStore.edit {
-            it.remove(TOKEN_KEY)
-            it.remove(USER_ID_KEY)
+            it[TOKEN_KEY] = ""
+            it[USER_ID_KEY] = ""
         }
     }
 }

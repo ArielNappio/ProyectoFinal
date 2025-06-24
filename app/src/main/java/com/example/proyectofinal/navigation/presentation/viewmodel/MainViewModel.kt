@@ -24,9 +24,6 @@ class MainViewModel(
     private val _userState = MutableStateFlow<UiState<UserResponseDto>>(UiState.Loading)
     val userState: StateFlow<UiState<UserResponseDto>> = _userState
 
-    private val _isLoggedIn = MutableStateFlow(false)
-    val isLoggedIn: StateFlow<Boolean> = _isLoggedIn
-
     private val _mainScreenUiState = MutableStateFlow<MainScreenUiState>(MainScreenUiState.Loading)
     val mainScreenUiState: StateFlow<MainScreenUiState> = _mainScreenUiState
 
@@ -90,7 +87,6 @@ class MainViewModel(
     fun logout() {
         viewModelScope.launch {
             tokenManager.clearAuthData()
-            _isLoggedIn.update { false }
             println("MainViewModel: Logout called, token cleared, isLoggedIn set to false") // Add this log
         }
     }

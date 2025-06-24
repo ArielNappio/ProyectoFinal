@@ -1,6 +1,5 @@
 package com.example.proyectofinal.navigation
 
-//import com.example.proyectofinal.auth.presentation.view.LoginScreen
 import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.compose.runtime.Composable
@@ -78,11 +77,12 @@ fun NavigationComponent(
             arguments = listOf(
                 navArgument("taskId") { type = NavType.IntType }
             )
-        ){ navBackStackEntry ->
+        ) { navBackStackEntry ->
             val taskId = navBackStackEntry.arguments?.getInt("taskId") ?: -1
             TaskStudent(
-                taskId = taskId ,
-                navController = navController)
+                taskId = taskId,
+                navController = navController
+            )
         }
         composable(route = ScreensRoute.Favorites.route) {
             FavoritesScreen(modifier, navController)
@@ -111,7 +111,6 @@ fun NavigationComponent(
                 else -> MailboxType.INBOX
             }
             InboxScreen(
-//                modifier = modifier,
                 navController = navController,
                 mailboxType = mailboxType,
                 onMessageClick = { }
@@ -148,7 +147,6 @@ fun NavigationComponent(
             )
         }
 
-
         composable(route = ScreensRoute.Preferences.route) {
             FontPreferencesScreen { navController.navigate(ScreensRoute.Home.route) }
         }
@@ -164,8 +162,8 @@ fun NavigationComponent(
         }
 
         composable(
-            route = "${ScreensRoute.UpdateUser.route}/{userId}" ,
-            arguments = listOf(navArgument("userId") { type = NavType.StringType})
+            route = "${ScreensRoute.UpdateUser.route}/{userId}",
+            arguments = listOf(navArgument("userId") { type = NavType.StringType })
         ) { backStackEntry ->
             val userId = backStackEntry.arguments?.getString("userId") ?: 0
             UpdateUserScreen(
@@ -173,7 +171,6 @@ fun NavigationComponent(
                 navController = navController
             )
         }
-
 
         composable(route = ScreensRoute.ManageUsers.route) {
             ManageUserScreen(navController = navController)

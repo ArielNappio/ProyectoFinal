@@ -60,7 +60,6 @@ fun StudentProfileScreen(
     val themeViewModel = koinViewModel<ThemeViewModel>()
     val preferencesViewModel = koinViewModel<PreferencesViewModel>()
     val tokenManager: TokenManager = koinInject()
-
     val user = tokenManager.user.collectAsState(initial = null).value
     val context = LocalContext.current
 

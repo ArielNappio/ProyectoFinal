@@ -13,7 +13,8 @@ class PreferencesViewModel(
     private val repository: UserPreferencesRepository
 ) : ViewModel() {
 
-    private val _preferences = MutableStateFlow(UserPreferences(16f, "Default", "",56f))
+    private val _preferences =
+        MutableStateFlow(UserPreferences(fontSize = 26f, fontFamily = "Default", iconSize = 32f))
     val preferences: StateFlow<UserPreferences> = _preferences.asStateFlow()
 
     init {
@@ -42,7 +43,6 @@ class PreferencesViewModel(
             repository.saveFontFamily(family)
         }
     }
-
 
     fun updateProfileImageUri(email: String, uri: String) {
         viewModelScope.launch {

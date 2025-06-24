@@ -48,6 +48,9 @@ class LoginViewModel(
     private val _navigateToMain = MutableStateFlow<Boolean>(false)
     val navigateToMain: StateFlow<Boolean> = _navigateToMain.asStateFlow()
 
+    private val _navigateToPreferences = MutableStateFlow<Boolean>(false)
+    val navigateToPreferences: StateFlow<Boolean> = _navigateToPreferences.asStateFlow()
+
     private val _showErrorDialog = MutableStateFlow(false)
     val showErrorDialog: StateFlow<Boolean> = _showErrorDialog.asStateFlow()
 
@@ -55,7 +58,6 @@ class LoginViewModel(
         _isLoading.update { true }
         checkExistingToken()
     }
-
 
     fun onLoginClick() {
         viewModelScope.launch {
@@ -97,7 +99,7 @@ class LoginViewModel(
                                         }
                                     }
                                 }
-
+                                _navigateToPreferences.update { true }
                                 _loginState.update { UiState.Success(response.data) }
                             }
                         }
@@ -130,9 +132,11 @@ class LoginViewModel(
             val token = tokenManager.token.firstOrNull()
             if (!token.isNullOrEmpty() && token != "") {
                 _navigateToMain.update { true }
+                _navigateToPreferences.update { false }
                 println("LoginViewModel: Existing token found, navigating to MainScreen")
             } else {
                 _navigateToMain.update { false }
+                _navigateToPreferences.update { false }
                 _isLoading.update { false }
                 println("LoginViewModel: No existing token found")
             }
