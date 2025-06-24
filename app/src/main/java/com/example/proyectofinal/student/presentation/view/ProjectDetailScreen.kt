@@ -17,7 +17,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.AudioFile
 import androidx.compose.material.icons.filled.Description
 import androidx.compose.material.icons.filled.PlayArrow
@@ -33,7 +33,6 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -71,10 +70,19 @@ fun ProjectDetailScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Detalles del Proyecto") },
+                title = {
+                    AppText(
+                        text = "Detalles del Proyecto",
+                        isTitle = true
+                    )
+                },
                 navigationIcon = {
                     IconButton(onClick = { navController.popBackStack() }) {
-                        Icon(Icons.Default.ArrowBack, contentDescription = "Volver")
+                        Icon(
+                            Icons.AutoMirrored.Filled.ArrowBack,
+                            contentDescription = "Volver",
+                            modifier = Modifier.size(iconSize)
+                        )
                     }
                 }
             )
@@ -157,10 +165,11 @@ private fun ProjectDetailContent(
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
         item {
-            ProjectCard(project = project,
+            ProjectCard(
+                project = project,
                 onClick = {},
-                onToggleFavorite ={ onToggleFavorite(project.id.toString(), project.isFavorite) },
-            iconSize = iconSize
+                onToggleFavorite = { onToggleFavorite(project.id.toString(), project.isFavorite) },
+                iconSize = iconSize
             )
         }
 
@@ -182,6 +191,7 @@ private fun ProjectDetailContent(
         }
     }
 }
+
 @Composable
 fun TaskItemCard(
     task: OrderStudent,
@@ -214,7 +224,7 @@ fun TaskItemCard(
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically
-            ){
+            ) {
                 Icon(
                     imageVector = Icons.Default.Description,
                     contentDescription = "Paginas",
@@ -225,8 +235,8 @@ fun TaskItemCard(
                 )
                 Spacer(modifier = Modifier.width(2.dp))
                 AppText(
-                    text = "${task.lastRead ?: 0}/${task.pageCount ?: 0} Leídas",
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                    text = "${task.lastRead}/${task.pageCount} Leídas",
+                    color = colorScheme.onSurfaceVariant
                 )
             }
 
@@ -242,19 +252,19 @@ fun TaskItemCard(
                 horizontalArrangement = Arrangement.SpaceEvenly
             ) {
 
-                    Column(
-                        modifier = Modifier
-                            .clickable { onViewAnnotations() }
-                            .padding(8.dp),
-                        horizontalAlignment = Alignment.CenterHorizontally
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.AudioFile, // ✏️
-                            contentDescription = "Ver anotaciones",
-                            tint = colorScheme.onBackground,
-                            modifier = Modifier.size(iconSize)
-                        )
-                    }
+                Column(
+                    modifier = Modifier
+                        .clickable { onViewAnnotations() }
+                        .padding(8.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.AudioFile, // ✏️
+                        contentDescription = "Ver anotaciones",
+                        tint = colorScheme.onBackground,
+                        modifier = Modifier.size(iconSize)
+                    )
+                }
 
                 // ▶️ Botón de ver en app
                 Column(

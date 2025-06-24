@@ -1,5 +1,6 @@
 package com.example.proyectofinal.student.presentation.viewmodel
 
+import android.util.Log
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModel
@@ -31,11 +32,16 @@ class ProjectDetailViewModel(
     private val _iconSize = MutableStateFlow(24.dp)
     val iconSize: StateFlow<Dp> = _iconSize.asStateFlow()
 
+    private val _fontSize = MutableStateFlow(24.dp)
+    val fontSize: StateFlow<Dp> = _fontSize.asStateFlow()
+
     init {
         viewModelScope.launch {
             repository.getUserPreferences().collect { prefs ->
                 _iconSize.value = prefs.iconSize.dp
-                println("Icon size updated to del projectDetailViewModel: ${iconSize.value}")
+                _fontSize.value = prefs.fontSize.dp
+                Log.d("ProjectDetailViewModel", "Icon size updated to: ${_iconSize.value}")
+                Log.d("ProjectDetailViewModel", "Font size updated to: ${_fontSize.value}")
             }
         }
     }
