@@ -27,8 +27,10 @@ val lastReadModule = module {
         Room.databaseBuilder(
             get(),
             LastPageReadDatabase::class.java,
-            "app_database"
-        ).build()
+            "last_read_database"
+        )
+            .fallbackToDestructiveMigration()
+            .build()
     }
 
     single { get<LastPageReadDatabase>().lastPageReadDao() }

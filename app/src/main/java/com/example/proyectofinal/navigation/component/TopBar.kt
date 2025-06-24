@@ -7,12 +7,17 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.requiredHeight
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
@@ -55,9 +60,9 @@ fun TopBar(navController: NavController) {
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .height(barHeight)
             .background(if (LocalTheme.current.isDark) Color.Black else Color.White)
-            .padding(horizontal = 16.dp),
+            .padding(top = WindowInsets.statusBars.asPaddingValues().calculateTopPadding(), start = 16.dp, end = 16.dp)
+            .requiredHeight(barHeight + WindowInsets.statusBars.asPaddingValues().calculateTopPadding()),
         contentAlignment = Alignment.Center
     ) {
         Row(

@@ -15,6 +15,10 @@ import com.example.proyectofinal.audio.player.AudioPlayerManager
 import com.example.proyectofinal.audio.recorder.AudioRecorderManager
 import com.example.proyectofinal.auth.data.tokenmanager.TokenManager
 import com.example.proyectofinal.core.network.NetworkResponse
+import com.example.proyectofinal.orderFeedback.domain.model.OrderFeedback
+import com.example.proyectofinal.orderFeedback.domain.usecase.GetFeedbackUseCase
+import com.example.proyectofinal.orderFeedback.domain.usecase.SaveFeedbackUseCase
+import com.example.proyectofinal.orderFeedback.domain.usecase.SendFeedbackUseCase
 import com.example.proyectofinal.orderManagement.data.repository.LastReadRepository
 import com.example.proyectofinal.orderManagement.domain.model.OrderDelivered
 import com.example.proyectofinal.orderManagement.domain.model.OrderParagraph
@@ -55,7 +59,10 @@ class TaskStudentViewModel(
     private val tokenManager: TokenManager,
     private val orderRepository: OrderRepository,
     private val userPreferences: DataStoreManager,
-    private val lastReadRepository: LastReadRepository
+    private val lastReadRepository: LastReadRepository,
+    private val sendFeedbackUseCase: SendFeedbackUseCase,
+    private val saveFeedbackUseCase: SaveFeedbackUseCase,
+    private val getFeedbackUseCase: GetFeedbackUseCase,
 ): ViewModel() {
 
     private val _projectState = MutableStateFlow<NetworkResponse<OrderDelivered>>(NetworkResponse.Loading())
@@ -163,6 +170,23 @@ class TaskStudentViewModel(
         ""
     )
 
+    // Feedback State
+
+    private val _feedbackState = MutableStateFlow<Boolean?>(null)
+    val feedbackState: StateFlow<Boolean?> = _feedbackState
+
+    private val _rating = MutableStateFlow(0)
+    val rating: StateFlow<Int> = _rating.asStateFlow()
+
+    private val _feedbackText = MutableStateFlow("")
+    val feedbackText: StateFlow<String> = _feedbackText.asStateFlow()
+
+    private val _isRecording = MutableStateFlow(false)
+    val isRecording: StateFlow<Boolean> = _isRecording.asStateFlow()
+
+    private val _recordedFilePath = MutableStateFlow<String?>(null)
+    val recordedFilePath: StateFlow<String?> = _recordedFilePath.asStateFlow()
+
     init {
         viewModelScope.launch {
             ttsManager.isStoped.collect { stopped ->
@@ -257,7 +281,6 @@ class TaskStudentViewModel(
     fun showAnnotations(){
         _showAnnotations.value = !_showAnnotations.value
     }
-
 
     fun showDownloadDialog(){
         _showDownloadDialog.value = !showDownloadDialog.value
@@ -363,26 +386,6 @@ class TaskStudentViewModel(
                 loadCommentsByTaskId(currentTaskId.value?: 0)
             }
         }
-    }
-
-    fun startFeedbackRecording() {
-        currentAudioFile = audioRecorderManager.startRecording()
-    }
-
-    fun stopFeedbackRecording() {
-        val recordedFile = audioRecorderManager.stopRecording()
-        currentAudioFile = recordedFile
-        _recordedFeedbackFilePath.value = recordedFile?.absolutePath
-    }
-
-    fun deleteFeedbackRecording() {
-        currentAudioFile?.let { file ->
-            if (file.exists()) {
-                file.delete()
-            }
-        }
-        currentAudioFile = null
-        _recordedFeedbackFilePath.value = null
     }
 
     private fun manageFileDownload(
@@ -524,6 +527,80 @@ class TaskStudentViewModel(
 
     fun closeFontMenu() {
         _showFontsMenu.value = false
+    }
+
+    fun loadFeedback(orderId: Int) {
+        viewModelScope.launch {
+            _feedbackState.value = getFeedbackUseCase(orderId)?.wasSent ?: false
+        }
+    }
+
+    fun sendFeedbackToApi(orderId: Int, feedbackText: String, stars: Int) {
+        viewModelScope.launch {
+            val feedbackLocal = getFeedbackUseCase(orderId)
+            if (feedbackLocal?.wasSent == true) {
+                return@launch
+            }
+
+            val studentId = tokenManager.userId.first() ?: return@launch
+
+            try {
+                val feedback = OrderFeedback(
+                    studentId = studentId,
+                    feedbackText = feedbackText,
+                    stars = stars,
+                    orderId = orderId
+                )
+
+                println("Feedback to send: $feedback.studentId, $feedback.feedbackText, $feedback.stars, $feedback.orderId")
+
+                sendFeedbackUseCase(feedback).collect { response ->
+                    when(response) {
+                        is NetworkResponse.Success -> {
+                            saveFeedbackUseCase(orderId, true)
+                            _feedbackState.value = true
+                        }
+                        is NetworkResponse.Failure -> {
+                            Log.e("Feedback", "Error al enviar feedback: ${response.error}")
+                        }
+                        is NetworkResponse.Loading -> {
+                            // mostrar loading si querés
+                        }
+                    }
+                }
+
+            } catch (e: Exception) {
+                Log.e("Feedback", "Excepción al enviar feedback: ${e.message}")
+            }
+        }
+    }
+
+    fun setRating(value: Int) {
+        _rating.value = value
+    }
+
+    fun setFeedbackText(text: String) {
+        _feedbackText.value = text
+    }
+
+    fun startFeedbackRecording() {
+        currentAudioFile = audioRecorderManager.startRecording()
+    }
+
+    fun stopFeedbackRecording() {
+        val recordedFile = audioRecorderManager.stopRecording()
+        currentAudioFile = recordedFile
+        _recordedFeedbackFilePath.value = recordedFile?.absolutePath
+    }
+
+    fun deleteFeedbackRecording() {
+        currentAudioFile?.let { file ->
+            if (file.exists()) {
+                file.delete()
+            }
+        }
+        currentAudioFile = null
+        _recordedFeedbackFilePath.value = null
     }
 
 }

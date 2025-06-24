@@ -7,7 +7,7 @@ import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
 import com.example.proyectofinal.orderManagement.data.entity.OrderEntity
 
-@Database(entities = [OrderEntity::class], version = 4, exportSchema = false)
+@Database(entities = [OrderEntity::class], version = 6, exportSchema = false)
 @TypeConverters(Converters::class)
 abstract class OrderDatabase : RoomDatabase() {
     abstract fun orderDao(): OrderDao
