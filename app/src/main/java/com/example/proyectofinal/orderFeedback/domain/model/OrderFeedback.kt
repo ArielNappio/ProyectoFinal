@@ -1,5 +1,8 @@
 package com.example.proyectofinal.orderFeedback.domain.model
 
+import kotlinx.serialization.Serializable
+
+@Serializable
 data class OrderFeedback(
     val studentId: String,
     val feedbackText: String,

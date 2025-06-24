@@ -28,6 +28,4 @@ class OrderFeedbackImpl(private val ktorClient: HttpClient) : OrderFeedbackProvi
             emit(NetworkResponse.Failure(error = e.toString()))
         }
     }
-
-
 }

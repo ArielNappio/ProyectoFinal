@@ -6,7 +6,7 @@ import com.example.proyectofinal.orderManagement.data.entity.LastReadPageEntity
 
 @Database(
     entities = [LastReadPageEntity::class],
-    version = 1,
+    version = 4,
     exportSchema = false
 )
 abstract class LastPageReadDatabase: RoomDatabase() {

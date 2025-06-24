@@ -15,12 +15,14 @@ import androidx.compose.animation.scaleOut
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -30,12 +32,17 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.MenuBook
 import androidx.compose.material.icons.automirrored.filled.VolumeUp
+import androidx.compose.material.icons.filled.Android
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.ArrowForward
 import androidx.compose.material.icons.filled.Create
@@ -44,6 +51,8 @@ import androidx.compose.material.icons.filled.Description
 import androidx.compose.material.icons.filled.Feedback
 import androidx.compose.material.icons.filled.FileDownload
 import androidx.compose.material.icons.filled.FontDownload
+import androidx.compose.material.icons.filled.Mic
+import androidx.compose.material.icons.filled.MicNone
 import androidx.compose.material.icons.filled.Pause
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Star
@@ -72,14 +81,19 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
+import com.example.proyectofinal.audio.speechrecognizer.SpeechRecognizerManager
 import com.example.proyectofinal.core.theme.ATKINSON_HYPERLEGIBLE_FAMILY_NAME
 import com.example.proyectofinal.core.theme.OPEN_DYSLEXIC_FAMILY_NAME
 import com.example.proyectofinal.student.presentation.component.CommentAudioCard
@@ -98,6 +112,28 @@ import org.koin.androidx.compose.koinViewModel
 fun TaskStudent(taskId: Int, navController: NavHostController) {
 
     val viewModel = koinViewModel<TaskStudentViewModel>()
+
+    val context = LocalContext.current
+
+    val speechRecognizerManager = remember {
+        SpeechRecognizerManager(
+            context = context,
+            onResult = { result ->
+                viewModel.setFeedbackText(result)
+            },
+            onError = { error ->
+                Log.e("SpeechRecognizer", error)
+            }
+        )
+    }
+
+    DisposableEffect(Unit) {
+        onDispose {
+            speechRecognizerManager.stopListening()
+        }
+    }
+
+
     val text by viewModel.textoPorPagina.collectAsState()
     val paragraphs by viewModel.paragraphs.collectAsState()
     val isSpeaking by viewModel.isSpeaking.collectAsState()
@@ -129,12 +165,11 @@ fun TaskStudent(taskId: Int, navController: NavHostController) {
     val currentlyPlayingPath by viewModel.currentlyPlayingPath.collectAsState()
     val currentPosition by viewModel.currentPosition.collectAsState()
 
-    var rating by remember { mutableStateOf(0) }
 
     var isRecording by remember { mutableStateOf(false) }
     var hasRecording by remember { mutableStateOf(false) }
     var isPlaying by remember { mutableStateOf(false) }
-    val recordedFilePath by viewModel.recordedFeedbackFilePath.collectAsState()
+
 
     val currentContext = LocalContext.current
 
@@ -142,23 +177,31 @@ fun TaskStudent(taskId: Int, navController: NavHostController) {
         getFontFamilyFromString(selectedFontFamily ?: ATKINSON_HYPERLEGIBLE_FAMILY_NAME)
     }
 
+    val feedbackState by viewModel.feedbackState.collectAsState()
+    val rating by viewModel.rating.collectAsState()
+    val feedbackText by viewModel.feedbackText.collectAsState()
+    val isRecordingFeedback by viewModel.isRecording.collectAsState()
+    val recordedFilePath by viewModel.recordedFeedbackFilePath.collectAsState()
+
     LaunchedEffect(taskId) {
         viewModel.loadProject(taskId)
         viewModel.saveTaskId(taskId)
         viewModel.loadCommentsByTaskId(taskId)
-        println("DEBUG de TEXT: $text")
+        viewModel.loadFeedback(taskId)
     }
 
-    LaunchedEffect(paragraphs) {
-        println("🔥 Se actualizaron los párrafos:")
-        paragraphs.forEach {
-            println("📄 Página: ${it.pageNumber}, Texto: ${it.paragraphText}")
-        }
-    }
+//    LaunchedEffect(paragraphs) {
+//        println("🔥 Se actualizaron los párrafos:")
+//        paragraphs.forEach {
+//            println("📄 Página: ${it.pageNumber}, Texto: ${it.paragraphText}")
+//        }
+//    }
 
     DisposableEffect(Unit) {
         onDispose {
-            viewModel.saveLastPage(taskId, currentPage+1)
+            viewModel.saveLastPage(taskId, currentPage + 1)
+            println("DEBUG: currentTaskId de la screen: $taskId")
+            println("DEBUG: feedbackState: $feedbackState")
         }
     }
 
@@ -198,7 +241,7 @@ fun TaskStudent(taskId: Int, navController: NavHostController) {
                     label = "Volver",
                     onClick = {
                         navController.popBackStack()
-                        viewModel.saveLastPage(taskId, currentPage+1)
+                        viewModel.saveLastPage(taskId, currentPage + 1)
                     }
                 )
                 AccessibleIconButton(
@@ -236,8 +279,8 @@ fun TaskStudent(taskId: Int, navController: NavHostController) {
             }
         }
 
-            // Contenido scrolleable
-        Box(modifier = Modifier.weight(1f)){
+        // Contenido scrolleable
+        Box(modifier = Modifier.weight(1f)) {
             Column(
                 modifier = Modifier
                     .fillMaxSize()
@@ -263,23 +306,27 @@ fun TaskStudent(taskId: Int, navController: NavHostController) {
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            if(!isFirstPage){
+            if (!isFirstPage) {
                 IconButton(
                     onClick = { viewModel.previousPage() },
                     enabled = currentPageIndex > 0,
                     modifier = Modifier
                         .size(iconButtonSize)
-                        .background(Color(0xFFFFA500)
-                             ,shape = RoundedCornerShape(32.dp)
+                        .background(
+                            Color(0xFFFFA500), shape = RoundedCornerShape(32.dp)
                         )
                         .padding(8.dp)
                 ) {
-                    Icon(Icons.Default.ArrowBack, contentDescription = "Anterior", tint = Color.White)
+                    Icon(
+                        Icons.Default.ArrowBack,
+                        contentDescription = "Anterior",
+                        tint = Color.White
+                    )
                 }
-            }
-            else {
-                Spacer(modifier = Modifier
-                    .size(iconButtonSize)
+            } else {
+                Spacer(
+                    modifier = Modifier
+                        .size(iconButtonSize)
                 )
             }
             Text(
@@ -293,27 +340,32 @@ fun TaskStudent(taskId: Int, navController: NavHostController) {
             )
 
             IconButton(
-                onClick = { 
-                    if(isLastPage) {
-                        Log.d("DEBUG", "Última página: mostrando diálogo")
-                        viewModel.showFeedback()
-                    }
-                    else {
+                onClick = {
+                    if (isLastPage) {
+                        if (feedbackState == false) {
+                            viewModel.showFeedback()
+                        }
+                    } else {
                         viewModel.nextPage()
                     }
-                          },
+                },
                 modifier = Modifier
                     .size(iconButtonSize)
                     .background(Color(0xFFFFA500), shape = RoundedCornerShape(32.dp))
                     .padding(8.dp)
             ) {
-                Icon(if(isLastPage){
-                    Icons.Default.Feedback
-                }
-                        else {
-                    Icons.Default.ArrowForward
-                },
-                    contentDescription = "Siguiente", tint = Color.White)
+                Icon(
+                    if (isLastPage) {
+                        if (feedbackState == false) {
+                            Icons.Default.Feedback
+                        } else {
+                            Icons.Default.Android
+                        }
+                    } else {
+                        Icons.Default.ArrowForward
+                    },
+                    contentDescription = "Siguiente", tint = Color.White
+                )
             }
         }
     }
@@ -449,14 +501,14 @@ fun TaskStudent(taskId: Int, navController: NavHostController) {
 
     // dialog fuente
 
-    if(showFont){
+    if (showFont) {
         Box(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(top = 100.dp)
                 .background(Color.Black.copy(alpha = 0.5f)) // Fondo difuminado
                 .clickable(onClick = { viewModel.showFont() }) // Toca afuera para cerrar
-        ){
+        ) {
             Box(
                 modifier = Modifier
                     .padding(16.dp)
@@ -498,7 +550,9 @@ fun TaskStudent(taskId: Int, navController: NavHostController) {
         }
     }
 
-    if(showFontsMenu){
+    //Dropdownmenu de la fuente
+
+    if (showFontsMenu) {
         Box(
             modifier = Modifier
                 .fillMaxWidth()
@@ -517,7 +571,13 @@ fun TaskStudent(taskId: Int, navController: NavHostController) {
                 onDismissRequest = { viewModel.closeFontMenu() },
                 modifier = Modifier.background(MaterialTheme.colorScheme.surface)
             ) {
-                val fonts = listOf("Sans", "Serif", "Monospace", ATKINSON_HYPERLEGIBLE_FAMILY_NAME, OPEN_DYSLEXIC_FAMILY_NAME)
+                val fonts = listOf(
+                    "Sans",
+                    "Serif",
+                    "Monospace",
+                    ATKINSON_HYPERLEGIBLE_FAMILY_NAME,
+                    OPEN_DYSLEXIC_FAMILY_NAME
+                )
                 fonts.forEach { fontName ->
                     DropdownMenuItem(
                         text = {
@@ -535,7 +595,6 @@ fun TaskStudent(taskId: Int, navController: NavHostController) {
             }
         }
     }
-
 
     // DIALOG DE DESCARGAS
 
@@ -587,7 +646,11 @@ fun TaskStudent(taskId: Int, navController: NavHostController) {
                         modifier = Modifier.fillMaxWidth(),
                         colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF3B6EF6))
                     ) {
-                        Text(text = "Cancelar", color = Color.White, style = MaterialTheme.typography.titleMedium)
+                        Text(
+                            text = "Cancelar",
+                            color = Color.White,
+                            style = MaterialTheme.typography.titleMedium
+                        )
                     }
                 }
             }
@@ -632,7 +695,7 @@ fun TaskStudent(taskId: Int, navController: NavHostController) {
                     ) {
                         repeat(5) { index ->
                             IconButton(onClick = {
-                                rating = index + 1
+                                viewModel.setRating(index + 1)
                             }) {
                                 Icon(
                                     imageVector = Icons.Default.Star,
@@ -673,13 +736,14 @@ fun TaskStudent(taskId: Int, navController: NavHostController) {
                                     modifier = Modifier.fillMaxWidth()
                                 ) {
 
-                                    IconButton(onClick = {
-                                        if (currentlyPlayingPath == path && isPlaying) {
-                                            viewModel.stopAudio()
-                                        } else {
-                                            viewModel.playAudio(path)
-                                        }
-                                    },
+                                    IconButton(
+                                        onClick = {
+                                            if (currentlyPlayingPath == path && isPlaying) {
+                                                viewModel.stopAudio()
+                                            } else {
+                                                viewModel.playAudio(path)
+                                            }
+                                        },
                                         modifier = Modifier.weight(1f)
                                     ) {
                                         Icon(
@@ -695,9 +759,10 @@ fun TaskStudent(taskId: Int, navController: NavHostController) {
                                             .weight(1f)
                                     )
 
-                                    IconButton(onClick = {
-                                        viewModel.deleteFeedbackRecording()
-                                    },
+                                    IconButton(
+                                        onClick = {
+                                            viewModel.deleteFeedbackRecording()
+                                        },
                                         modifier = Modifier.weight(1f)
                                     ) {
                                         Icon(
@@ -713,23 +778,84 @@ fun TaskStudent(taskId: Int, navController: NavHostController) {
 
                     Spacer(modifier = Modifier.height(20.dp))
 
-                    // MicControl para grabar
-                    MicControl(
-                        isRecording = isRecording,
-                        onStartRecording = {
-                            isRecording = true
-                            viewModel.startFeedbackRecording()
-                        },
-                        onStopRecording = {
-                            isRecording = false
-                            viewModel.stopFeedbackRecording()
+                    var isListening by remember { mutableStateOf(false) }
+                    val focusRequester = remember { FocusRequester() }
+
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clip(RoundedCornerShape(24.dp))
+                            .background(MaterialTheme.colorScheme.surfaceVariant)
+                            .padding(horizontal = 12.dp, vertical = 8.dp)
+                    ) {
+                        BasicTextField(
+                            value = feedbackText,
+                            onValueChange = { viewModel.setFeedbackText(it) },
+                            modifier = Modifier
+                                .weight(1f)
+                                .focusRequester(focusRequester),
+                            decorationBox = { innerTextField ->
+                                Box(
+                                    modifier = Modifier
+                                        .padding(8.dp)
+                                        .defaultMinSize(minHeight = 48.dp)
+                                ) {
+                                    if (feedbackText.isBlank()) {
+                                        Text(
+                                            text = "Escribí tu opinión acá...",
+                                            color = Color.Gray
+                                        )
+                                    }
+                                    innerTextField()
+                                }
+                            },
+                            maxLines = 5,
+                            keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Done),
+                            keyboardActions = KeyboardActions(onDone = {
+                                // opcional: enviar texto al apretar Enter
+                            })
+                        )
+
+                        Spacer(modifier = Modifier.width(8.dp))
+
+
+                        Box(
+                            modifier = Modifier
+                                .size(48.dp)
+                                .clip(CircleShape)
+                                .background(Color(0xFF4CAF50))
+                                .pointerInput(Unit) {
+                                    detectTapGestures(
+                                        onPress = {
+                                            isListening = true
+                                            speechRecognizerManager.startListening()
+                                            tryAwaitRelease()
+                                            isListening = false
+                                            speechRecognizerManager.stopListening()
+                                        }
+                                    )
+                                },
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Icon(
+                                imageVector = if (isListening) Icons.Default.Mic else Icons.Default.MicNone,
+                                contentDescription = null,
+                                tint = Color.White
+                            )
+
                         }
-                    )
+                    }
 
                     Spacer(modifier = Modifier.height(20.dp))
 
                     Button(
                         onClick = {
+                            viewModel.sendFeedbackToApi(
+                                orderId = taskId,
+                                feedbackText = feedbackText,
+                                stars = rating
+                            )
                             viewModel.showFeedback()
                         },
                         modifier = Modifier.fillMaxWidth(),
