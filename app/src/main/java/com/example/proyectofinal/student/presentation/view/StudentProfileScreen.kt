@@ -1,5 +1,6 @@
 package com.example.proyectofinal.student.presentation.view
 
+import android.content.Intent
 import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -16,6 +17,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
@@ -30,12 +32,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import coil.compose.rememberAsyncImagePainter
 import com.example.proyectofinal.R
 import com.example.proyectofinal.auth.data.tokenmanager.TokenManager
 import com.example.proyectofinal.core.theme.LocalTheme
@@ -45,12 +49,7 @@ import com.example.proyectofinal.userpreferences.presentation.component.AppText
 import com.example.proyectofinal.userpreferences.presentation.viewmodel.PreferencesViewModel
 import org.koin.androidx.compose.koinViewModel
 import org.koin.compose.koinInject
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.compose.ui.platform.LocalContext
-import coil.compose.rememberAsyncImagePainter
-import android.content.Intent
-import androidx.compose.ui.layout.ContentScale
+import androidx.core.net.toUri
 
 
 @Composable
@@ -59,11 +58,10 @@ fun StudentProfileScreen(
     navController: NavController,
 ) {
     val themeViewModel = koinViewModel<ThemeViewModel>()
-    val preferencesViewModel = koinViewModel<PreferencesViewModel>()  // Aquí lo obtenés directamente
+    val preferencesViewModel = koinViewModel<PreferencesViewModel>()
     val tokenManager: TokenManager = koinInject()
 
     val user = tokenManager.user.collectAsState(initial = null).value
-    val preferences by preferencesViewModel.preferences.collectAsState()
     val context = LocalContext.current
 
     val imageUri = remember { mutableStateOf<Uri?>(null) }
@@ -71,7 +69,7 @@ fun StudentProfileScreen(
     LaunchedEffect(user?.email) {
         user?.email?.let { email ->
             preferencesViewModel.getProfileImageUri(email) { uriString ->
-                uriString?.let { imageUri.value = Uri.parse(it) }
+                uriString?.let { imageUri.value = it.toUri() }
             }
         }
     }
@@ -90,9 +88,6 @@ fun StudentProfileScreen(
             }
         }
     }
-
-
-
 
     Column(
         modifier = modifier
@@ -115,11 +110,10 @@ fun StudentProfileScreen(
                     .size(120.dp)
                     .clip(CircleShape)
                     .background(Color.DarkGray)
-                    .clickable(){
+                    .clickable {
                         launcher.launch(arrayOf("image/*"))
                     },
-                        contentScale = ContentScale.Crop //  Ajusta la imagen al recuardo
-
+                contentScale = ContentScale.Crop
             )
 
             Spacer(modifier = Modifier.width(24.dp))
@@ -154,9 +148,9 @@ fun StudentProfileScreen(
         Button(
             onClick = { navController.navigate(ScreensRoute.Preferences.route) },
             modifier = Modifier
+                .wrapContentSize()
                 .fillMaxWidth()
-                .padding(vertical = 4.dp)
-                .height(48.dp),
+                .padding(vertical = 4.dp),
             colors = ButtonDefaults.buttonColors(
                 containerColor = Color(0xFF3A66FF),
                 contentColor = Color.White
@@ -175,10 +169,10 @@ fun StudentProfileScreen(
                     popUpTo(0) { inclusive = true }
                     launchSingleTop = true
                 }
-                      },
+            },
             modifier = Modifier
-                .fillMaxWidth()
-                .height(48.dp),
+                .wrapContentSize()
+                .fillMaxWidth(),
             colors = ButtonDefaults.buttonColors(
                 containerColor = Color(0xFFE53935),
                 contentColor = Color.White
