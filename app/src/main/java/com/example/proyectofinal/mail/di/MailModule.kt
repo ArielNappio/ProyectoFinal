@@ -1,5 +1,7 @@
 package com.example.proyectofinal.mail.di
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.room.Room
 import com.example.proyectofinal.mail.data.local.MailDatabase
 import com.example.proyectofinal.mail.data.provider.MailProviderImpl
@@ -35,6 +37,7 @@ val mailDatabaseModule = module {
 
 }
 
+@RequiresApi(Build.VERSION_CODES.O)
 val mailModule = module {
     single<MailProvider> { MailProviderImpl(get(), get()) }
     single<MailRepository> { MailRepoImpl(get(), get()) }

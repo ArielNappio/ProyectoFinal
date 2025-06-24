@@ -1,6 +1,8 @@
 package com.example.proyectofinal
 
 import android.app.Application
+import android.os.Build
+import androidx.annotation.RequiresApi
 import com.example.proyectofinal.audio.di.audioModule
 import com.example.proyectofinal.audio.di.databaseModule
 import com.example.proyectofinal.auth.di.repositoryModule
@@ -10,6 +12,7 @@ import com.example.proyectofinal.core.di.useCaseModule
 import com.example.proyectofinal.core.di.viewModelModule
 import com.example.proyectofinal.mail.di.mailDatabaseModule
 import com.example.proyectofinal.mail.di.mailModule
+import com.example.proyectofinal.orderFeedback.di.feedbackModule
 import com.example.proyectofinal.orderManagement.di.orderDatabaseModule
 import com.example.proyectofinal.orderManagement.di.orderModule
 import com.example.proyectofinal.student.data.di.CommentsRepositoryModule
@@ -26,6 +29,7 @@ import org.koin.core.context.GlobalContext.startKoin
 
 class WirinApplication: Application() {
 
+    @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate() {
         super.onCreate()
 
@@ -51,7 +55,8 @@ class WirinApplication: Application() {
                 pdfRemoteRepositoryModule,
                 orderModule,
                 orderDatabaseModule,
-                userModule
+                userModule,
+                feedbackModule
             )
         }
 
