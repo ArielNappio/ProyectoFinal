@@ -13,6 +13,7 @@ import com.example.proyectofinal.core.di.viewModelModule
 import com.example.proyectofinal.mail.di.mailDatabaseModule
 import com.example.proyectofinal.mail.di.mailModule
 import com.example.proyectofinal.orderFeedback.di.feedbackModule
+import com.example.proyectofinal.orderManagement.di.lastReadModule
 import com.example.proyectofinal.orderManagement.di.orderDatabaseModule
 import com.example.proyectofinal.orderManagement.di.orderModule
 import com.example.proyectofinal.student.data.di.CommentsRepositoryModule
@@ -56,7 +57,9 @@ class WirinApplication: Application() {
                 orderModule,
                 orderDatabaseModule,
                 userModule,
-                feedbackModule
+                feedbackModule,
+                userModule,
+                lastReadModule
             )
         }
 

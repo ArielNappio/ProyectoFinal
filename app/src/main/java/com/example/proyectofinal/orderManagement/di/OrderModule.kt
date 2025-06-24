@@ -1,8 +1,10 @@
 package com.example.proyectofinal.orderManagement.di
 
 import androidx.room.Room
+import com.example.proyectofinal.orderManagement.data.local.LastPageReadDatabase
 import com.example.proyectofinal.orderManagement.data.local.OrderDatabase
 import com.example.proyectofinal.orderManagement.data.provider.OrderManagementImpl
+import com.example.proyectofinal.orderManagement.data.repository.LastReadRepository
 import com.example.proyectofinal.orderManagement.data.repository.OrderRepositoryImpl
 import com.example.proyectofinal.orderManagement.domain.provider.OrderManagementProvider
 import com.example.proyectofinal.orderManagement.domain.repository.OrderRepository
@@ -18,6 +20,20 @@ val orderDatabaseModule = module {
             .build()
     }
     single { get<OrderDatabase>().orderDao() }
+}
+
+val lastReadModule = module {
+    single {
+        Room.databaseBuilder(
+            get(),
+            LastPageReadDatabase::class.java,
+            "app_database"
+        ).build()
+    }
+
+    single { get<LastPageReadDatabase>().lastPageReadDao() }
+
+    single { LastReadRepository(get()) }
 }
 
 

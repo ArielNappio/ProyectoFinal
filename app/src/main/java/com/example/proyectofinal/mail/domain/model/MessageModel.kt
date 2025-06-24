@@ -1,6 +1,7 @@
 package com.example.proyectofinal.mail.domain.model
 
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.Transient
 
 @Serializable
 data class MessageModel(

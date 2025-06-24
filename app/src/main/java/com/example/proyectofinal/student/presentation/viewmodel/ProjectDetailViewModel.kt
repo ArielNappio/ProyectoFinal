@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.proyectofinal.auth.data.tokenmanager.TokenManager
 import com.example.proyectofinal.core.network.NetworkResponse
+import com.example.proyectofinal.orderManagement.data.repository.LastReadRepository
 import com.example.proyectofinal.orderManagement.domain.model.OrderDelivered
 import com.example.proyectofinal.orderManagement.domain.usecase.GetTaskGroupByStudentUseCase
 import com.example.proyectofinal.orderManagement.domain.usecase.UpdateFavoriteStatusUseCase
@@ -20,7 +21,8 @@ class ProjectDetailViewModel(
     private val getOrders: GetTaskGroupByStudentUseCase,
     private val tokenManager: TokenManager,
     private val updateFavoriteStatusUseCase: UpdateFavoriteStatusUseCase,
-    private val repository: UserPreferencesRepository
+    private val repository: UserPreferencesRepository,
+    private val lastReadRepository: LastReadRepository
 ) : ViewModel() {
 
     private val _projectState = MutableStateFlow<NetworkResponse<OrderDelivered>>(NetworkResponse.Loading())
@@ -51,7 +53,14 @@ class ProjectDetailViewModel(
                                 // Buscar el proyecto específico por ID
                                 val project = response.data?.find { it.id == projectId }
                                 if (project != null) {
-                                    _projectState.value = NetworkResponse.Success(project)
+                                    val updatedOrders = project.orders.map { task ->
+                                        val lastReadInt = lastReadRepository.getLastReadPage(task.id)
+                                        task.copy(lastRead = lastReadInt.toString())
+                                    }
+
+                                    _projectState.value = NetworkResponse.Success(
+                                        project.copy(orders = updatedOrders)
+                                    )
                                 } else {
                                     _projectState.value = NetworkResponse.Failure("Proyecto no encontrado")
                                 }

@@ -5,8 +5,8 @@ import android.content.Context
 import android.util.Log
 import android.widget.Toast
 import androidx.compose.ui.text.AnnotatedString
-import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.unit.sp
+import androidx.core.text.HtmlCompat
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.proyectofinal.audio.domain.model.RecordedAudio
@@ -15,6 +15,7 @@ import com.example.proyectofinal.audio.player.AudioPlayerManager
 import com.example.proyectofinal.audio.recorder.AudioRecorderManager
 import com.example.proyectofinal.auth.data.tokenmanager.TokenManager
 import com.example.proyectofinal.core.network.NetworkResponse
+import com.example.proyectofinal.orderManagement.data.repository.LastReadRepository
 import com.example.proyectofinal.orderManagement.domain.model.OrderDelivered
 import com.example.proyectofinal.orderManagement.domain.model.OrderParagraph
 import com.example.proyectofinal.orderManagement.domain.provider.OrderManagementProvider
@@ -26,6 +27,7 @@ import com.example.proyectofinal.task_student.domain.usecase.DownloadAsPdfUseCas
 import com.example.proyectofinal.task_student.domain.usecase.DownloadAsTxtUseCase
 import com.example.proyectofinal.task_student.presentation.tts.TextToSpeechManager
 import com.example.proyectofinal.task_student.util.htmlToAnnotatedStringFormatted
+import com.example.proyectofinal.userpreferences.data.manager.DataStoreManager
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -51,7 +53,9 @@ class TaskStudentViewModel(
     private val downloadAsTxtUseCase: DownloadAsTxtUseCase,
     private val getOrders: GetTaskGroupByStudentUseCase,
     private val tokenManager: TokenManager,
-    private val orderRepository: OrderRepository
+    private val orderRepository: OrderRepository,
+    private val userPreferences: DataStoreManager,
+    private val lastReadRepository: LastReadRepository
 ): ViewModel() {
 
     private val _projectState = MutableStateFlow<NetworkResponse<OrderDelivered>>(NetworkResponse.Loading())
@@ -101,15 +105,6 @@ class TaskStudentViewModel(
     private val _annotatedParagraphs = MutableStateFlow<List<Pair<Int, AnnotatedString>>>(emptyList())
     val annotatedParagraphs: StateFlow<List<Pair<Int, AnnotatedString>>> = _annotatedParagraphs.asStateFlow()
 
-    val annotatedTextPerPage = combine(currentPageIndex, annotatedParagraphs) { index, paragraphs ->
-        buildAnnotatedString {
-            paragraphs.filter { it.first == index + 1 }.forEachIndexed { i, (_, span) ->
-                append(span)
-                if (i != paragraphs.size - 1) append("\n\n")
-            }
-        }
-    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), AnnotatedString(""))
-
     // Estado de reproducción
     private val _isSpeaking = MutableStateFlow(false)
     val isSpeaking = _isSpeaking.asStateFlow()
@@ -137,10 +132,18 @@ class TaskStudentViewModel(
     private val _showAnnotations = MutableStateFlow(false)
     val showAnnotations = _showAnnotations.asStateFlow()
 
-    // Estado del fontsize
+    private val _showFontsMenu = MutableStateFlow(false)
+    val showFontsMenu: StateFlow<Boolean> = _showFontsMenu
+
+    // Estado del font
 
     private val _fontSize = MutableStateFlow(MIN_FONT_SIZE)
     val fontSize = _fontSize.asStateFlow()
+
+    private val _selectedFontFamily = MutableStateFlow<String?>(null)
+    val selectedFontFamily: StateFlow<String?> = _selectedFontFamily
+
+    private var minFontSize = 0f
 
     private val _totalPages = _paragraphs.map { paragraphs ->
         paragraphs.map { it.pageNumber }
@@ -173,6 +176,12 @@ class TaskStudentViewModel(
                         speakCurrentPage()
                     }
                 }
+            }
+
+            userPreferences.preferencesFlow.collect { prefs ->
+                _selectedFontFamily.value = prefs.fontFamily
+                minFontSize = prefs.fontSize
+                _fontSize.value = minFontSize.sp
             }
         }
     }
@@ -266,13 +275,14 @@ class TaskStudentViewModel(
     fun startSpeech() {
 
         val currentPage = _currentPageIndex.value
-        val currentText = _paragraphs.value
+        val currentTextHtml = _paragraphs.value
             .filter { it.pageNumber == currentPage + 1 }
             .joinToString("\n") { it.paragraphText }
 
-        println("currentText del StartSpeech: $currentText")
+        println("currentText del StartSpeech: $currentTextHtml")
 
-        ttsManager.speak(currentText)
+        val currentTextPlain = htmlToPlainText(currentTextHtml)
+        ttsManager.speak(currentTextPlain)
         _isSpeaking.value = true
         println("Start speech activado")
     }
@@ -314,14 +324,15 @@ class TaskStudentViewModel(
 
     fun speakCurrentPage() {
         stopSpeech()
-
         val currentPage = _currentPageIndex.value
-        val currentText = _paragraphs.value
+        val currentTextHtml = _paragraphs.value
             .filter { it.pageNumber == currentPage }
             .joinToString("\n") { it.paragraphText }
 
-        println("currentText del SpeakCurrentPage: $currentText")
-        ttsManager.speak(currentText)
+        println("currentText del SpeakCurrentPage: $currentTextHtml")
+
+        val currentTextPlain = htmlToPlainText(currentTextHtml)
+        ttsManager.speak(currentTextPlain)
 
         _isSpeaking.value = true
         _isStopped.value = false
@@ -386,19 +397,19 @@ class TaskStudentViewModel(
                     DownloadType.PDF -> downloadAsPdfUseCase(
                         context,
                         _projectState.value.data!!.title,
-                        _paragraphs.value.map { it.paragraphText },
+                        _paragraphs.value.map { htmlToPlainText(it.paragraphText) },
                         totalPages.value,
                         _fontSize.value.value
                     )
                     DownloadType.MP3 -> downloadAsMp3UseCase(
                         context,
                         _projectState.value.data!!.title,
-                        textoPorPagina.value
+                        htmlToPlainText(textoPorPagina.value)
                     )
                     DownloadType.TXT -> downloadAsTxtUseCase(
                         context,
                         _projectState.value.data!!.title,
-                        textoPorPagina.value
+                        htmlToPlainText(textoPorPagina.value)
                     )
                 }
                 resultMessage = "${type.friendlyName} downloaded successfully"
@@ -412,6 +423,12 @@ class TaskStudentViewModel(
                     Toast.makeText(context, resultMessage, Toast.LENGTH_SHORT).show()
                 }
             }
+        }
+    }
+
+    fun saveLastPage(orderId: Int, page: Int) {
+        viewModelScope.launch {
+            lastReadRepository.saveLastReadPage(orderId, page)
         }
     }
 
@@ -480,6 +497,34 @@ class TaskStudentViewModel(
             val comments = audioRepositoryImpl.getAudiosForTask(taskId.toString())
             _comments.value = comments
         }
+    }
+
+    fun htmlToPlainText(html: String): String {
+            val cleaned = html
+                .replace("<br>", "\n")
+                .replace("<br/>", "\n")
+                .replace("</p>", "\n")
+                .replace("<p>", "")
+                .replace("&nbsp;", " ")
+
+            // 2. Convertir a texto plano
+            return HtmlCompat.fromHtml(cleaned, HtmlCompat.FROM_HTML_MODE_LEGACY).toString()
+
+    }
+
+    fun setFontFamily(font: String) {
+        _selectedFontFamily.value = font
+        viewModelScope.launch {
+            userPreferences.saveFontFamily(font)
+        }
+    }
+
+    fun toggleFontMenu() {
+        _showFontsMenu.value = !_showFontsMenu.value
+    }
+
+    fun closeFontMenu() {
+        _showFontsMenu.value = false
     }
 
 }
