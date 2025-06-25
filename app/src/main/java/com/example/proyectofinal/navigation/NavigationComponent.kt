@@ -4,6 +4,8 @@ import android.net.Uri
 import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
@@ -16,6 +18,7 @@ import com.example.proyectofinal.mail.presentation.view.InboxScreen
 import com.example.proyectofinal.mail.presentation.view.MessageDetailScreen
 import com.example.proyectofinal.mail.presentation.view.MessageScreen
 import com.example.proyectofinal.mail.presentation.viewmodel.InboxViewModel
+import com.example.proyectofinal.mail.presentation.viewmodel.MessageViewModel
 import com.example.proyectofinal.student.presentation.view.CommentsScreen
 import com.example.proyectofinal.student.presentation.view.FavoritesScreen
 import com.example.proyectofinal.student.presentation.view.HomeScreen
@@ -134,13 +137,27 @@ fun NavigationComponent(
             val messageId = backStackEntry.arguments?.getInt("messageId") ?: -1
             val mailboxType = MailboxType.valueOf(backStackEntry.arguments?.getString("mailboxType") ?: "INBOX")
 
-            val viewModel: InboxViewModel = koinViewModel()
-            val message = viewModel.getMessageById(messageId)
+            val inboxViewModel: InboxViewModel = koinViewModel()
+            val messageVm: MessageViewModel = koinViewModel()
+            val message = inboxViewModel.getMessageById(messageId)
+
+            val userEmail = inboxViewModel.userEmail.collectAsState().value
+            val recipientEmail = messageVm.to.collectAsState().value
+
+            LaunchedEffect(message) {
+                message?.let {
+                    if (mailboxType == MailboxType.OUTBOX || mailboxType == MailboxType.DRAFT) {
+                        messageVm.getEmailByUserId(it.userToId)
+                    }
+                }
+            }
 
             message?.let {
                 MessageDetailScreen(
                     message = it,
                     mailboxType = mailboxType,
+                    userEmail = userEmail ?: "Desconocido",
+                    recipientEmail = if (mailboxType == MailboxType.INBOX) userEmail ?: "Desconocido" else recipientEmail,
                     onBack = { navController.popBackStack() },
                     onReply = { msg ->
                         navController.navigate(
@@ -150,6 +167,7 @@ fun NavigationComponent(
                 )
             }
         }
+
         composable(
             route = "${ScreensRoute.Message.route}?draftId={draftId}&replyToSubject={replyToSubject}&fromUserId={fromUserId}",
             arguments = listOf(

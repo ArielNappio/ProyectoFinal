@@ -28,6 +28,8 @@ import java.io.File
 fun MessageDetailScreen(
     message: MessageModel,
     mailboxType: MailboxType,
+    userEmail: String,
+    recipientEmail: String,
     onBack: () -> Unit,
     onReply: ((MessageModel) -> Unit)? = null
 ) {
@@ -58,15 +60,27 @@ fun MessageDetailScreen(
                 .verticalScroll(rememberScrollState())
         ) {
             Text("De:", color = Color.White, fontSize = 14.sp, fontWeight = FontWeight.Bold)
-            Text(message.sender, color = Color.White, fontSize = 16.sp)
-            HorizontalDivider(
-                modifier = Modifier.padding(vertical = 8.dp),
-                color = Color.Gray
+            Text(
+                text = when (mailboxType) {
+                    MailboxType.INBOX -> message.sender
+                    MailboxType.OUTBOX, MailboxType.DRAFT -> userEmail
+                },
+                color = Color.White,
+                fontSize = 16.sp
+            )
+            HorizontalDivider(Modifier.padding(vertical = 8.dp), color = Color.Gray)
+
+            Text("Para:", color = Color.White, fontSize = 14.sp, fontWeight = FontWeight.Bold)
+            Text(
+                text = when (mailboxType) {
+                    MailboxType.INBOX -> userEmail
+                    MailboxType.OUTBOX, MailboxType.DRAFT -> recipientEmail
+                },
+                color = Color.White,
+                fontSize = 16.sp
             )
 
-            Text("Para (ID):", color = Color.White, fontSize = 14.sp, fontWeight = FontWeight.Bold)
-            Text(message.userToId, color = Color.White, fontSize = 16.sp)
-            HorizontalDivider(color = Color.Gray, modifier = Modifier.padding(vertical = 8.dp))
+            HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp), color = Color.Gray)
 
             Text("Asunto:", color = Color.White, fontSize = 14.sp, fontWeight = FontWeight.Bold)
             Text(message.subject, color = Color.White, fontSize = 16.sp)
