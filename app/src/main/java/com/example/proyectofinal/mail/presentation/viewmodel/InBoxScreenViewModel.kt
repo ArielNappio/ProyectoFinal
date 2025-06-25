@@ -203,6 +203,16 @@ class InboxViewModel(
         return dateTime.format(formatter)
     }
 
+    fun getMessageById(id: Int): MessageModel? {
+        val message = inboxMessages.value.find { it.id == id }
+            ?: outboxMessages.value.find { it.id == id }
+            ?: draftMessages.value.find { it.id == id }
+
+        if (message == null) {
+            Log.w("InboxViewModel", "Mensaje no encontrado con id: $id")
+        }
+        return message
+    }
 
     private fun loadDraftMessages() {
         viewModelScope.launch(Dispatchers.IO) {

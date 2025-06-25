@@ -1,5 +1,6 @@
 package com.example.proyectofinal.navigation
 
+import android.net.Uri
 import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.compose.runtime.Composable
@@ -12,7 +13,9 @@ import androidx.navigation.navArgument
 import com.example.proyectofinal.auth.presentation.view.LoginScreen
 import com.example.proyectofinal.mail.domain.model.MailboxType
 import com.example.proyectofinal.mail.presentation.view.InboxScreen
+import com.example.proyectofinal.mail.presentation.view.MessageDetailScreen
 import com.example.proyectofinal.mail.presentation.view.MessageScreen
+import com.example.proyectofinal.mail.presentation.viewmodel.InboxViewModel
 import com.example.proyectofinal.student.presentation.view.CommentsScreen
 import com.example.proyectofinal.student.presentation.view.FavoritesScreen
 import com.example.proyectofinal.student.presentation.view.HomeScreen
@@ -26,6 +29,7 @@ import com.example.proyectofinal.userpreferences.presentation.view.FontPreferenc
 import com.example.proyectofinal.users.presentation.view.CreateUserScreen
 import com.example.proyectofinal.users.presentation.view.ManageUserScreen
 import com.example.proyectofinal.users.presentation.view.UpdateUserScreen
+import org.koin.androidx.compose.koinViewModel
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
@@ -113,8 +117,38 @@ fun NavigationComponent(
             InboxScreen(
                 navController = navController,
                 mailboxType = mailboxType,
-                onMessageClick = { }
+                onMessageClick = { message ->
+                    navController.navigate(
+                        "${ScreensRoute.MessageDetail.route}/messageId=${message.id}&mailboxType=${mailboxType.name}"
+                    )
+                }
             )
+        }
+        composable(
+            route = "${ScreensRoute.MessageDetail.route}/messageId={messageId}&mailboxType={mailboxType}",
+            arguments = listOf(
+                navArgument("messageId") { type = NavType.IntType },
+                navArgument("mailboxType") { type = NavType.StringType }
+            )
+        ) { backStackEntry ->
+            val messageId = backStackEntry.arguments?.getInt("messageId") ?: -1
+            val mailboxType = MailboxType.valueOf(backStackEntry.arguments?.getString("mailboxType") ?: "INBOX")
+
+            val viewModel: InboxViewModel = koinViewModel()
+            val message = viewModel.getMessageById(messageId)
+
+            message?.let {
+                MessageDetailScreen(
+                    message = it,
+                    mailboxType = mailboxType,
+                    onBack = { navController.popBackStack() },
+                    onReply = { msg ->
+                        navController.navigate(
+                            "${ScreensRoute.Message.route}?draftId=-1&replyToSubject=${Uri.encode(msg.subject)}&fromUserId=${msg.userFromId}"
+                        )
+                    }
+                )
+            }
         }
         composable(
             route = "${ScreensRoute.Message.route}?draftId={draftId}&replyToSubject={replyToSubject}&fromUserId={fromUserId}",

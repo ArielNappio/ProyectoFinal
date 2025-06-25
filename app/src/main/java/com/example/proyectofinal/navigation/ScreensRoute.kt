@@ -17,6 +17,7 @@ enum class ScreensRoute(
     Comments("comments", showsTopBar = false, showsBottomBar = false),
     Mail("mail/{mailboxType}", false, showsBottomBar = false, showsBackButton = false),
     Message("message", false, false),
+    MessageDetail("mail_detail", false, false),
     Preferences("user_preferences", false, false),
     TextEdit("text_edit/{taskId}", showsTopBar = false, showsBottomBar = false),
     UpdateUser("update_user", showsTopBar = true, showsBottomBar = false),

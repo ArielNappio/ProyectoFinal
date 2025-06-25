@@ -52,11 +52,31 @@ fun MessageItem(
                 .fillMaxWidth()
                 .clickable(onClick = onClick),
             headlineContent = {
-                Text(
-                    text = "De: ${message.sender}",
-                    color = Color.White,
-                    style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold, fontSize = 18.sp)
-                )
+                when(type) {
+                    MailboxType.INBOX -> {
+                        Text(
+                            text = "De: ${message.sender}",
+                            color = Color.White,
+                            style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold, fontSize = 18.sp)
+                        )
+                    }
+                    MailboxType.OUTBOX -> {
+                        Text(
+                            text = "Para: ${message.sender}",
+                            color = Color.White,
+                            style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold, fontSize = 18.sp)
+                        )
+                }
+
+                    MailboxType.DRAFT -> {
+                        Text(
+                            text = "Para: ${message.sender}",
+                            color = Color.White,
+                            style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold, fontSize = 18.sp)
+                        )
+                    }
+                }
+
             },
             supportingContent = {
                 Column {
@@ -118,28 +138,28 @@ fun MessageItem(
                             IconButton(
                                 onClick = { onContinueEditing?.invoke(message) },
                                 modifier = Modifier
-                                    .size(64.dp) // Aumenté el tamaño del botón
+                                    .size(64.dp)
                                     .semantics { contentDescription = "Editar borrador" }
                             ) {
                                 Icon(
                                     Icons.Default.Edit,
                                     contentDescription = null,
                                     tint = Color.White,
-                                    modifier = Modifier.size(36.dp) // Aumenté el tamaño del ícono
+                                    modifier = Modifier.size(36.dp)
                                 )
                             }
 
                             IconButton(
                                 onClick = { onDelete?.invoke(message.id.toString()) },
                                 modifier = Modifier
-                                    .size(64.dp) // Aumenté el tamaño del botón
+                                    .size(64.dp)
                                     .semantics { contentDescription = "Eliminar borrador" }
                             ) {
                                 Icon(
                                     Icons.Default.Delete,
                                     contentDescription = null,
                                     tint = Color.White,
-                                    modifier = Modifier.size(36.dp) // Aumenté el tamaño del ícono
+                                    modifier = Modifier.size(36.dp)
                                 )
                             }
                         }
