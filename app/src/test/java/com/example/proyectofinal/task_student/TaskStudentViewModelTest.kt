@@ -6,6 +6,9 @@ import com.example.proyectofinal.audio.domain.repository.AudioRepository
 import com.example.proyectofinal.audio.player.AudioPlayerManager
 import com.example.proyectofinal.audio.recorder.AudioRecorderManager
 import com.example.proyectofinal.auth.data.tokenmanager.TokenManager
+import com.example.proyectofinal.orderFeedback.domain.usecase.GetFeedbackUseCase
+import com.example.proyectofinal.orderFeedback.domain.usecase.SaveFeedbackUseCase
+import com.example.proyectofinal.orderFeedback.domain.usecase.SendFeedbackUseCase
 import com.example.proyectofinal.orderManagement.data.repository.LastReadRepository
 import com.example.proyectofinal.orderManagement.domain.repository.OrderRepository
 import com.example.proyectofinal.orderManagement.domain.usecase.GetTaskGroupByStudentUseCase
@@ -66,6 +69,7 @@ class TaskStudentViewModelTest {
         Dispatchers.setMain(testDispatcher)
         coEvery { ttsManager.isStoped } returns MutableStateFlow(true)
         coEvery { tokenManager.userId } returns flowOf("example_id")
+
         viewModel = TaskStudentViewModel(
             ttsManager = ttsManager,
             audioRecorderManager = audioRecorderManager,
@@ -78,7 +82,10 @@ class TaskStudentViewModelTest {
             downloadAsTxtUseCase = DownloadAsTxtUseCase(),
             orderRepository = orderRepository,
             userPreferences = userPreferences,
-            lastReadRepository = lastReadRepository
+            lastReadRepository = lastReadRepository,
+            sendFeedbackUseCase = SendFeedbackUseCase(mockk()),
+            saveFeedbackUseCase = SaveFeedbackUseCase(mockk()),
+            getFeedbackUseCase = GetFeedbackUseCase(mockk()),
         )
     }
 
@@ -161,8 +168,10 @@ class TaskStudentViewModelTest {
     }
 
     @Test
-    fun `when fontSizeDecrease is called, fontSize is decremented`() = runTest {
+    fun `when fontSizeDecrease is called, fontSize is decremented`() = testScope.runTest {
         viewModel.fontSizeDecrease()
+
+        testDispatcher.scheduler.advanceUntilIdle()
         assertTrue(viewModel.fontSize.value.value < 52)
     }
 }

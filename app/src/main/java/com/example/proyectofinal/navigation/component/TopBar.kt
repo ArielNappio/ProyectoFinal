@@ -45,9 +45,9 @@ fun TopBar(navController: NavController) {
     val prefs by prefsRepo.getUserPreferences()
         .collectAsState(
             initial = UserPreferences(
-                fontSize = 16f,
+                fontSize = 26f,
                 fontFamily = "Default",
-                iconSize = 24f
+                iconSize = 32f
             )
         )
 
