@@ -10,8 +10,11 @@ import com.example.proyectofinal.mail.data.entity.MessageEntity
 @Dao
 interface MessageDao {
 
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
     fun insertMessage(message: MessageEntity)
+
+    @Query("SELECT id FROM message")
+    fun getAllMessageIds(): List<Int>
 
     // Último mensaje enviado (que no sea borrador)
     @Query("SELECT * FROM message WHERE isDraft = 0 ORDER BY date DESC LIMIT 1")
@@ -44,4 +47,15 @@ interface MessageDao {
     // Eliminar borrador por ID
     @Query("DELETE FROM message WHERE isDraft = 1 AND id = :idMessage")
     fun deleteDraftById(idMessage: Int)
+
+    @Query("""
+    DELETE FROM message 
+    WHERE id NOT IN (
+        SELECT MIN(id) 
+        FROM message 
+        GROUP BY subject, sender, date, userToId
+    )
+""")
+    fun deleteDuplicateMessages()
+
 }

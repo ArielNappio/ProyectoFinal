@@ -12,7 +12,7 @@ import kotlinx.coroutines.flow.Flow
 class ReceiveMessageUseCase(
     private val messageRepository: MailRepository
 ) {
-    suspend operator fun invoke(userId: String): Flow<NetworkResponse<List<MessageModel>>> {
-        return messageRepository.receiveMessages(userId)
+     operator fun invoke(userEmail: String): Flow<NetworkResponse<List<MessageModel>>> {
+        return messageRepository.receiveMessages(userEmail)
     }
 }

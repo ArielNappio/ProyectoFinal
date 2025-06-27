@@ -11,7 +11,8 @@ interface MailRepository {
     fun receiveMessages(userId: String): Flow<NetworkResponse<List<MessageModel>>>
     //message type OUTBOX
     suspend fun getOutboxMessages(userId: String): Flow<NetworkResponse<List<MessageModel>>>
-
+    //message type OUTBOX
+    fun receiveOutboxMessages(userId: String): Flow<NetworkResponse<List<MessageModel>>>
     suspend fun saveDraft(message: MessageModel)
     suspend fun getDrafts(): List<MessageModel>
     suspend fun deleteDraftById(idMessage: Int)

@@ -5,7 +5,7 @@ import androidx.room.PrimaryKey
 
 @Entity(tableName = "message")
 data class MessageEntity(
-    @PrimaryKey(autoGenerate = true) val id: Int = 0,
+    @PrimaryKey val id: Int,
     val isDraft: Boolean,
     val userFromId: String,
     val userToId: String,

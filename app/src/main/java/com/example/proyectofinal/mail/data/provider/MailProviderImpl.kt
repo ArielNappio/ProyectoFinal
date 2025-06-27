@@ -1,5 +1,6 @@
 package com.example.proyectofinal.mail.data.provider
 
+import android.util.Log
 import com.example.proyectofinal.auth.data.tokenmanager.TokenManager
 import com.example.proyectofinal.core.network.ApiUrls
 import com.example.proyectofinal.core.network.NetworkResponse
@@ -23,6 +24,7 @@ import io.ktor.http.isSuccess
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flow
+import kotlinx.serialization.json.Json
 
 class MailProviderImpl(
     private val ktorClient: HttpClient,
@@ -86,7 +88,6 @@ class MailProviderImpl(
             emit(NetworkResponse.Loading())
 
             val url = ApiUrls.MESSAGES_OUTBOX
-
             val token = tokenManager.token.firstOrNull()
 
             if (token.isNullOrEmpty()) {
@@ -97,19 +98,26 @@ class MailProviderImpl(
             val response = ktorClient.get(url) {
                 header("Authorization", "Bearer $token")
             }
+
             val bodyText = response.bodyAsText()
             println("DEBUG JSON: $bodyText")
 
             if (response.status == HttpStatusCode.OK) {
-                val messages = response.body<List<MessageModel>>()
+                val json = Json { ignoreUnknownKeys = true }
+                val messages = json.decodeFromString<List<MessageModel>>(bodyText)
                 emit(NetworkResponse.Success(messages))
             } else {
+                Log.e("ProviderOutbox", "Error ${response.status.value} al obtener mensajes de outbox")
+                Log.e("ProviderOutbox", "Body del error: $bodyText")
                 emit(NetworkResponse.Failure("Error en get outbox: ${response.status.value}"))
             }
+
         } catch (e: Exception) {
+            Log.e("ProviderOutbox", "Excepción: $e")
             emit(NetworkResponse.Failure(error = e.toString()))
         }
     }
+
 
     override fun updateMessage(message: MessageModel): Flow<NetworkResponse<Unit>> = flow {
         try {

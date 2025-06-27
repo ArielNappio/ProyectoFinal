@@ -2,11 +2,11 @@
   "formatVersion": 1,
   "database": {
     "version": 7,
-    "identityHash": "5e8a441a0f8a9e473dcf72fca6667d29",
+    "identityHash": "5ac5dba5ee49b26da4c02b7590844c32",
     "entities": [
       {
         "tableName": "message",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `isDraft` INTEGER NOT NULL, `userFromId` TEXT NOT NULL, `userToId` TEXT NOT NULL, `sender` TEXT NOT NULL, `subject` TEXT NOT NULL, `date` TEXT NOT NULL, `content` TEXT NOT NULL, `filePath` TEXT, `isResponse` INTEGER NOT NULL, `responseText` TEXT)",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER NOT NULL, `isDraft` INTEGER NOT NULL, `userFromId` TEXT NOT NULL, `userToId` TEXT NOT NULL, `sender` TEXT NOT NULL, `subject` TEXT NOT NULL, `date` TEXT NOT NULL, `content` TEXT NOT NULL, `filePath` TEXT, `isResponse` INTEGER NOT NULL, `responseText` TEXT, PRIMARY KEY(`id`))",
         "fields": [
           {
             "fieldPath": "id",
@@ -76,7 +76,7 @@
           }
         ],
         "primaryKey": {
-          "autoGenerate": true,
+          "autoGenerate": false,
           "columnNames": [
             "id"
           ]
@@ -88,7 +88,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '5e8a441a0f8a9e473dcf72fca6667d29')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '5ac5dba5ee49b26da4c02b7590844c32')"
     ]
   }
 }

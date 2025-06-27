@@ -21,6 +21,7 @@ fun MessageEntity.toDomain(): MessageModel {
 
 fun MessageModel.toEntity(): MessageEntity {
     return MessageEntity(
+        id = id,
         sender = sender,
         subject = subject,
         date = date,
