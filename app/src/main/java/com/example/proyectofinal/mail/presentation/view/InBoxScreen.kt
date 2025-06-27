@@ -97,57 +97,69 @@ fun InboxScreen(
             Text("Redactar", color = Color.White, fontSize = 18.sp)
         }
 
-        when (receivedInboxState) {
-            is NetworkResponse.Loading -> {
-                Box(
-                    modifier = Modifier.fillMaxSize().padding(top = 32.dp),
-                    contentAlignment = Alignment.Center
-                ) {
-                    CircularProgressIndicator()
+        if (mailboxType == MailboxType.DRAFT) {
+            MessageList(
+                messages = messages,
+                type = mailboxType,
+                onMessageClick = onMessageClick,
+                onReply = null,
+                onMarkStatus = null,
+                onDelete = { id -> viewModel.discardDraft(id.toInt()) },
+                onContinueEditing = { message ->
+                    navController.navigate("${ScreensRoute.Message.route}?draftId=${message.id}")
                 }
-            }
+            )
+        } else {
+            when (receivedInboxState) {
+                is NetworkResponse.Loading -> {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(top = 32.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        CircularProgressIndicator()
+                    }
+                }
 
-            is NetworkResponse.Failure -> {
-                Box(
-                    modifier = Modifier.fillMaxSize().padding(top = 32.dp),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Text(
-                        text = "Error al cargar mensajes",
-                        color = Color.Red,
-                        fontSize = 16.sp
+                is NetworkResponse.Failure -> {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(top = 32.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(
+                            text = "Error al cargar mensajes",
+                            color = Color.Red,
+                            fontSize = 16.sp
+                        )
+                    }
+                }
+
+                is NetworkResponse.Success -> {
+                    MessageList(
+                        messages = messages,
+                        type = mailboxType,
+                        onMessageClick = onMessageClick,
+                        onReply = if (mailboxType == MailboxType.INBOX) {
+                            { message ->
+                                navController.navigate(
+                                    "${ScreensRoute.Message.route}?draftId=-1&replyToSubject=${
+                                        Uri.encode(message.subject)
+                                    }&fromUserId=${message.userFromId}"
+                                )
+                            }
+                        } else null,
+                        onMarkStatus = if (mailboxType == MailboxType.OUTBOX) {
+                            { message, status ->
+                                // Si lo necesitás
+                            }
+                        } else null,
+                        onDelete = null,
+                        onContinueEditing = null
                     )
                 }
-            }
-
-            is NetworkResponse.Success -> {
-                MessageList(
-                    messages = messages,
-                    type = mailboxType,
-                    onMessageClick = onMessageClick,
-                    onReply = if (mailboxType == MailboxType.INBOX) {
-                        { message ->
-                            navController.navigate(
-                                "${ScreensRoute.Message.route}?draftId=-1&replyToSubject=${
-                                    Uri.encode(message.subject)
-                                }&fromUserId=${message.userFromId}"
-                            )
-                        }
-                    } else null,
-                    onMarkStatus = if (mailboxType == MailboxType.OUTBOX) {
-                        { message, status ->
-                            // Si lo necesitás
-                        }
-                    } else null,
-                    onDelete = if (mailboxType == MailboxType.DRAFT) {
-                        { id -> viewModel.discardDraft(id.toInt()) }
-                    } else null,
-                    onContinueEditing = if (mailboxType == MailboxType.DRAFT) {
-                        { message ->
-                            navController.navigate("${ScreensRoute.Message.route}?draftId=${message.id}")
-                        }
-                    } else null
-                )
             }
         }
     }

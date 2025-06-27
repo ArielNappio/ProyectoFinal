@@ -56,6 +56,7 @@ class InboxViewModel(
 
     init {
         initInbox()
+        loadDraftMessages()
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
@@ -215,6 +216,7 @@ class InboxViewModel(
     }
 
     private fun loadDraftMessages() {
+
         viewModelScope.launch(Dispatchers.IO) {
             val drafts: List<MessageModel> = getDraftMessagesUseCase()
             _draftMessages.value = drafts
@@ -224,6 +226,7 @@ class InboxViewModel(
                 println("Borradores cargados: ${drafts.size}")
             }
         }
+
     }
 
     fun discardDraft(draftId: Int) {

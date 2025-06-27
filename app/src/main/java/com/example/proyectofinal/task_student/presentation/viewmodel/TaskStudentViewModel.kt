@@ -122,6 +122,12 @@ class TaskStudentViewModel(
     private val _isStopped = MutableStateFlow(true)
     val isStopped = _isStopped.asStateFlow()
 
+    private val _speechRate = MutableStateFlow(1.0f)
+    val speechRate: StateFlow<Float> = _speechRate.asStateFlow()
+
+    private val _pitch = MutableStateFlow(1.0f)
+    val pitch: StateFlow<Float> = _pitch.asStateFlow()
+
     // Estados del Dialog
 
     private val _showExtraButton = MutableStateFlow(false)
@@ -141,6 +147,9 @@ class TaskStudentViewModel(
 
     private val _showFontsMenu = MutableStateFlow(false)
     val showFontsMenu: StateFlow<Boolean> = _showFontsMenu
+
+    private val _showSpeechSettingsMenu = MutableStateFlow(false)
+    val showSpeechSettingsMenu = _showSpeechSettingsMenu.asStateFlow()
 
     // Estado del font
 
@@ -602,5 +611,39 @@ class TaskStudentViewModel(
         currentAudioFile = null
         _recordedFeedbackFilePath.value = null
     }
+
+    fun setSpeechRate(rate: Float) {
+        if (rate <= 0f) return
+        _speechRate.value = rate
+        ttsManager.setSpeechRate(rate)
+        if (_isSpeaking.value && !_isPaused.value) {
+            restartSpeechWithNewParams()
+        }
+    }
+
+    fun setPitch(newPitch: Float) {
+        if (newPitch <= 0f) return
+        _pitch.value = newPitch
+        ttsManager.setPitch(newPitch)
+        if (_isSpeaking.value && !_isPaused.value) {
+            restartSpeechWithNewParams()
+        }
+    }
+
+    private fun restartSpeechWithNewParams() {
+        ttsManager.pause()
+        ttsManager.resume()
+        _isSpeaking.value = true
+        _isPaused.value = false
+    }
+
+    fun toggleSpeechSettingsMenu() {
+        _showSpeechSettingsMenu.value = !_showSpeechSettingsMenu.value
+    }
+
+    fun closeSpeechSettingsMenu() {
+        _showSpeechSettingsMenu.value = false
+    }
+
 
 }

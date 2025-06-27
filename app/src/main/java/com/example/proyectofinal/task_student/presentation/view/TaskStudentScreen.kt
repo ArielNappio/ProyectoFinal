@@ -69,6 +69,7 @@ import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Slider
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
@@ -166,10 +167,13 @@ fun TaskStudent(taskId: Int, navController: NavHostController) {
     val currentlyPlayingPath by viewModel.currentlyPlayingPath.collectAsState()
     val currentPosition by viewModel.currentPosition.collectAsState()
 
-
     var isRecording by remember { mutableStateOf(false) }
     var hasRecording by remember { mutableStateOf(false) }
     var isPlaying by remember { mutableStateOf(false) }
+
+    val showSpeechSettingsMenu by viewModel.showSpeechSettingsMenu.collectAsState()
+    val speechRate by viewModel.speechRate.collectAsState()
+    val pitch by viewModel.pitch.collectAsState()
 
 
     val currentContext = LocalContext.current
@@ -273,13 +277,12 @@ fun TaskStudent(taskId: Int, navController: NavHostController) {
                         } else {
                             viewModel.stopSpeech()
                         }
-                        viewModel.showExtraButton()
+                        viewModel.toggleSpeechSettingsMenu()
                     },
                     tint = iconTint
                 )
             }
         }
-
         // Contenido scrolleable
         Box(modifier = Modifier.weight(1f)) {
             Column(
@@ -367,6 +370,53 @@ fun TaskStudent(taskId: Int, navController: NavHostController) {
                     },
                     contentDescription = "Siguiente", tint = Color.White
                 )
+            }
+        }
+    }
+
+    if (showSpeechSettingsMenu) {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(Color.Black.copy(alpha = 0.5f)) // Fondo semi oscuro
+                .clickable { viewModel.closeSpeechSettingsMenu() } // Tap fuera para cerrar
+        ) {
+            Card(
+                modifier = Modifier
+                    .align(Alignment.CenterEnd) // lo podés cambiar a Center o donde quieras
+                    .width(280.dp)
+                    .padding(16.dp),
+                shape = RoundedCornerShape(12.dp)
+            ) {
+                Column(
+                    modifier = Modifier
+                        .background(Color.White)
+                        .padding(16.dp),
+                    verticalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
+                    Text("Velocidad de lectura: ${String.format("%.2f", speechRate)}x")
+                    Slider(
+                        value = speechRate,
+                        onValueChange = { viewModel.setSpeechRate(it) },
+                        valueRange = 0.5f..2.0f,
+                        steps = 6
+                    )
+
+                    Text("Tono: ${String.format("%.2f", pitch)}x")
+                    Slider(
+                        value = pitch,
+                        onValueChange = { viewModel.setPitch(it) },
+                        valueRange = 0.5f..2.0f,
+                        steps = 6
+                    )
+
+                    Button(
+                        onClick = { viewModel.closeSpeechSettingsMenu() },
+                        modifier = Modifier.align(Alignment.End)
+                    ) {
+                        Text("Cerrar")
+                    }
+                }
             }
         }
     }
