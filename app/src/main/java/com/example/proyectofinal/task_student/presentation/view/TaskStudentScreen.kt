@@ -15,7 +15,6 @@ import androidx.compose.animation.scaleOut
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -30,6 +29,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
@@ -59,6 +59,7 @@ import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.filled.Stop
 import androidx.compose.material.icons.filled.TextDecrease
 import androidx.compose.material.icons.filled.TextIncrease
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
@@ -69,8 +70,12 @@ import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Slider
+import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
@@ -85,7 +90,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.TextStyle
@@ -97,7 +101,9 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.example.proyectofinal.audio.speechrecognizer.SpeechRecognizerManager
 import com.example.proyectofinal.core.theme.ATKINSON_HYPERLEGIBLE_FAMILY_NAME
+import com.example.proyectofinal.core.theme.LocalTheme
 import com.example.proyectofinal.core.theme.OPEN_DYSLEXIC_FAMILY_NAME
+import com.example.proyectofinal.core.ui.ThemeViewModel
 import com.example.proyectofinal.student.presentation.component.CommentAudioCard
 import com.example.proyectofinal.task_student.presentation.component.AccessibleIconButton
 import com.example.proyectofinal.task_student.presentation.component.DownloadOption
@@ -108,11 +114,13 @@ import com.example.proyectofinal.task_student.util.htmlToAnnotatedStringFormatte
 import com.example.proyectofinal.userpreferences.util.getFontFamilyFromString
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import org.koin.androidx.compose.koinViewModel
+import kotlin.math.abs
 
 @OptIn(ExperimentalPermissionsApi::class)
 @Composable
 fun TaskStudent(taskId: Int, navController: NavHostController) {
 
+    val themeViewModel = koinViewModel<ThemeViewModel>()
     val viewModel = koinViewModel<TaskStudentViewModel>()
 
     val context = LocalContext.current
@@ -148,6 +156,9 @@ fun TaskStudent(taskId: Int, navController: NavHostController) {
     val showFont by viewModel.showFont.collectAsState()
     val showAnnotations by viewModel.showAnnotations.collectAsState()
     val showFontsMenu by viewModel.showFontsMenu.collectAsState()
+    val showEditDialog by viewModel.showEditDialog.collectAsState()
+    val editingName by viewModel.editingName.collectAsState()
+
     val selectedFontFamily by viewModel.selectedFontFamily.collectAsState()
     val fontSize by viewModel.fontSize.collectAsState()
 
@@ -274,10 +285,10 @@ fun TaskStudent(taskId: Int, navController: NavHostController) {
                     onClick = {
                         if (!isSpeaking) {
                             viewModel.startSpeech()
+                            viewModel.toggleSpeechSettingsMenu()
                         } else {
                             viewModel.stopSpeech()
                         }
-                        viewModel.toggleSpeechSettingsMenu()
                     },
                     tint = iconTint
                 )
@@ -374,45 +385,81 @@ fun TaskStudent(taskId: Int, navController: NavHostController) {
         }
     }
 
+    // dialog show speech
+
     if (showSpeechSettingsMenu) {
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .background(Color.Black.copy(alpha = 0.5f)) // Fondo semi oscuro
-                .clickable { viewModel.closeSpeechSettingsMenu() } // Tap fuera para cerrar
+                .background(Color.Black.copy(alpha = 0.5f))
+                .clickable { viewModel.closeSpeechSettingsMenu() }
         ) {
             Card(
                 modifier = Modifier
-                    .align(Alignment.CenterEnd) // lo podés cambiar a Center o donde quieras
+                    .align(Alignment.CenterEnd)
                     .width(280.dp)
                     .padding(16.dp),
-                shape = RoundedCornerShape(12.dp)
+                shape = RoundedCornerShape(16.dp),
+                elevation = CardDefaults.cardElevation(8.dp)
             ) {
                 Column(
                     modifier = Modifier
-                        .background(Color.White)
                         .padding(16.dp),
-                    verticalArrangement = Arrangement.spacedBy(12.dp)
+                    verticalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
-                    Text("Velocidad de lectura: ${String.format("%.2f", speechRate)}x")
+                    Text(
+                        text = "Velocidad de lectura",
+                        style = MaterialTheme.typography.titleMedium
+                    )
+
+                    val displayText = when {
+                        speechRate < 0.75f -> "x0.5"
+                        speechRate < 1.25f -> "Normal"
+                        speechRate < 1.75f -> "x1.5"
+                        else -> "x2"
+                    }
+
+                    Text(
+                        text = displayText,
+                        modifier = Modifier.align(Alignment.CenterHorizontally),
+                        style = MaterialTheme.typography.bodyMedium
+                    )
+
                     Slider(
                         value = speechRate,
                         onValueChange = { viewModel.setSpeechRate(it) },
+                        onValueChangeFinished = {
+                            val closest = listOf(0.5f, 1.0f, 1.5f, 2.0f).minByOrNull { abs(it - speechRate) } ?: 1.0f
+                            viewModel.setSpeechRate(closest)
+                        },
                         valueRange = 0.5f..2.0f,
-                        steps = 6
-                    )
-
-                    Text("Tono: ${String.format("%.2f", pitch)}x")
-                    Slider(
-                        value = pitch,
-                        onValueChange = { viewModel.setPitch(it) },
-                        valueRange = 0.5f..2.0f,
-                        steps = 6
+                        steps = 2,
+                        modifier = Modifier
+                            .fillMaxWidth(),
                     )
 
                     Button(
+                        onClick = {
+                            if (isSpeaking) viewModel.pauseSpeech()
+                            else viewModel.playSpeech()
+                        },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(48.dp),
+                        shape = RoundedCornerShape(8.dp)
+                    ) {
+                        Icon(
+                            imageVector = if (isSpeaking) Icons.Default.Pause else Icons.Default.PlayArrow,
+                            contentDescription = if (isSpeaking) "Pausar lectura" else "Iniciar lectura"
+                        )
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text(if (isSpeaking) "Pausar" else "Leer")
+                    }
+
+                    OutlinedButton(
                         onClick = { viewModel.closeSpeechSettingsMenu() },
-                        modifier = Modifier.align(Alignment.End)
+                        modifier = Modifier.align(Alignment.End),
+                        shape = RoundedCornerShape(8.dp)
                     ) {
                         Text("Cerrar")
                     }
@@ -499,6 +546,9 @@ fun TaskStudent(taskId: Int, navController: NavHostController) {
                                         },
                                         onDeleteClick = {
                                             viewModel.deleteComment(comment.filePath)
+                                        },
+                                        onEditClick = { path, title ->
+                                            viewModel.openEditDialog(path, title)
                                         }
                                     )
                                     Spacer(modifier = Modifier.height(8.dp))
@@ -557,44 +607,59 @@ fun TaskStudent(taskId: Int, navController: NavHostController) {
             modifier = Modifier
                 .fillMaxSize()
                 .padding(top = 100.dp)
-                .background(Color.Black.copy(alpha = 0.5f)) // Fondo difuminado
-                .clickable(onClick = { viewModel.showFont() }) // Toca afuera para cerrar
+                .background(Color.Black.copy(alpha = 0.5f))
+                .clickable(onClick = { viewModel.showFont() })
         ) {
-            Box(
+            Column(
                 modifier = Modifier
                     .padding(16.dp)
-                    .height(120.dp)
+                    .wrapContentHeight()
                     .clip(RoundedCornerShape(24.dp))
                     .background(MaterialTheme.colorScheme.primaryContainer)
+                    .align(Alignment.Center)
+                    .padding(16.dp), // Padding interno
+                verticalArrangement = Arrangement.spacedBy(16.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
+                // Primera fila con botones
                 Row(
-                    modifier = Modifier.fillMaxSize(),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(88.dp),
                     horizontalArrangement = Arrangement.SpaceEvenly,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     AccessibleIconButton(
                         icon = Icons.Default.FontDownload,
                         label = "Fuente",
-                        onClick = {
-                            viewModel.toggleFontMenu()
-                        },
+                        onClick = { viewModel.toggleFontMenu() },
                         iconSize = 56.dp
                     )
                     AccessibleIconButton(
                         icon = Icons.Default.TextIncrease,
                         label = "Aumentar",
-                        onClick = {
-                            viewModel.fontSizeIncrease()
-                        },
+                        onClick = { viewModel.fontSizeIncrease() },
                         iconSize = 56.dp
                     )
                     AccessibleIconButton(
                         icon = Icons.Default.TextDecrease,
                         label = "Disminuir",
-                        onClick = {
-                            viewModel.fontSizeDecrease()
-                        },
+                        onClick = { viewModel.fontSizeDecrease() },
                         iconSize = 56.dp
+                    )
+                }
+
+                // Switch de tema
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.Center,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text("Tema oscuro")
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Switch(
+                        checked = LocalTheme.current.isDark,
+                        onCheckedChange = { themeViewModel.toggleTheme() }
                     )
                 }
             }
@@ -879,16 +944,13 @@ fun TaskStudent(taskId: Int, navController: NavHostController) {
                                 .size(48.dp)
                                 .clip(CircleShape)
                                 .background(Color(0xff2e7d32))
-                                .pointerInput(Unit) {
-                                    detectTapGestures(
-                                        onPress = {
-                                            isListening = true
-                                            speechRecognizerManager.startListening()
-                                            tryAwaitRelease()
-                                            isListening = false
-                                            speechRecognizerManager.stopListening()
-                                        }
-                                    )
+                                .clickable {
+                                    if (isListening) {
+                                        speechRecognizerManager.stopListening()
+                                    } else {
+                                        speechRecognizerManager.startListening()
+                                    }
+                                    isListening = !isListening
                                 },
                             contentAlignment = Alignment.Center
                         ) {
@@ -921,6 +983,37 @@ fun TaskStudent(taskId: Int, navController: NavHostController) {
             }
         }
     }
+
+    // dialog edit audio
+
+    if (showEditDialog) {
+        AlertDialog(
+            onDismissRequest = { viewModel.closeEditDialog() },
+            confirmButton = {
+                TextButton(
+                    onClick = { viewModel.confirmEditName() },
+                    enabled = editingName.isNotBlank()
+                ) {
+                    Text("Guardar")
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { viewModel.closeEditDialog() }) {
+                    Text("Cancelar")
+                }
+            },
+            title = { Text("Editar nombre") },
+            text = {
+                OutlinedTextField(
+                    value = editingName,
+                    onValueChange = { viewModel.updateEditingName(it) },
+                    singleLine = true,
+                    label = { Text("Nuevo nombre") }
+                )
+            }
+        )
+    }
+
 
     // Circular progress for download in progress
     if (isDownloading) {

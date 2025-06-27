@@ -9,7 +9,7 @@ import java.util.concurrent.TimeUnit
 fun scheduleOneTimeWorker(context: Context, userId: String) {
     val workRequest = OneTimeWorkRequestBuilder<NotificationWorker>()
         .setInputData(workDataOf("userId" to userId))
-        .setInitialDelay(1, TimeUnit.MINUTES)
+        .setInitialDelay(100, TimeUnit.MINUTES)
         .build()
 
     WorkManager.getInstance(context).enqueue(workRequest)

@@ -7,4 +7,6 @@ interface AudioRepository {
     suspend fun getAudiosForTask(taskId: String): List<RecordedAudio>
     suspend fun getAllAudios(): List<RecordedAudio>
     suspend fun deleteAudio(path: String)
+    suspend fun updateAudioName(filePath: String, newTitle: String)
+
 }

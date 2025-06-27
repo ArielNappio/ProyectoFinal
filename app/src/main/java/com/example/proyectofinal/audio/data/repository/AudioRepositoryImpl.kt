@@ -62,4 +62,8 @@ class AudioRepositoryImpl(
             0L
         }
     }
+
+    override suspend fun updateAudioName(filePath: String, newTitle: String) {
+        audioDao.updateTitleByFilePath(filePath, newTitle)
+    }
 }

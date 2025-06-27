@@ -30,6 +30,15 @@ class CommentsViewModel(
     private val _isPlaying = MutableStateFlow(false)
     val isPlaying: StateFlow<Boolean> = _isPlaying
 
+    private val _showEditDialog = MutableStateFlow(false)
+    val showEditDialog: StateFlow<Boolean> = _showEditDialog
+
+    private val _editingName = MutableStateFlow("")
+    val editingName: StateFlow<String> = _editingName
+
+    private val _editingPath = MutableStateFlow("")
+    val editingPath: StateFlow<String> = _editingPath
+
     fun playAudio(filePath: String) {
         viewModelScope.launch {
             when {
@@ -109,6 +118,44 @@ class CommentsViewModel(
         viewModelScope.launch {
             val comments = audioRepositoryImpl.getAudiosForTask(taskId.toString())
             _comments.value = comments
+        }
+    }
+
+    fun openEditDialog(filePath: String, currentName: String) {
+        _editingPath.value = filePath
+        _editingName.value = currentName
+        _showEditDialog.value = true
+    }
+
+    fun updateEditingName(newName: String) {
+        _editingName.value = newName
+    }
+
+    fun closeEditDialog() {
+        _showEditDialog.value = false
+        _editingPath.value = ""
+        _editingName.value = ""
+    }
+
+    fun confirmEditName() {
+        viewModelScope.launch {
+            val newName = editingName.value.trim()
+            val path = editingPath.value
+            val current = _comments.value.find { it.filePath == path } ?: return@launch
+
+            val isDuplicate = _comments.value.any {
+                it.title.equals(newName, ignoreCase = true) && it.filePath != path && it.associatedTaskId == current.associatedTaskId
+            }
+
+            if (newName.isBlank() || isDuplicate) return@launch
+
+            audioRepositoryImpl.updateAudioName(path, newName)
+
+            _comments.value = _comments.value.map {
+                if (it.filePath == path) it.copy(title = newName) else it
+            }
+
+            closeEditDialog()
         }
     }
 }

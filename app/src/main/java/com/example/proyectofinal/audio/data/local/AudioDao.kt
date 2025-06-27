@@ -19,4 +19,8 @@ interface AudioDao {
 
     @Query("DELETE FROM recorded_audio WHERE filePath = :filePath")
     suspend fun deleteByFilePath(filePath: String)
+
+    @Query("UPDATE recorded_audio SET title = :newTitle WHERE filePath = :filePath")
+    suspend fun updateTitleByFilePath(filePath: String, newTitle: String)
+
 }

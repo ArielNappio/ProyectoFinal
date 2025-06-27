@@ -92,10 +92,39 @@ class MailRepoImpl(
         ).map { it.toDomain() }
     }
 
-    override suspend fun getOutboxMessages(currentUserId: String): List<MessageModel> {
-        return messageDao.getOutboxMessages(
-            currentUserId
-        ).map { it.toDomain() }
+    override suspend fun getOutboxMessages(userId: String): Flow<NetworkResponse<List<MessageModel>>> = flow {
+        emit(NetworkResponse.Loading())
+        try {
+            mailProvider.receiveMessageOutbox().collect { response ->
+                when (response) {
+                    is NetworkResponse.Success -> {
+                        val messages = response.data ?: emptyList()
+                        messages.forEach { messageDao.insertMessage(it.toEntity()) }
+                        emit(NetworkResponse.Success(messages))
+                    }
+
+                    is NetworkResponse.Failure -> {
+                        // Si falla, intento cargar desde base local
+                        val localMessages = messageDao.getOutboxMessages(userId).map { it.toDomain() }
+                        if (localMessages.isNotEmpty()) {
+                            emit(NetworkResponse.Success(localMessages))
+                        } else {
+                            emit(NetworkResponse.Failure(response.error))
+                        }
+                    }
+
+                    is NetworkResponse.Loading -> {}
+                }
+            }
+        } catch (e: Exception) {
+            // Si la llamada al provider falla antes de collect (por ej. sin internet)
+            val localMessages = messageDao.getOutboxMessages(userId).map { it.toDomain() }
+            if (localMessages.isNotEmpty()) {
+                emit(NetworkResponse.Success(localMessages))
+            } else {
+                emit(NetworkResponse.Failure(e.toString()))
+            }
+        }
     }
 
     override suspend fun saveDraft(message: MessageModel) {

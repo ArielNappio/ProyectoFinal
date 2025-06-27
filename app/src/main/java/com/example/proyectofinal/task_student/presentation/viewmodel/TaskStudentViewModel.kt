@@ -128,6 +128,15 @@ class TaskStudentViewModel(
     private val _pitch = MutableStateFlow(1.0f)
     val pitch: StateFlow<Float> = _pitch.asStateFlow()
 
+    private val _editingPath = MutableStateFlow("")
+    val editingPath: StateFlow<String> = _editingPath
+
+    private val _editingName = MutableStateFlow("")
+    val editingName: StateFlow<String> = _editingName
+
+    private val _showEditDialog = MutableStateFlow(false)
+    val showEditDialog: StateFlow<Boolean> = _showEditDialog
+
     // Estados del Dialog
 
     private val _showExtraButton = MutableStateFlow(false)
@@ -195,6 +204,9 @@ class TaskStudentViewModel(
 
     private val _recordedFilePath = MutableStateFlow<String?>(null)
     val recordedFilePath: StateFlow<String?> = _recordedFilePath.asStateFlow()
+
+    private val _isDarkTheme = MutableStateFlow(true)
+    val isDarkTheme: StateFlow<Boolean> = _isDarkTheme
 
     init {
         viewModelScope.launch {
@@ -616,17 +628,16 @@ class TaskStudentViewModel(
         if (rate <= 0f) return
         _speechRate.value = rate
         ttsManager.setSpeechRate(rate)
-        if (_isSpeaking.value && !_isPaused.value) {
-            restartSpeechWithNewParams()
-        }
-    }
 
-    fun setPitch(newPitch: Float) {
-        if (newPitch <= 0f) return
-        _pitch.value = newPitch
-        ttsManager.setPitch(newPitch)
-        if (_isSpeaking.value && !_isPaused.value) {
-            restartSpeechWithNewParams()
+        when {
+            isSpeaking.value -> {
+                restartSpeechWithNewParams()
+            }
+
+            isPaused.value -> {
+                ttsManager.pause()
+            }
+            else -> {}
         }
     }
 
@@ -645,5 +656,56 @@ class TaskStudentViewModel(
         _showSpeechSettingsMenu.value = false
     }
 
+    fun playSpeech(){
+        ttsManager.resume()
+        _isSpeaking.value = true
+        _isPaused.value = false
+    }
+
+    fun pauseSpeech(){
+        ttsManager.pause()
+        _isSpeaking.value = false
+        _isPaused.value = true
+    }
+
+    fun openEditDialog(filePath: String, currentName: String) {
+        _editingPath.value = filePath
+        _editingName.value = currentName
+        _showEditDialog.value = true
+    }
+
+    fun updateEditingName(newName: String) {
+        _editingName.value = newName
+    }
+
+    fun closeEditDialog() {
+        _showEditDialog.value = false
+        _editingPath.value = ""
+        _editingName.value = ""
+    }
+
+    fun confirmEditName() {
+        viewModelScope.launch {
+            val newName = editingName.value.trim()
+            val path = editingPath.value
+            val current = _comments.value.find { it.filePath == path } ?: return@launch
+
+            val isDuplicate = _comments.value.any {
+                it.title.equals(newName, ignoreCase = true) &&
+                        it.filePath != path &&
+                        it.associatedTaskId == current.associatedTaskId
+            }
+
+            if (newName.isBlank() || isDuplicate) return@launch
+
+            audioRepositoryImpl.updateAudioName(path, newName)
+
+            _comments.value = _comments.value.map {
+                if (it.filePath == path) it.copy(title = newName) else it
+            }
+
+            closeEditDialog()
+        }
+    }
 
 }

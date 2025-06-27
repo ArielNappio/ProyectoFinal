@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Pause
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material3.Card
@@ -20,8 +21,6 @@ import androidx.compose.material3.Slider
 import androidx.compose.material3.SliderDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -37,11 +36,11 @@ fun CommentAudioCard(
     onPauseClick: () -> Unit,
     onDeleteClick: () -> Unit,
     onSeek: (Long, Boolean, String) -> Unit,
+    onEditClick: (String, String) -> Unit, // NUEVO
     modifier: Modifier = Modifier
 ) {
     val totalDuration = comment.duration.coerceAtLeast(1L)
     val formattedRemainingTime = formatDuration(comment.duration - currentPosition)
-    val sliderPosition = remember(currentPosition) { mutableStateOf(currentPosition.toFloat()) }
 
     Card(
         shape = RoundedCornerShape(12.dp),
@@ -51,7 +50,28 @@ fun CommentAudioCard(
         elevation = CardDefaults.cardElevation(4.dp)
     ) {
         Column(Modifier.padding(16.dp)) {
-            Text(comment.title, style = MaterialTheme.typography.titleMedium)
+
+            // ---------- Título con botón de editar ----------
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = comment.title,
+                    style = MaterialTheme.typography.titleMedium,
+                    modifier = Modifier.weight(1f)
+                )
+                IconButton(
+                    onClick = { onEditClick(comment.filePath, comment.title) }
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Edit,
+                        contentDescription = "Editar nombre",
+                        tint = MaterialTheme.colorScheme.primary
+                    )
+                }
+            }
+
             Spacer(Modifier.height(4.dp))
 
             Text(
@@ -60,6 +80,9 @@ fun CommentAudioCard(
                 color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
             )
 
+            Spacer(Modifier.height(8.dp))
+
+            // ---------- Controles ----------
             Row(verticalAlignment = Alignment.CenterVertically) {
                 IconButton(onClick = {
                     if (isPlaying) onPauseClick() else onPlayClick()
@@ -71,12 +94,12 @@ fun CommentAudioCard(
                 }
 
                 Slider(
-                    value = sliderPosition.value,
+                    value = currentPosition.toFloat(),
                     onValueChange = { newValue ->
-                        sliderPosition.value = newValue
+                        onSeek(newValue.toLong(), false, comment.filePath)
                     },
                     onValueChangeFinished = {
-                        onSeek(sliderPosition.value.toLong(), true, comment.filePath)
+                        onSeek(currentPosition, true, comment.filePath)
                     },
                     valueRange = 0f..totalDuration.toFloat(),
                     modifier = Modifier.weight(1f),
@@ -85,8 +108,8 @@ fun CommentAudioCard(
                         activeTrackColor = MaterialTheme.colorScheme.primary,
                         inactiveTrackColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.3f)
                     )
-
                 )
+
                 IconButton(onClick = {
                     onDeleteClick()
                 }) {

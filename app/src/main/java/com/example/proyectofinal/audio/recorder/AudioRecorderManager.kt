@@ -10,7 +10,7 @@ class AudioRecorderManager(private val context: Context) {
     private var outputFile: File? = null
 
     fun startRecording(): File {
-        val fileName = "audio_${System.currentTimeMillis()}.m4a"
+        val fileName = "Wirin_audio_${System.currentTimeMillis()}.m4a"
         val file = File(context.cacheDir, fileName)
 
         recorder = MediaRecorder().apply {

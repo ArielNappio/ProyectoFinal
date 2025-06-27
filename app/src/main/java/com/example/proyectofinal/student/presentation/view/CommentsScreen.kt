@@ -15,10 +15,13 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -45,6 +48,8 @@ fun CommentsScreen(
     val currentlyPlayingPath by viewModel.currentlyPlayingPath.collectAsState()
     val isPlaying by viewModel.isPlaying.collectAsState()
     val currentPosition by viewModel.currentPosition.collectAsState()
+    val showEditDialog by viewModel.showEditDialog.collectAsState()
+    val editingName by viewModel.editingName.collectAsState()
 
     LaunchedEffect(taskId){
         viewModel.loadCommentsByTaskId(taskId)
@@ -96,6 +101,9 @@ fun CommentsScreen(
                         },
                         onDeleteClick = {
                             viewModel.deleteComment(comment.filePath)
+                        },
+                        onEditClick = { filePath, newTitle ->
+                            viewModel.openEditDialog(comment.filePath, comment.title)
                         }
                     )
 
@@ -119,6 +127,35 @@ fun CommentsScreen(
                 }
             }
 
+        }
+
+
+        if (showEditDialog) {
+            AlertDialog(
+                onDismissRequest = { viewModel.closeEditDialog() },
+                confirmButton = {
+                    TextButton(
+                        onClick = { viewModel.confirmEditName() },
+                        enabled = editingName.isNotBlank()
+                    ) {
+                        Text("Guardar")
+                    }
+                },
+                dismissButton = {
+                    TextButton(onClick = { viewModel.closeEditDialog() }) {
+                        Text("Cancelar")
+                    }
+                },
+                title = { Text("Editar nombre") },
+                text = {
+                    OutlinedTextField(
+                        value = editingName,
+                        onValueChange = { viewModel.updateEditingName(it) },
+                        singleLine = true,
+                        label = { Text("Nuevo nombre") }
+                    )
+                }
+            )
         }
     }
 }
