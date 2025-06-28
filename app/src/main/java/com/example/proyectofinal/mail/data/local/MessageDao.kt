@@ -16,10 +16,6 @@ interface MessageDao {
     @Query("SELECT id FROM message")
     fun getAllMessageIds(): List<Int>
 
-    // Último mensaje enviado (que no sea borrador)
-    @Query("SELECT * FROM message WHERE isDraft = 0 ORDER BY date DESC LIMIT 1")
-    fun getLastMessage(): MessageEntity?
-
     // Mensajes en bandeja de entrada
     @Query("SELECT * FROM message WHERE userToID = :currentUserId ORDER BY date DESC")
     fun getInboxMessages(currentUserId: String): List<MessageEntity>

@@ -13,7 +13,7 @@ import com.example.proyectofinal.mail.domain.usecase.DeleteMessageByIdUseCase
 import com.example.proyectofinal.mail.domain.usecase.GetDraftByIdUseCase
 import com.example.proyectofinal.mail.domain.usecase.SaveDraftUseCase
 import com.example.proyectofinal.mail.domain.usecase.SendMessageUseCase
-import com.example.proyectofinal.users.domain.provider.usecase.GetUserUseCase
+import com.example.proyectofinal.users.domain.usecase.GetUserUseCase
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -94,6 +94,10 @@ class MessageViewModel(
         }
     }
 
+    suspend fun getUserIdByEmailSync(email: String): String {
+        return getUserUseCase().first().data?.find { it.email == email }?.id ?: ""
+    }
+
     fun getUserIdByEmail(email: String) {
         viewModelScope.launch {
             getUserUseCase().collect { response ->
@@ -101,6 +105,10 @@ class MessageViewModel(
                 _userToId.value = user?.id ?: ""
             }
         }
+    }
+
+    suspend fun getEmailByUserIdSync(userId: String): String {
+        return getUserUseCase().first().data?.find { it.id == userId }?.email ?: "Desconocido"
     }
 
     fun getEmailByUserId(userId: String) {

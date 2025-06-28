@@ -6,7 +6,6 @@ import com.example.proyectofinal.camera.presentation.viewmodel.CameraViewModel
 import com.example.proyectofinal.core.ui.ThemeViewModel
 import com.example.proyectofinal.navigation.presentation.viewmodel.MainViewModel
 import com.example.proyectofinal.student.presentation.viewmodel.CommentsViewModel
-import com.example.proyectofinal.student.presentation.viewmodel.DetailsViewModel
 import com.example.proyectofinal.student.presentation.viewmodel.HomeScreenViewModel
 import com.example.proyectofinal.student.presentation.viewmodel.ProjectDetailViewModel
 import com.example.proyectofinal.task_student.presentation.viewmodel.TaskStudentViewModel
@@ -22,7 +21,6 @@ val viewModelModule = module {
     viewModel { MainViewModel(get(), get()) }
     viewModel { HomeScreenViewModel(get(), get(), get(), get()) }
     viewModel { ProjectDetailViewModel(get(), get<TokenManager>(), get(),get(), get()) }
-    viewModel { DetailsViewModel(get()) }
     viewModel { TaskStudentViewModel(get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get()) }
     viewModel { CommentsViewModel(get(),get())}
     single { ThemeViewModel(get()) }

@@ -6,9 +6,9 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.proyectofinal.core.network.NetworkResponse
 import com.example.proyectofinal.users.data.model.User
-import com.example.proyectofinal.users.domain.provider.usecase.CreateUserUseCase
-import com.example.proyectofinal.users.domain.provider.usecase.DeleteUserUseCase
-import com.example.proyectofinal.users.domain.provider.usecase.GetUserUseCase
+import com.example.proyectofinal.users.domain.usecase.CreateUserUseCase
+import com.example.proyectofinal.users.domain.usecase.DeleteUserUseCase
+import com.example.proyectofinal.users.domain.usecase.GetUserUseCase
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow

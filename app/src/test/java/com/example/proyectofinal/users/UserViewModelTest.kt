@@ -5,9 +5,9 @@ import android.util.Log
 import com.example.proyectofinal.core.network.NetworkResponse
 import com.example.proyectofinal.users.data.model.User
 import com.example.proyectofinal.users.data.provider.UserProviderImpl
-import com.example.proyectofinal.users.domain.provider.usecase.CreateUserUseCase
-import com.example.proyectofinal.users.domain.provider.usecase.DeleteUserUseCase
-import com.example.proyectofinal.users.domain.provider.usecase.GetUserUseCase
+import com.example.proyectofinal.users.domain.usecase.CreateUserUseCase
+import com.example.proyectofinal.users.domain.usecase.DeleteUserUseCase
+import com.example.proyectofinal.users.domain.usecase.GetUserUseCase
 import com.example.proyectofinal.users.presentation.viewmodel.UserViewModel
 import io.mockk.coEvery
 import io.mockk.coVerify

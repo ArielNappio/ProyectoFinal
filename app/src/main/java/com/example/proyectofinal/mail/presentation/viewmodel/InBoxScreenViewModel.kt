@@ -11,10 +11,8 @@ import com.example.proyectofinal.mail.data.local.MessageDao
 import com.example.proyectofinal.mail.domain.model.MessageModel
 import com.example.proyectofinal.mail.domain.usecase.DeleteMessageByIdUseCase
 import com.example.proyectofinal.mail.domain.usecase.GetDraftMessagesUseCase
-import com.example.proyectofinal.mail.domain.usecase.GetOutboxMessagesUseCase
 import com.example.proyectofinal.mail.domain.usecase.ReceiveMessageUseCase
 import com.example.proyectofinal.mail.domain.usecase.ReceiveOutboxMessageUseCase
-import com.example.proyectofinal.users.domain.provider.usecase.GetUserUseCase
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -77,14 +75,15 @@ class InboxViewModel(
             val user = tokenManager.user.first()
             currentUserId = userId
             Log.d("InboxViewModel", "UserId obtenido: $userId")
-            Log.d("InboxViewModel", "User email? obtenido: ${user?.email}")
+            Log.d("InboxViewModel", "User email obtenido: ${user?.email}")
 
-            // Limpiar duplicados antes de cargar mensajes
+            _userEmail.value = user?.email // <-- ACA lo guardás en el StateFlow
+
             cleanUpDuplicates()
-
             loadMessages(userId.toString(), user?.email.toString())
         }
     }
+
 
     private fun cleanUpDuplicates() {
         viewModelScope.launch(Dispatchers.IO) {

@@ -11,8 +11,6 @@ import com.example.proyectofinal.mail.domain.repository.MailRepository
 import com.example.proyectofinal.mail.domain.usecase.DeleteMessageByIdUseCase
 import com.example.proyectofinal.mail.domain.usecase.GetDraftByIdUseCase
 import com.example.proyectofinal.mail.domain.usecase.GetDraftMessagesUseCase
-import com.example.proyectofinal.mail.domain.usecase.GetInboxMessagesUseCase
-import com.example.proyectofinal.mail.domain.usecase.GetOutboxMessagesUseCase
 import com.example.proyectofinal.mail.domain.usecase.ReceiveMessageUseCase
 import com.example.proyectofinal.mail.domain.usecase.ReceiveOutboxMessageUseCase
 import com.example.proyectofinal.mail.domain.usecase.SaveDraftUseCase
@@ -45,8 +43,6 @@ val mailModule = module {
     factory { SendMessageUseCase(get()) }
     factory { ReceiveMessageUseCase(get()) }
     factory { UpdateMessageUseCase(get()) }
-    factory { GetInboxMessagesUseCase(get()) }
-    factory { GetOutboxMessagesUseCase(get()) }
     factory { SaveDraftUseCase(get()) }
     factory { DeleteMessageByIdUseCase(get()) }
     factory { GetDraftMessagesUseCase(get()) }

@@ -1,6 +1,7 @@
 package com.example.proyectofinal.student.presentation.view
 
 import LoadingWithImageBar
+import android.annotation.SuppressLint
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -87,11 +88,11 @@ fun ProjectDetailScreen(
                 }
             )
         }
-    ) { paddingValues ->
+    ) {  paddingValues ->
         Box(
             modifier = modifier
                 .fillMaxSize()
-                .padding(top = 50.dp)
+                .padding(paddingValues)
         ) {
             when (val project = projectState) {
                 is NetworkResponse.Loading -> {
@@ -110,7 +111,7 @@ fun ProjectDetailScreen(
                         ProjectDetailContent(
                             project = projectData,
                             onViewInApp = { taskId ->
-                                navController.navigate("${ScreensRoute.Task.route}/$taskId")
+                                navController.navigate("${ScreensRoute.TaskStudent.route}/$taskId")
                             },
                             onViewAnnotations = { taskId ->
                                 navController.navigate("${ScreensRoute.Comments.route}/$taskId")

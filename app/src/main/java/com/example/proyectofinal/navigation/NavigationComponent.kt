@@ -25,7 +25,6 @@ import com.example.proyectofinal.student.presentation.view.HomeScreen
 import com.example.proyectofinal.student.presentation.view.ProjectDetailScreen
 import com.example.proyectofinal.student.presentation.view.SearchScreen
 import com.example.proyectofinal.student.presentation.view.StudentProfileScreen
-import com.example.proyectofinal.student.presentation.view.TaskDetailScreen
 import com.example.proyectofinal.task_student.presentation.view.TaskStudent
 import com.example.proyectofinal.text_editor.presentation.view.TextEditorScreen
 import com.example.proyectofinal.userpreferences.presentation.view.FontPreferencesScreen
@@ -54,19 +53,6 @@ fun NavigationComponent(
             SearchScreen(navController)
         }
         composable(
-            route = "${ScreensRoute.TaskDetails.route}/{taskId}",
-            arguments = listOf(
-                navArgument("taskId") { type = NavType.IntType }
-            )
-        ) { navBackStackEntry ->
-            val taskID = navBackStackEntry.arguments?.getInt("taskId") ?: 0
-            TaskDetailScreen(
-                modifier = modifier,
-                taskId = taskID,
-                navController = navController
-            )
-        }
-        composable(
             route = "${ScreensRoute.ProjectDetail.route}/{projectId}",
             arguments = listOf(
                 navArgument("projectId") { type = NavType.StringType }
@@ -80,7 +66,7 @@ fun NavigationComponent(
             )
         }
         composable(
-            route = "${ScreensRoute.Task.route}/{taskId}",
+            route = "${ScreensRoute.TaskStudent.route}/{taskId}",
             arguments = listOf(
                 navArgument("taskId") { type = NavType.IntType }
             )
@@ -134,20 +120,24 @@ fun NavigationComponent(
                 navArgument("mailboxType") { type = NavType.StringType }
             )
         ) { backStackEntry ->
+
             val messageId = backStackEntry.arguments?.getInt("messageId") ?: -1
             val mailboxType = MailboxType.valueOf(backStackEntry.arguments?.getString("mailboxType") ?: "INBOX")
 
             val inboxViewModel: InboxViewModel = koinViewModel()
             val messageVm: MessageViewModel = koinViewModel()
+
             val message = inboxViewModel.getMessageById(messageId)
 
             val userEmail = inboxViewModel.userEmail.collectAsState().value
-            val recipientEmail = messageVm.to.collectAsState().value
+            val otherPartyEmail = messageVm.to.collectAsState().value // <- le cambio el nombre para que quede claro
 
+            // Trae el mail de quien corresponda según mailboxType
             LaunchedEffect(message) {
                 message?.let {
-                    if (mailboxType == MailboxType.OUTBOX || mailboxType == MailboxType.DRAFT) {
-                        messageVm.getEmailByUserId(it.userToId)
+                    when (mailboxType) {
+                        MailboxType.OUTBOX, MailboxType.DRAFT -> messageVm.getEmailByUserId(it.userToId)
+                        MailboxType.INBOX -> messageVm.getEmailByUserId(it.userFromId)
                     }
                 }
             }
@@ -157,7 +147,7 @@ fun NavigationComponent(
                     message = it,
                     mailboxType = mailboxType,
                     userEmail = userEmail ?: "Desconocido",
-                    recipientEmail = if (mailboxType == MailboxType.INBOX) userEmail ?: "Desconocido" else recipientEmail,
+                    recipientEmail = otherPartyEmail, // <- ahora siempre le pasa lo que recuperó del ViewModel
                     onBack = { navController.popBackStack() },
                     onReply = { msg ->
                         navController.navigate(

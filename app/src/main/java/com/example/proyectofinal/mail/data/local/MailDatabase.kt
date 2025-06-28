@@ -5,7 +5,7 @@ import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 import com.example.proyectofinal.mail.data.entity.MessageEntity
 
-@Database(entities = [MessageEntity::class], version = 8)
+@Database(entities = [MessageEntity::class], version = 9)
 @TypeConverters(Converters::class)
 abstract class MailDatabase : RoomDatabase(){
     abstract fun messageDao(): MessageDao

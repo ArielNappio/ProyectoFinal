@@ -56,6 +56,7 @@ import com.example.proyectofinal.mail.domain.model.MessageModel
 import com.example.proyectofinal.mail.presentation.component.MessageItem
 import com.example.proyectofinal.mail.presentation.viewmodel.InboxViewModel
 import com.example.proyectofinal.navigation.ScreensRoute
+import com.example.proyectofinal.userpreferences.presentation.component.AppText
 import org.koin.androidx.compose.koinViewModel
 
 @RequiresApi(Build.VERSION_CODES.O)
@@ -94,7 +95,7 @@ fun InboxScreen(
         ) {
             Icon(Icons.Filled.Add, contentDescription = "Redactar", tint = Color.White)
             Spacer(Modifier.width(6.dp))
-            Text("Redactar", color = Color.White, fontSize = 18.sp)
+            AppText("Redactar", color = Color.White)
         }
 
         if (mailboxType == MailboxType.DRAFT) {
@@ -129,11 +130,9 @@ fun InboxScreen(
                             .padding(top = 32.dp),
                         contentAlignment = Alignment.Center
                     ) {
-                        Text(
+                        AppText(
                             text = "Error al cargar mensajes",
-                            color = Color.Red,
-                            fontSize = 16.sp
-                        )
+                            color = Color.Red)
                     }
                 }
 
@@ -227,13 +226,12 @@ fun InboxScreenTopBar(
 
             Spacer(modifier = Modifier.width(8.dp))
 
-            Text(
+            AppText(
                 text = when (mailboxType) {
                     MailboxType.INBOX -> "Bandeja de Entrada"
                     MailboxType.OUTBOX -> "Bandeja de Salida"
                     MailboxType.DRAFT -> "Borradores"
                 },
-                fontSize = 20.sp,
                 fontWeight = FontWeight.Bold,
                 modifier = Modifier.weight(1f),
                 textAlign = TextAlign.Center
@@ -315,6 +313,7 @@ fun InboxScreenTopBar(
 }
 
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun MessageList(
     messages: List<MessageModel>,
@@ -332,10 +331,9 @@ fun MessageList(
                 .padding(),
             contentAlignment = Alignment.Center
         ) {
-            Text(
+            AppText(
                 text = "No hay mensajes aún.",
                 color = Color.White,
-                fontSize = 18.sp,
                 textAlign = TextAlign.Center
             )
         }

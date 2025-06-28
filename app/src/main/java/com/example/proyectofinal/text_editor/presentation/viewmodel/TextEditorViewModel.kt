@@ -6,7 +6,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.proyectofinal.core.network.ApiUrls
 import com.example.proyectofinal.core.network.NetworkResponse
-import com.example.proyectofinal.student.domain.usecase.GetTaskById
 import com.example.proyectofinal.text_editor.data.repository.PdfProviderImpl
 import com.example.proyectofinal.text_editor.domain.PdfBitmapConverter
 import kotlinx.coroutines.CoroutineDispatcher
@@ -19,7 +18,6 @@ import kotlinx.coroutines.launch
 class TextEditorViewModel(
     private val pdfBitmapConverter: PdfBitmapConverter,
     private val pdfRemoteRepository: PdfProviderImpl,
-    private val getTaskById: GetTaskById,
     private val dispatcher: CoroutineDispatcher = Dispatchers.IO
 ): ViewModel() {
 
@@ -36,17 +34,17 @@ class TextEditorViewModel(
     fun getProcessedTask(context: Context, id: Int) {
         viewModelScope.launch(dispatcher) {
             downloadPdf(context)
-            getTaskById(id).collect {
-                _textState.value = it.data?.description ?:
-                    when (it) {
-//                        is NetworkResponse.Failure<*> -> "Error al cargar la tarea"
-                        is NetworkResponse.Loading<*> -> "Cargando..."
-                        is NetworkResponse.Success<*>, is NetworkResponse.Failure<*> -> {
-                            _isLoadingText.value = false
-                            "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum. Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum"
-                        }
-                    }
-            }
+//            getTaskById(id).collect {
+//                _textState.value = it.data?.description ?:
+//                    when (it) {
+////                        is NetworkResponse.Failure<*> -> "Error al cargar la tarea"
+//                        is NetworkResponse.Loading<*> -> "Cargando..."
+//                        is NetworkResponse.Success<*>, is NetworkResponse.Failure<*> -> {
+//                            _isLoadingText.value = false
+//                            "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum. Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum"
+//                        }
+//                    }
+//            }
         }
     }
 

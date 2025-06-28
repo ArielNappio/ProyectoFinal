@@ -16,9 +16,6 @@ import com.example.proyectofinal.orderFeedback.di.feedbackModule
 import com.example.proyectofinal.orderManagement.di.lastReadModule
 import com.example.proyectofinal.orderManagement.di.orderDatabaseModule
 import com.example.proyectofinal.orderManagement.di.orderModule
-import com.example.proyectofinal.student.data.di.CommentsRepositoryModule
-import com.example.proyectofinal.student.data.di.taskProviderModule
-import com.example.proyectofinal.student.data.di.taskRepositoryModule
 import com.example.proyectofinal.task_student.di.downloadFileUseCasesModule
 import com.example.proyectofinal.task_student.di.ttsModule
 import com.example.proyectofinal.text_editor.di.pdfBitmapConverterModule
@@ -44,11 +41,8 @@ class WirinApplication: Application() {
                 viewModelModule,
                 useCaseModule,
                 tokenManagerModule,
-                taskRepositoryModule,
-                taskProviderModule,
                 ttsModule,
                 downloadFileUseCasesModule,
-                CommentsRepositoryModule,
                 mailDatabaseModule,
                 mailModule,
                 preferencesModule,
