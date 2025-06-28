@@ -7,6 +7,7 @@ import com.example.proyectofinal.orderManagement.data.repository.LastReadReposit
 import com.example.proyectofinal.orderManagement.domain.model.OrderDelivered
 import com.example.proyectofinal.orderManagement.domain.model.OrderParagraph
 import com.example.proyectofinal.orderManagement.domain.model.OrderStudent
+import com.example.proyectofinal.orderManagement.domain.repository.OrderRepository
 import com.example.proyectofinal.orderManagement.domain.usecase.GetTaskGroupByStudentUseCase
 import com.example.proyectofinal.orderManagement.domain.usecase.UpdateFavoriteStatusUseCase
 import com.example.proyectofinal.student.presentation.viewmodel.ProjectDetailViewModel
@@ -26,10 +27,10 @@ import org.junit.Test
 class ProjectDetailViewModelTest {
 
     private lateinit var viewModel: ProjectDetailViewModel
-    private lateinit var getOrders: GetTaskGroupByStudentUseCase
     private lateinit var tokenManager: TokenManager
     private lateinit var updateFavoriteStatusUseCase: UpdateFavoriteStatusUseCase
     private lateinit var lastReadRepository: LastReadRepository
+    private lateinit var orderRepository: OrderRepository
 
     private val repository: UserPreferencesRepository = mockk(relaxed = true)
     private val testDispatcher = StandardTestDispatcher()
@@ -71,18 +72,19 @@ class ProjectDetailViewModelTest {
 
     @Before
     fun setUp() {
-        getOrders = mockk()
         tokenManager = mockk()
         updateFavoriteStatusUseCase = mockk()
         coEvery { tokenManager.userId } returns flowOf(userId)
-        coEvery { getOrders(userId) } returns flowOf(
-            NetworkResponse.Success(orderDeliveredMock)
-        )
         lastReadRepository = mockk()
         coEvery { lastReadRepository.getLastReadPage(any()) } returns 1
 
+        orderRepository = mockk()
+        coEvery { orderRepository.getTasks(userId) } returns flowOf(
+            NetworkResponse.Success(orderDeliveredMock)
+        )
+
         viewModel = ProjectDetailViewModel(
-            getOrders,
+            GetTaskGroupByStudentUseCase(orderRepository),
             tokenManager,
             updateFavoriteStatusUseCase,
             repository,
@@ -96,7 +98,7 @@ class ProjectDetailViewModelTest {
         testDispatcher.scheduler.advanceUntilIdle()
 
         viewModel.projectState.test {
-            skipItems(1)
+            testDispatcher.scheduler.advanceUntilIdle()
             val state = awaitItem()
             assert(state is NetworkResponse.Success)
             assertEquals(projectId, (state as NetworkResponse.Success).data!!.id)
@@ -107,13 +109,21 @@ class ProjectDetailViewModelTest {
     @Test
     fun `loadProject should update projectState with failure when project not found`() =
         testScope.runTest {
-            coEvery { getOrders(userId) } returns flowOf(NetworkResponse.Success(emptyList()))
+            coEvery { orderRepository.getTasks(userId) } returns flowOf(
+                NetworkResponse.Success(emptyList())
+            )
+            viewModel = ProjectDetailViewModel(
+                GetTaskGroupByStudentUseCase(orderRepository),
+                tokenManager,
+                updateFavoriteStatusUseCase,
+                repository,
+                lastReadRepository
+            )
 
             viewModel.loadProject(projectId)
             testDispatcher.scheduler.advanceUntilIdle()
 
             viewModel.projectState.test {
-                skipItems(1)
                 val state = awaitItem()
                 assert(state is NetworkResponse.Failure)
                 assertEquals(
@@ -132,9 +142,10 @@ class ProjectDetailViewModelTest {
             coEvery { updateFavoriteStatusUseCase(projectId, isFavorite) } just Runs
 
             viewModel.loadProject(projectId)
+            testDispatcher.scheduler.advanceUntilIdle()
+
             viewModel.projectState.test {
-                skipItems(2)
-                cancelAndConsumeRemainingEvents()
+                skipItems(1)
                 viewModel.toggleFavorite(projectId, isFavorite)
                 testDispatcher.scheduler.advanceUntilIdle()
                 viewModel.projectState.test {
@@ -143,6 +154,7 @@ class ProjectDetailViewModelTest {
                     assertEquals(isFavorite, (state as NetworkResponse.Success).data!!.isFavorite)
                     cancelAndConsumeRemainingEvents()
                 }
+                cancelAndConsumeRemainingEvents()
             }
         }
 }
