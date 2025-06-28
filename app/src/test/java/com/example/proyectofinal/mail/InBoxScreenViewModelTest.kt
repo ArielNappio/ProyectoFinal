@@ -1,19 +1,19 @@
 package com.example.proyectofinal.mail
 
 import android.util.Log
+import com.example.proyectofinal.auth.data.model.UserResponseDto
 import com.example.proyectofinal.auth.data.tokenmanager.TokenManager
 import com.example.proyectofinal.core.network.NetworkResponse
+import com.example.proyectofinal.mail.data.local.MessageDao
 import com.example.proyectofinal.mail.domain.model.MessageModel
 import com.example.proyectofinal.mail.domain.usecase.DeleteMessageByIdUseCase
 import com.example.proyectofinal.mail.domain.usecase.GetDraftMessagesUseCase
 import com.example.proyectofinal.mail.domain.usecase.GetInboxMessagesUseCase
-import com.example.proyectofinal.mail.domain.usecase.GetOutboxMessagesUseCase
 import com.example.proyectofinal.mail.domain.usecase.ReceiveMessageUseCase
 import com.example.proyectofinal.mail.domain.usecase.ReceiveOutboxMessageUseCase
 import com.example.proyectofinal.mail.presentation.viewmodel.InboxViewModel
 import com.example.proyectofinal.users.data.model.User
 import com.example.proyectofinal.users.data.provider.UserProviderImpl
-import com.example.proyectofinal.users.domain.provider.usecase.GetUserUseCase
 import io.mockk.Runs
 import io.mockk.coEvery
 import io.mockk.coVerify
@@ -39,11 +39,11 @@ import kotlin.test.assertEquals
 class InBoxScreenViewModelTest {
 
     private val getInboxMessagesUseCase: GetInboxMessagesUseCase = mockk()
-    private val getOutboxMessagesUseCase: GetOutboxMessagesUseCase = mockk()
     private val getDraftMessagesUseCase: GetDraftMessagesUseCase = mockk()
     private val deleteMessageByIdUseCase: DeleteMessageByIdUseCase = mockk()
     private val receiveOutboxMessagesUseCase: ReceiveOutboxMessageUseCase = mockk()
     private val receiveMessageUseCase: ReceiveMessageUseCase = mockk()
+    private val messageDao: MessageDao = mockk(relaxed = true)
     private val tokenManager: TokenManager = mockk()
     private val userProviderMock: UserProviderImpl = mockk()
 
@@ -57,12 +57,6 @@ class InBoxScreenViewModelTest {
             "2025-06-01", "Content of the inbox message", isResponse = false
         )
     )
-    private val outboxMessagesStub = listOf(
-        MessageModel(
-            2, "userFromId", "1", false, "sender", "Subject",
-            "2025-06-01", "Content of the outbox message", isResponse = false
-        )
-    )
     private val draftMessagesStub = listOf(
         MessageModel(
             3, "userFromId", "1", true, "sender", "Subject",
@@ -70,6 +64,7 @@ class InBoxScreenViewModelTest {
         )
     )
     private val userMock = User("1", "user1", "User One", "user1@example.com", "password", "1234567890", listOf("role1"))
+    private val userResponseMock = UserResponseDto("user1", "user1@example.com", "User One", listOf("role1"))
 
     @Before
     fun setup() {
@@ -80,26 +75,29 @@ class InBoxScreenViewModelTest {
         every { Log.e(any(), any()) } returns 0
 
         coEvery { getInboxMessagesUseCase(any()) } returns inboxMessagesStub
-        coEvery { getOutboxMessagesUseCase(any()) } returns outboxMessagesStub
         coEvery { getDraftMessagesUseCase() } returns draftMessagesStub
         coEvery { deleteMessageByIdUseCase(any()) } returns Unit
         coEvery { receiveMessageUseCase(any()) } returns flowOf(
             NetworkResponse.Success(listOf())
         )
+        coEvery { receiveOutboxMessagesUseCase(any()) } returns flowOf(
+            NetworkResponse.Success(emptyList())
+        )
         coEvery { tokenManager.token } returns flowOf(null)
         coEvery { tokenManager.saveToken(any()) } just Runs
         coEvery { tokenManager.userId } returns flowOf("example_id")
+        coEvery { tokenManager.user } returns flowOf(userResponseMock)
         coEvery { tokenManager.saveUserId(any()) } just Runs
         coEvery { tokenManager.saveUser(any()) } just Runs
 
         coEvery { userProviderMock.getUsers() } returns flowOf(NetworkResponse.Success(listOf(userMock)))
-        val getUserUseCase = GetUserUseCase(userProviderMock)
+
         viewModel = InboxViewModel(
             getDraftMessagesUseCase,
             deleteMessageByIdUseCase,
             receiveMessageUseCase,
             receiveOutboxMessagesUseCase,
-            getUserUseCase,
+            messageDao,
             tokenManager
         )
     }
