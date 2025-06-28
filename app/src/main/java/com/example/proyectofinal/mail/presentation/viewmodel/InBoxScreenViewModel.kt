@@ -77,14 +77,15 @@ class InboxViewModel(
             val user = tokenManager.user.first()
             currentUserId = userId
             Log.d("InboxViewModel", "UserId obtenido: $userId")
-            Log.d("InboxViewModel", "User email? obtenido: ${user?.email}")
+            Log.d("InboxViewModel", "User email obtenido: ${user?.email}")
 
-            // Limpiar duplicados antes de cargar mensajes
+            _userEmail.value = user?.email // <-- ACA lo guardás en el StateFlow
+
             cleanUpDuplicates()
-
             loadMessages(userId.toString(), user?.email.toString())
         }
     }
+
 
     private fun cleanUpDuplicates() {
         viewModelScope.launch(Dispatchers.IO) {

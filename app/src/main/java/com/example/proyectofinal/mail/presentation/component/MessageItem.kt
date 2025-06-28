@@ -1,5 +1,7 @@
 package com.example.proyectofinal.mail.presentation.component
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import com.example.proyectofinal.mail.domain.model.MailboxType
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.foundation.clickable
@@ -27,11 +29,20 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.produceState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import com.example.proyectofinal.mail.domain.model.MessageModel
+import com.example.proyectofinal.mail.presentation.viewmodel.InboxViewModel
+import com.example.proyectofinal.mail.presentation.viewmodel.MessageViewModel
+import com.example.proyectofinal.userpreferences.presentation.component.AppText
+import org.koin.androidx.compose.koinViewModel
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun MessageItem(
     message: MessageModel,
@@ -42,6 +53,17 @@ fun MessageItem(
     onDelete: ((String) -> Unit)? = null,
     onContinueEditing: ((MessageModel) -> Unit)? = null
 ) {
+    val messageVm: MessageViewModel = koinViewModel()
+
+    val emailState = messageVm.to.collectAsState()
+
+    LaunchedEffect(message.userFromId) {
+        messageVm.getEmailByUserId(message.userFromId)
+    }
+
+    val fromEmail = emailState.value.ifBlank { "Cargando..." }
+
+
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -54,25 +76,28 @@ fun MessageItem(
             headlineContent = {
                 when(type) {
                     MailboxType.INBOX -> {
-                        Text(
-                            text = "De: ${message.sender}",
+                        AppText(
+                            text = "De: $fromEmail",
                             color = Color.White,
-                            style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold, fontSize = 18.sp)
+                            fontWeight = FontWeight.Bold,
+                            isTitle = true,
                         )
                     }
                     MailboxType.OUTBOX -> {
-                        Text(
+                        AppText(
                             text = "Para: ${message.sender}",
                             color = Color.White,
-                            style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold, fontSize = 18.sp)
+                            fontWeight = FontWeight.Bold,
+                            isTitle = true,
                         )
                 }
 
                     MailboxType.DRAFT -> {
-                        Text(
+                        AppText(
                             text = "Para: ${message.sender}",
                             color = Color.White,
-                            style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold, fontSize = 18.sp)
+                            fontWeight = FontWeight.Bold,
+                            isTitle = true,
                         )
                     }
                 }
@@ -80,15 +105,13 @@ fun MessageItem(
             },
             supportingContent = {
                 Column {
-                    Text(
+                    AppText(
                         text = "Asunto: ${message.subject}",
                         color = Color.White,
-                        fontSize = 18.sp
                     )
-                    Text(
+                    AppText(
                         text = "Fecha: ${message.date}",
                         color = Color.Gray,
-                        fontSize = 16.sp
                     )
                 }
             },

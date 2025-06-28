@@ -134,20 +134,24 @@ fun NavigationComponent(
                 navArgument("mailboxType") { type = NavType.StringType }
             )
         ) { backStackEntry ->
+
             val messageId = backStackEntry.arguments?.getInt("messageId") ?: -1
             val mailboxType = MailboxType.valueOf(backStackEntry.arguments?.getString("mailboxType") ?: "INBOX")
 
             val inboxViewModel: InboxViewModel = koinViewModel()
             val messageVm: MessageViewModel = koinViewModel()
+
             val message = inboxViewModel.getMessageById(messageId)
 
             val userEmail = inboxViewModel.userEmail.collectAsState().value
-            val recipientEmail = messageVm.to.collectAsState().value
+            val otherPartyEmail = messageVm.to.collectAsState().value // <- le cambio el nombre para que quede claro
 
+            // Trae el mail de quien corresponda según mailboxType
             LaunchedEffect(message) {
                 message?.let {
-                    if (mailboxType == MailboxType.OUTBOX || mailboxType == MailboxType.DRAFT) {
-                        messageVm.getEmailByUserId(it.userToId)
+                    when (mailboxType) {
+                        MailboxType.OUTBOX, MailboxType.DRAFT -> messageVm.getEmailByUserId(it.userToId)
+                        MailboxType.INBOX -> messageVm.getEmailByUserId(it.userFromId)
                     }
                 }
             }
@@ -157,7 +161,7 @@ fun NavigationComponent(
                     message = it,
                     mailboxType = mailboxType,
                     userEmail = userEmail ?: "Desconocido",
-                    recipientEmail = if (mailboxType == MailboxType.INBOX) userEmail ?: "Desconocido" else recipientEmail,
+                    recipientEmail = otherPartyEmail, // <- ahora siempre le pasa lo que recuperó del ViewModel
                     onBack = { navController.popBackStack() },
                     onReply = { msg ->
                         navController.navigate(

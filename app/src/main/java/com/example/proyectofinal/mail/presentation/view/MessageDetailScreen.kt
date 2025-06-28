@@ -21,6 +21,7 @@ import com.example.proyectofinal.core.theme.BlueDark
 import com.example.proyectofinal.core.theme.GreenLight
 import com.example.proyectofinal.mail.domain.model.MailboxType
 import com.example.proyectofinal.mail.domain.model.MessageModel
+import com.example.proyectofinal.userpreferences.presentation.component.AppText
 import java.io.File
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -37,7 +38,7 @@ fun MessageDetailScreen(
         containerColor = Color(0xFF121212),
         topBar = {
             TopAppBar(
-                title = { Text("Detalle de mensaje", color = Color.White) },
+                title = { AppText("Detalle de mensaje", color = Color.White) },
                 navigationIcon = {
                     IconButton(onClick = { onBack() }) {
                         Icon(
@@ -59,42 +60,37 @@ fun MessageDetailScreen(
                 .padding(16.dp)
                 .verticalScroll(rememberScrollState())
         ) {
-            Text("De:", color = Color.White, fontSize = 14.sp, fontWeight = FontWeight.Bold)
-            Text(
+            AppText("De:", color = Color.White, fontWeight = FontWeight.Bold)
+            AppText(
                 text = when (mailboxType) {
-                    MailboxType.INBOX -> message.sender
+                    MailboxType.INBOX -> recipientEmail // remitente (desde userFromId)
                     MailboxType.OUTBOX, MailboxType.DRAFT -> userEmail
-                },
-                color = Color.White,
-                fontSize = 16.sp
+                }
             )
             HorizontalDivider(Modifier.padding(vertical = 8.dp), color = Color.Gray)
 
-            Text("Para:", color = Color.White, fontSize = 14.sp, fontWeight = FontWeight.Bold)
-            Text(
+            AppText("Para:", color = Color.White, fontWeight = FontWeight.Bold)
+            AppText(
                 text = when (mailboxType) {
                     MailboxType.INBOX -> userEmail
-                    MailboxType.OUTBOX, MailboxType.DRAFT -> recipientEmail
-                },
-                color = Color.White,
-                fontSize = 16.sp
+                    MailboxType.OUTBOX, MailboxType.DRAFT -> message.sender
+                }
             )
 
             HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp), color = Color.Gray)
 
-            Text("Asunto:", color = Color.White, fontSize = 14.sp, fontWeight = FontWeight.Bold)
-            Text(message.subject, color = Color.White, fontSize = 16.sp)
+            AppText("Asunto:", color = Color.White, fontWeight = FontWeight.Bold)
+            AppText(message.subject, color = Color.White)
             HorizontalDivider(color = Color.Gray, modifier = Modifier.padding(vertical = 8.dp))
 
-            Text("Fecha:", color = Color.White, fontSize = 14.sp, fontWeight = FontWeight.Bold)
-            Text(message.date, color = Color.White, fontSize = 16.sp)
+            AppText("Fecha:", color = Color.White, fontWeight = FontWeight.Bold)
+            AppText(message.date, color = Color.White)
             HorizontalDivider(color = Color.Gray, modifier = Modifier.padding(vertical = 8.dp))
 
-            Text("Mensaje:", color = Color.White, fontSize = 14.sp, fontWeight = FontWeight.Bold)
-            Text(
+            AppText("Mensaje:", color = Color.White, fontWeight = FontWeight.Bold)
+            AppText(
                 message.content,
                 color = Color.White,
-                fontSize = 16.sp,
                 modifier = Modifier.padding(top = 8.dp)
             )
 
@@ -104,10 +100,9 @@ fun MessageDetailScreen(
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Icon(Icons.Default.AttachFile, contentDescription = null, tint = GreenLight)
                         Spacer(Modifier.width(8.dp))
-                        Text(
+                        AppText(
                             File(it).name,
-                            color = GreenLight,
-                            fontSize = 16.sp
+                            color = GreenLight
                         )
                     }
                 }
@@ -115,11 +110,10 @@ fun MessageDetailScreen(
 
             if (message.isResponse) {
                 Spacer(Modifier.height(16.dp))
-                Text("Respuesta:", color = Color.White, fontSize = 14.sp, fontWeight = FontWeight.Bold)
-                Text(
+                AppText("Respuesta:", color = Color.White, fontWeight = FontWeight.Bold)
+                AppText(
                     message.responseText ?: "Sin respuesta",
                     color = Color.White,
-                    fontSize = 16.sp,
                     modifier = Modifier.padding(top = 8.dp)
                 )
             }
@@ -139,7 +133,7 @@ fun MessageDetailScreen(
                         tint = GreenLight
                     )
                     Spacer(Modifier.width(8.dp))
-                    Text("Responder", color = GreenLight, fontSize = 18.sp)
+                    AppText("Responder", color = GreenLight)
                 }
             }
         }

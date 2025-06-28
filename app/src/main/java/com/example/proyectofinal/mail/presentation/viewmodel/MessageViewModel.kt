@@ -94,6 +94,10 @@ class MessageViewModel(
         }
     }
 
+    suspend fun getUserIdByEmailSync(email: String): String {
+        return getUserUseCase().first().data?.find { it.email == email }?.id ?: ""
+    }
+
     fun getUserIdByEmail(email: String) {
         viewModelScope.launch {
             getUserUseCase().collect { response ->
@@ -101,6 +105,10 @@ class MessageViewModel(
                 _userToId.value = user?.id ?: ""
             }
         }
+    }
+
+    suspend fun getEmailByUserIdSync(userId: String): String {
+        return getUserUseCase().first().data?.find { it.id == userId }?.email ?: "Desconocido"
     }
 
     fun getEmailByUserId(userId: String) {
