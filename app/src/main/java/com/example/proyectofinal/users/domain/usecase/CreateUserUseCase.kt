@@ -1,4 +1,4 @@
-package com.example.proyectofinal.users.domain.provider.usecase
+package com.example.proyectofinal.users.domain.usecase
 
 import com.example.proyectofinal.users.data.model.User
 import com.example.proyectofinal.users.data.provider.UserProviderImpl

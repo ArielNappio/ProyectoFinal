@@ -25,7 +25,6 @@ import com.example.proyectofinal.student.presentation.view.HomeScreen
 import com.example.proyectofinal.student.presentation.view.ProjectDetailScreen
 import com.example.proyectofinal.student.presentation.view.SearchScreen
 import com.example.proyectofinal.student.presentation.view.StudentProfileScreen
-import com.example.proyectofinal.student.presentation.view.TaskDetailScreen
 import com.example.proyectofinal.task_student.presentation.view.TaskStudent
 import com.example.proyectofinal.text_editor.presentation.view.TextEditorScreen
 import com.example.proyectofinal.userpreferences.presentation.view.FontPreferencesScreen
@@ -54,19 +53,6 @@ fun NavigationComponent(
             SearchScreen(navController)
         }
         composable(
-            route = "${ScreensRoute.TaskDetails.route}/{taskId}",
-            arguments = listOf(
-                navArgument("taskId") { type = NavType.IntType }
-            )
-        ) { navBackStackEntry ->
-            val taskID = navBackStackEntry.arguments?.getInt("taskId") ?: 0
-            TaskDetailScreen(
-                modifier = modifier,
-                taskId = taskID,
-                navController = navController
-            )
-        }
-        composable(
             route = "${ScreensRoute.ProjectDetail.route}/{projectId}",
             arguments = listOf(
                 navArgument("projectId") { type = NavType.StringType }
@@ -80,7 +66,7 @@ fun NavigationComponent(
             )
         }
         composable(
-            route = "${ScreensRoute.Task.route}/{taskId}",
+            route = "${ScreensRoute.TaskStudent.route}/{taskId}",
             arguments = listOf(
                 navArgument("taskId") { type = NavType.IntType }
             )

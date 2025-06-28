@@ -13,7 +13,7 @@ import com.example.proyectofinal.mail.domain.usecase.SendMessageUseCase
 import com.example.proyectofinal.mail.presentation.viewmodel.MessageViewModel
 import com.example.proyectofinal.users.data.model.User
 import com.example.proyectofinal.users.domain.provider.UserProvider
-import com.example.proyectofinal.users.domain.provider.usecase.GetUserUseCase
+import com.example.proyectofinal.users.domain.usecase.GetUserUseCase
 import io.mockk.Runs
 import io.mockk.coEvery
 import io.mockk.coVerify
