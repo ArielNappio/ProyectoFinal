@@ -2,7 +2,6 @@ package com.example.proyectofinal.text_editor
 
 import android.content.Context
 import android.graphics.Bitmap
-import com.example.proyectofinal.student.domain.usecase.GetTaskById
 import com.example.proyectofinal.text_editor.data.repository.PdfProviderImpl
 import com.example.proyectofinal.text_editor.domain.PdfBitmapConverter
 import com.example.proyectofinal.text_editor.presentation.viewmodel.TextEditorViewModel
@@ -29,7 +28,6 @@ class TextEditorViewModelTest {
     private lateinit var mockFile: File
     private lateinit var mockBitmapList: List<Bitmap>
     private lateinit var mockPdfRemoteRepository: PdfProviderImpl
-    private lateinit var mockGetTaskById: GetTaskById
     private val testDispatcher = StandardTestDispatcher()
     private val testScope = TestScope(testDispatcher)
 
@@ -41,10 +39,9 @@ class TextEditorViewModelTest {
         mockBitmapList = listOf(mockk())
         mockPdfBitmapConverter = mockk()
         mockPdfRemoteRepository = mockk()
-        mockGetTaskById = mockk()
         coEvery { mockPdfBitmapConverter.pdfToBitmaps(mockFile) } returns mockBitmapList
         coEvery { mockPdfRemoteRepository.downloadPdf(mockContext, any()) } returns mockFile
-        viewModel = TextEditorViewModel(mockPdfBitmapConverter, mockPdfRemoteRepository, mockGetTaskById, testDispatcher)
+        viewModel = TextEditorViewModel(mockPdfBitmapConverter, mockPdfRemoteRepository, testDispatcher)
     }
 
     @Test

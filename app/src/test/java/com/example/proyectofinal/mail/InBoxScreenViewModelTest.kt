@@ -8,7 +8,6 @@ import com.example.proyectofinal.mail.data.local.MessageDao
 import com.example.proyectofinal.mail.domain.model.MessageModel
 import com.example.proyectofinal.mail.domain.usecase.DeleteMessageByIdUseCase
 import com.example.proyectofinal.mail.domain.usecase.GetDraftMessagesUseCase
-import com.example.proyectofinal.mail.domain.usecase.GetInboxMessagesUseCase
 import com.example.proyectofinal.mail.domain.usecase.ReceiveMessageUseCase
 import com.example.proyectofinal.mail.domain.usecase.ReceiveOutboxMessageUseCase
 import com.example.proyectofinal.mail.presentation.viewmodel.InboxViewModel
@@ -38,7 +37,6 @@ import kotlin.test.assertEquals
 @OptIn(ExperimentalCoroutinesApi::class)
 class InBoxScreenViewModelTest {
 
-    private val getInboxMessagesUseCase: GetInboxMessagesUseCase = mockk()
     private val getDraftMessagesUseCase: GetDraftMessagesUseCase = mockk()
     private val deleteMessageByIdUseCase: DeleteMessageByIdUseCase = mockk()
     private val receiveOutboxMessagesUseCase: ReceiveOutboxMessageUseCase = mockk()
@@ -51,12 +49,6 @@ class InBoxScreenViewModelTest {
     private val testDispatcher = StandardTestDispatcher()
     private val testScope = TestScope(testDispatcher)
 
-    private val inboxMessagesStub = listOf(
-        MessageModel(
-            1, "userFromId", "1", false, "sender", "Subject",
-            "2025-06-01", "Content of the inbox message", isResponse = false
-        )
-    )
     private val draftMessagesStub = listOf(
         MessageModel(
             3, "userFromId", "1", true, "sender", "Subject",
@@ -74,7 +66,6 @@ class InBoxScreenViewModelTest {
         every { Log.d(any(), any()) } returns 0
         every { Log.e(any(), any()) } returns 0
 
-        coEvery { getInboxMessagesUseCase(any()) } returns inboxMessagesStub
         coEvery { getDraftMessagesUseCase() } returns draftMessagesStub
         coEvery { deleteMessageByIdUseCase(any()) } returns Unit
         coEvery { receiveMessageUseCase(any()) } returns flowOf(

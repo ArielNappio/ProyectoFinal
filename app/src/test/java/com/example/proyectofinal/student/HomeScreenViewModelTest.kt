@@ -12,7 +12,11 @@ import com.example.proyectofinal.orderManagement.domain.usecase.UpdateFavoriteSt
 import com.example.proyectofinal.student.presentation.viewmodel.HomeScreenViewModel
 import com.example.proyectofinal.userpreferences.domain.model.UserPreferences
 import com.example.proyectofinal.userpreferences.domain.repository.UserPreferencesRepository
+import io.mockk.Runs
+import io.mockk.coEvery
+import io.mockk.coVerify
 import io.mockk.every
+import io.mockk.just
 import io.mockk.mockk
 import io.mockk.mockkStatic
 import io.mockk.unmockkAll
@@ -85,6 +89,7 @@ class HomeScreenViewModelTest {
         every { userPreferencesRepository.getUserPreferences() } returns flowOf(UserPreferences(26f, "Default", iconSize = 32f))
         repository = mockk()
         every { repository.getTasks(any()) } returns flowOf(NetworkResponse.Success(mockTasks))
+        coEvery { repository.toggleFavorite(any(), any()) } just Runs
         tokenManager = mockk()
         every { tokenManager.userId } returns flowOf("example_id")
         val getTaskGroupByStudentUseCase = GetTaskGroupByStudentUseCase(repository)
@@ -108,15 +113,15 @@ class HomeScreenViewModelTest {
         assertEquals(newText, viewModel.searchText.value)
     }
 
-//    @Test
-//    fun `toggleFavorite should call repository toggleFavorite`() = testScope.runTest {
-//        val taskId = 1
-//        every { repository.toggleFavorite(taskId) } just Runs
-//
-//        viewModel.toggleFavorite(taskId)
-//
-//        coVerify { repository.toggleFavorite(taskId) }
-//    }
+    @Test
+    fun `toggleFavorite should call repository toggleFavorite`() = testScope.runTest {
+        val taskId = "1"
+
+        viewModel.toggleFavorite(taskId, true)
+        testDispatcher.scheduler.advanceUntilIdle()
+
+        coVerify { repository.toggleFavorite(taskId, true) }
+    }
 
     @After
     fun tearDown() {
