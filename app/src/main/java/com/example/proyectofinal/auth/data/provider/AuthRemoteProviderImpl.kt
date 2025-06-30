@@ -16,7 +16,6 @@ import io.ktor.http.ContentType
 import io.ktor.http.HttpStatusCode
 import io.ktor.http.contentType
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flow
 
 class AuthRemoteProviderImpl (
@@ -44,8 +43,14 @@ class AuthRemoteProviderImpl (
    }
 
     override fun getMe(): Flow<NetworkResponse<UserResponseDto>> = flow {
+
+        val userId = tokenManager.getUserIdOrNull()
+        if (userId == null) {
+            emit(NetworkResponse.Failure("userId no encontrado"))
+            return@flow
+        }
+
         try {
-            val userId = tokenManager.userId.first()
 
             if (userId.isNullOrEmpty()) {
                 emit(NetworkResponse.Failure("userId no encontrado"))

@@ -33,6 +33,7 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.proyectofinal.student.presentation.component.CommentAudioCard
 import com.example.proyectofinal.student.presentation.viewmodel.CommentsViewModel
+import com.example.proyectofinal.student.util.formatHumanReadableDate
 import org.koin.androidx.compose.koinViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -116,11 +117,11 @@ fun CommentsScreen(
 
                     ) {
                         Text(
-                            text = "📄 Página: ${comment.page}",
+                            text = "📄 Página: ${comment.page + 1}",
                             style = MaterialTheme.typography.bodyMedium
                         )
                         Text(
-                            text = "📅 Fecha: ${comment.date}",
+                            text = "📅 Fecha: ${formatHumanReadableDate(comment.date)}",
                             style = MaterialTheme.typography.bodyMedium
                         )
                     }

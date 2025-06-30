@@ -80,11 +80,12 @@ fun LoginScreen(
         )
     }
 
-    if (navigateToMain) {
-        LaunchedEffect(Unit) {
+    LaunchedEffect(navigateToMain) {
+        if (navigateToMain) {
             navController.navigate(ScreensRoute.Home.route) {
                 popUpTo(ScreensRoute.Login.route) { inclusive = true }
             }
+            viewmodel.updateNavigateToMain(false) // reset después de navegar
         }
     }
 

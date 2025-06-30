@@ -1,7 +1,9 @@
 package com.example.proyectofinal.task_student.presentation.view
 
 
+import android.os.Build
 import android.util.Log
+import androidx.annotation.RequiresApi
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateColor
 import androidx.compose.animation.core.RepeatMode
@@ -70,7 +72,6 @@ import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Slider
 import androidx.compose.material3.Switch
@@ -116,6 +117,7 @@ import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import org.koin.androidx.compose.koinViewModel
 import kotlin.math.abs
 
+@RequiresApi(Build.VERSION_CODES.O)
 @OptIn(ExperimentalPermissionsApi::class)
 @Composable
 fun TaskStudent(taskId: Int, navController: NavHostController) {
@@ -143,8 +145,6 @@ fun TaskStudent(taskId: Int, navController: NavHostController) {
         }
     }
 
-
-    val text by viewModel.textoPorPagina.collectAsState()
     val paragraphs by viewModel.paragraphs.collectAsState()
     val isSpeaking by viewModel.isSpeaking.collectAsState()
     val isDownloading by viewModel.isDownloadInProgress.collectAsState()
@@ -184,8 +184,6 @@ fun TaskStudent(taskId: Int, navController: NavHostController) {
 
     val showSpeechSettingsMenu by viewModel.showSpeechSettingsMenu.collectAsState()
     val speechRate by viewModel.speechRate.collectAsState()
-    val pitch by viewModel.pitch.collectAsState()
-
 
     val currentContext = LocalContext.current
 
@@ -205,13 +203,6 @@ fun TaskStudent(taskId: Int, navController: NavHostController) {
         viewModel.loadCommentsByTaskId(taskId)
         viewModel.loadFeedback(taskId)
     }
-
-//    LaunchedEffect(paragraphs) {
-//        println("🔥 Se actualizaron los párrafos:")
-//        paragraphs.forEach {
-//            println("📄 Página: ${it.pageNumber}, Texto: ${it.paragraphText}")
-//        }
-//    }
 
     DisposableEffect(Unit) {
         onDispose {
@@ -396,7 +387,7 @@ fun TaskStudent(taskId: Int, navController: NavHostController) {
         ) {
             Card(
                 modifier = Modifier
-                    .align(Alignment.CenterEnd)
+                    .align(Alignment.Center)
                     .width(280.dp)
                     .padding(16.dp),
                 shape = RoundedCornerShape(16.dp),
@@ -446,7 +437,11 @@ fun TaskStudent(taskId: Int, navController: NavHostController) {
                         modifier = Modifier
                             .fillMaxWidth()
                             .height(48.dp),
-                        shape = RoundedCornerShape(8.dp)
+                        shape = RoundedCornerShape(8.dp),
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = MaterialTheme.colorScheme.primaryContainer,
+                            contentColor = MaterialTheme.colorScheme.onPrimaryContainer
+                        )
                     ) {
                         Icon(
                             imageVector = if (isSpeaking) Icons.Default.Pause else Icons.Default.PlayArrow,
@@ -456,12 +451,16 @@ fun TaskStudent(taskId: Int, navController: NavHostController) {
                         Text(if (isSpeaking) "Pausar" else "Leer")
                     }
 
-                    OutlinedButton(
+                    Spacer(modifier = Modifier.height(12.dp))
+
+                    Button(
                         onClick = { viewModel.closeSpeechSettingsMenu() },
                         modifier = Modifier.align(Alignment.End),
-                        shape = RoundedCornerShape(8.dp)
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = MaterialTheme.colorScheme.primary
+                        )
                     ) {
-                        Text("Cerrar")
+                        Text("Cerrar", color = MaterialTheme.colorScheme.onPrimary)
                     }
                 }
             }

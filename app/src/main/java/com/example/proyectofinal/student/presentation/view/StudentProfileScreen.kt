@@ -38,6 +38,7 @@ import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.core.net.toUri
 import androidx.navigation.NavController
 import coil.compose.rememberAsyncImagePainter
 import com.example.proyectofinal.R
@@ -45,11 +46,11 @@ import com.example.proyectofinal.auth.data.tokenmanager.TokenManager
 import com.example.proyectofinal.core.theme.LocalTheme
 import com.example.proyectofinal.core.ui.ThemeViewModel
 import com.example.proyectofinal.navigation.ScreensRoute
+import com.example.proyectofinal.navigation.presentation.viewmodel.MainViewModel
 import com.example.proyectofinal.userpreferences.presentation.component.AppText
 import com.example.proyectofinal.userpreferences.presentation.viewmodel.PreferencesViewModel
 import org.koin.androidx.compose.koinViewModel
 import org.koin.compose.koinInject
-import androidx.core.net.toUri
 
 
 @Composable
@@ -58,6 +59,7 @@ fun StudentProfileScreen(
     navController: NavController,
 ) {
     val themeViewModel = koinViewModel<ThemeViewModel>()
+    val mainViewModel = koinViewModel<MainViewModel>()
     val preferencesViewModel = koinViewModel<PreferencesViewModel>()
     val tokenManager: TokenManager = koinInject()
     val user = tokenManager.user.collectAsState(initial = null).value
@@ -163,12 +165,12 @@ fun StudentProfileScreen(
 
         Button(
             onClick = {
-                themeViewModel.logout()
+                println("Click en cerrar sesión")
+                mainViewModel.logout()
                 navController.navigate(ScreensRoute.Login.route) {
-                    popUpTo(0) { inclusive = true }
-                    launchSingleTop = true
-                }
-            },
+                    popUpTo(ScreensRoute.Login.route) { inclusive = true }
+                                                             }
+                      },
             modifier = Modifier
                 .wrapContentSize()
                 .fillMaxWidth(),

@@ -1,5 +1,6 @@
 package com.example.proyectofinal.orderManagement.data.repository
 
+import android.util.Log
 import com.example.proyectofinal.core.network.NetworkResponse
 import com.example.proyectofinal.orderManagement.data.entity.OrderEntity
 import com.example.proyectofinal.orderManagement.data.local.OrderDao
@@ -20,52 +21,46 @@ class OrderRepositoryImpl(
     override fun getTasks(studentId: String): Flow<NetworkResponse<List<OrderDelivered>>> = flow {
         emit(NetworkResponse.Loading())
 
+        // 1. Emito cache local rápido para mejorar experiencia UI
+        val cachedEntities = orderDao.getTasksByStudent(studentId).first()
+        if (cachedEntities.isNotEmpty()) {
+            val cachedDomain = cachedEntities.map { it.toTaskGroup() }
+            emit(NetworkResponse.Success(cachedDomain))
+        }
+
         try {
+            // 2. Traigo datos remotos y hago merge
             orderProvider.getOrdersManagement(studentId).collect { response ->
                 when (response) {
                     is NetworkResponse.Success -> {
-                        // Traigo el cache local completo
-                        val cachedEntities = orderDao.getTasksByStudent(studentId).first()
-
-                        // Hago merge de cada dto de la API con su cache local para conservar hasComments, isFavorite, etc
                         val apiEntities = response.data!!.map { it.toEntity(studentId) }
                         val mergedEntities = apiEntities.map { apiEntity ->
                             val cachedEntity = cachedEntities.find { it.id == apiEntity.id }
                             mergeEntities(apiEntity, cachedEntity)
                         }
 
-
-                        // Guardo en DB la lista mergeada
+                        // 3. Guardo mergeado en DB
                         orderDao.saveTaskGroup(mergedEntities)
 
-                        // Emito la lista en dominio para la UI
+                        // 4. Emito resultado actualizado
                         val mergedDomain = mergedEntities.map { it.toTaskGroup() }
                         emit(NetworkResponse.Success(mergedDomain))
+                        Log.d("RESPONSE GET ORDERS", "Success - Actualizando ui con nueva data q trajimos de la api wachin")
+
                     }
 
                     is NetworkResponse.Failure -> {
-                        // En caso de fallo, uso cache local si existe
-                        val cached = orderDao.getTasksByStudent(studentId).first()
-                        if (cached.isNotEmpty()) {
-                            val taskGroups = cached.map { it.toTaskGroup() }
-                            emit(NetworkResponse.Success(taskGroups))
-                        } else {
-                            emit(response)
+                        Log.d("RESPONSE GET ORDERS", "failure del response de internet")
                         }
-                    }
 
                     is NetworkResponse.Loading -> {
-                        // Opcional, podes emitir loading acá
+                        Log.d("RESPONSE GET ORDERS", "Loading...")
                     }
                 }
             }
         } catch (e: Exception) {
-            // En error, intento devolver cache local si existe
-            val cached = orderDao.getTasksByStudent(studentId).first()
-            if (cached.isNotEmpty()) {
-                val taskGroups = cached.map { it.toTaskGroup() }
-                emit(NetworkResponse.Success(taskGroups))
-            } else {
+            // En error remoto, si no hay cache, emitimos failure
+            if (cachedEntities.isEmpty()) {
                 emit(NetworkResponse.Failure(e.localizedMessage ?: "Error desconocido"))
             }
         }

@@ -9,6 +9,7 @@ import androidx.datastore.preferences.preferencesDataStore
 import com.example.proyectofinal.auth.data.model.UserResponseDto
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.map
 import kotlinx.serialization.json.Json
 
@@ -60,10 +61,16 @@ class TokenManager(private val context: Context) {
         }
     }
 
+    suspend fun getUserIdOrNull(): String? {
+        return userId.firstOrNull()?.takeIf { it.isNotEmpty() }
+    }
+
     suspend fun clearAuthData() {
         context.dataStore.edit {
-            it[TOKEN_KEY] = ""
-            it[USER_ID_KEY] = ""
+            it.remove(TOKEN_KEY)
+            it.remove(USER_ID_KEY)
+            it.remove(USER_DATA_KEY)
         }
+        Log.d("TokenManager", "clearAuthData: Datos eliminados")
     }
 }
