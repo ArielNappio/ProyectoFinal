@@ -1,11 +1,9 @@
 package com.example.proyectofinal.core.ui
 
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
 import com.example.proyectofinal.auth.data.tokenmanager.TokenManager
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.launch
 
 class ThemeViewModel(
     val tokenManager: TokenManager
@@ -15,12 +13,5 @@ class ThemeViewModel(
 
     fun toggleTheme() {
         _isDarkTheme.value = !_isDarkTheme.value
-    }
-
-    fun logout() {
-        viewModelScope.launch {
-            tokenManager.clearAuthData()
-            println("MainViewModel: Logout called, token cleared, isLoggedIn set to false") // Add this log
-        }
     }
 }

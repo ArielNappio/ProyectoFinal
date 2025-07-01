@@ -43,6 +43,10 @@ fun Main(
     val mainScreenUiState by viewModel.mainScreenUiState.collectAsState()
     val navBackStackEntry by navController.currentBackStackEntryAsState()
 
+    LaunchedEffect(Unit) {
+        viewModel.refreshSession()
+    }
+
     when (mainScreenUiState) {
         is MainScreenUiState.Loading -> {
             Column(
@@ -54,21 +58,23 @@ fun Main(
                 CircularProgressIndicator()
             }
         }
+        else -> Unit // No hagas nada acá
+    }
 
-        is MainScreenUiState.Authenticated -> {
-            LaunchedEffect(Unit) {
+// Manejá la navegación aparte y de forma controlada
+    LaunchedEffect(mainScreenUiState) {
+        when (mainScreenUiState) {
+            is MainScreenUiState.Authenticated -> {
                 navController.navigate(ScreensRoute.Home.route) {
                     popUpTo(ScreensRoute.Login.route) { inclusive = true }
                 }
             }
-        }
-
-        is MainScreenUiState.Unauthenticated -> {
-            LaunchedEffect(Unit) {
+            is MainScreenUiState.Unauthenticated -> {
                 navController.navigate(ScreensRoute.Login.route) {
-                    popUpTo(ScreensRoute.Login.route) { inclusive = true }
+                    popUpTo(0) { inclusive = true }
                 }
             }
+            else -> {} // Loading, no navegues
         }
     }
 

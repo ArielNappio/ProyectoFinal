@@ -21,7 +21,7 @@ class LoginViewModel(
     private val tokenManager: TokenManager
 ) : ViewModel() {
 
-    private val _email = MutableStateFlow<String>("admin@bypass.com")
+    private val _email = MutableStateFlow<String>("sofialopez@biblioteca.com")
     val email = _email.asStateFlow()
 
     private val _password = MutableStateFlow<String>("Test123.")
@@ -63,59 +63,56 @@ class LoginViewModel(
         viewModelScope.launch {
             println("Intentando loguear con ${email.value} y ${password.value}")
 
-            if (email.value.isNotEmpty() && password.value.isNotEmpty()) {
-                if (email.value == "admin@bypass.com" && password.value == "123456") {
-                    println("Bypass activado, navegando directo")
-                    _isLoading.update { false }
-                    _navigateToMain.update { true }
-                    return@launch
-                }
+            if(email.value.isNotEmpty() && password.value.isNotEmpty())
+            {
 
                 println("entro al if de que no esta empty")
                 _isLoading.update { true }
-                repository.postLogin(LoginRequestDto(email.value, password.value))
-                    .collect { response ->
-                        when (response) {
-                            is NetworkResponse.Success -> {
-                                _isLoading.update { false }
-                                println("Respuesta exitosa: ${response.data}")
-                                if (response.data != null) {
-                                    tokenManager.saveToken(response.data.token)
-                                    tokenManager.saveUserId(response.data.userId)
+                repository.postLogin(LoginRequestDto(email.value, password.value)).collect { response ->
+                    when (response) {
+                        is NetworkResponse.Success -> {
+                            _isLoading.update { false }
+                            println("Respuesta exitosa: ${response.data}")
+                            if (response.data != null) {
+                                tokenManager.saveToken(response.data.token)
+                                tokenManager.saveUserId(response.data.userId)
 
-                                    repository.getMe().collect { userResponse ->
-                                        when (userResponse) {
-                                            is NetworkResponse.Success -> {
-                                                tokenManager.saveUser(userResponse.data)
-                                                println("Usuario obtenido y guardado: ${userResponse.data?.email}")
-                                            }
+                                repository.getMe().collect { userResponse ->
+                                    when (userResponse) {
+                                        is NetworkResponse.Success -> {
+                                            tokenManager.saveUser(userResponse.data)
+                                            println("Usuario obtenido y guardado: ${userResponse.data?.email}")
+                                        }
 
-                                            is NetworkResponse.Failure -> {
-                                                println("Error al obtener el usuario: ${userResponse.error}")
-                                            }
+                                        is NetworkResponse.Failure -> {
+                                            println("Error al obtener el usuario: ${userResponse.error}")
+                                        }
 
-                                            is NetworkResponse.Loading -> {
-                                                println("Cargando usuario...")
-                                            }
+                                        is NetworkResponse.Loading -> {
+                                            println("Cargando usuario...")
                                         }
                                     }
-                                    _navigateToPreferences.update { true }
-                                    _loginState.update { UiState.Success(response.data) }
                                 }
-                            }
-                            is NetworkResponse.Loading -> {
-                                _isLoading.update { true }
-                                println("Cargando...")
-                            }
-                            is NetworkResponse.Failure -> {
-                                _isLoading.update { false }
-                                _loginState.update { UiState.Error("Ocurrió un error desconocido 😕") }
-                                _showErrorDialog.update { true }
+                                _navigateToPreferences.update { true }
+                                _loginState.update { UiState.Success(response.data) }
                             }
                         }
+                        is NetworkResponse.Loading -> {
+                            _isLoading.update { true }
+                            println("Cargando...")
+                        }
+                        is NetworkResponse.Failure -> {
+                            _isLoading.update { false }
+                            _loginState.update { UiState.Error("Noooo, donde te sentaste\n\n Ocurrió un error desconocido 😕") }
+                            _showErrorDialog.update { true }
+                            println("Falló")
+                        }
                     }
-            } else {
+                }
+            }
+            else {
                 _loginState.update { UiState.Error("Email o contraseña vacíos") }
+                print("ta vacio")
             }
         }
     }
@@ -126,22 +123,23 @@ class LoginViewModel(
 
     private fun checkExistingToken() {
         viewModelScope.launch {
-            val token = tokenManager.token.firstOrNull()
-            if (!token.isNullOrEmpty() && token != "") {
-                _navigateToMain.update { true }
-                _navigateToPreferences.update { false }
-                println("LoginViewModel: Existing token found, navigating to MainScreen")
-            } else {
-                _navigateToMain.update { false }
+            viewModelScope.launch {
+                val token = tokenManager.token.firstOrNull()
+                val isLogged = !token.isNullOrBlank()
+                println("LoginViewModel (checkExistingToken): token = $token, isLogged = $isLogged")
+                _navigateToMain.update { isLogged }
                 _navigateToPreferences.update { false }
                 _isLoading.update { false }
-                println("LoginViewModel: No existing token found")
             }
         }
     }
 
     private fun validateEmail(email: String): Boolean {
         return Patterns.EMAIL_ADDRESS.matcher(email).matches()
+    }
+
+    fun updateNavigateToMain(value: Boolean) {
+        _navigateToMain.update { value }
     }
 
     fun onEmailChange(newEmail: String) {

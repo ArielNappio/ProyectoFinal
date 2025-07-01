@@ -2,8 +2,10 @@ package com.example.proyectofinal.task_student.presentation.viewmodel
 
 
 import android.content.Context
+import android.os.Build
 import android.util.Log
 import android.widget.Toast
+import androidx.annotation.RequiresApi
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.unit.sp
 import androidx.core.text.HtmlCompat
@@ -46,6 +48,9 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.File
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
 class TaskStudentViewModel(
     private val ttsManager: TextToSpeechManager,
@@ -312,10 +317,6 @@ class TaskStudentViewModel(
         _showFeedback.value = !_showFeedback.value
     }
 
-    fun showExtraButton(){
-        _showExtraButton.value = !showExtraButton.value
-    }
-
     fun startSpeech() {
 
         val currentPage = _currentPageIndex.value
@@ -388,16 +389,21 @@ class TaskStudentViewModel(
         currentAudioFile = audioRecorderManager.startRecording()
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     fun stopRecording(){
+
+        val formatter = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
+        val currentDate = formatter.format(Date()) // "30/06/2025"
+
         val recordedFile = audioRecorderManager.stopRecording()
         recordedFile?.takeIf { it.exists() && it.length() > 0 }?.let { file ->
             viewModelScope.launch {
                 audioRepositoryImpl.saveAudio(
                     path = file.absolutePath,
                     taskId = currentTaskId.value.toString(),
-                    title = "audio_${currentPageIndex.value}_${System.currentTimeMillis()}",
+                    title = "Wirin_audio_task_${currentTaskId.value.toString()}_page${currentPageIndex.value+1}_${System.currentTimeMillis()}",
                     page = currentPageIndex.value,
-                    date = "hoy"
+                    date = currentDate
                 )
                 val studentId = tokenManager.userId.first() ?: return@launch
                 val taskId = currentTaskId.value?.toString() ?: return@launch
@@ -602,16 +608,6 @@ class TaskStudentViewModel(
 
     fun setFeedbackText(text: String) {
         _feedbackText.value = text
-    }
-
-    fun startFeedbackRecording() {
-        currentAudioFile = audioRecorderManager.startRecording()
-    }
-
-    fun stopFeedbackRecording() {
-        val recordedFile = audioRecorderManager.stopRecording()
-        currentAudioFile = recordedFile
-        _recordedFeedbackFilePath.value = recordedFile?.absolutePath
     }
 
     fun deleteFeedbackRecording() {
