@@ -4,7 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.proyectofinal.auth.data.model.UserResponseDto
 import com.example.proyectofinal.auth.data.tokenmanager.TokenManager
-import com.example.proyectofinal.auth.domain.provider.AuthRemoteProvider
+import com.example.proyectofinal.auth.domain.usecases.GetMeUseCase
 import com.example.proyectofinal.core.network.NetworkResponse
 import com.example.proyectofinal.core.util.UiState
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -16,7 +16,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 class MainViewModel(
-    val authRemoteRepository: AuthRemoteProvider,
+    private val getMeUseCase: GetMeUseCase,
     val tokenManager: TokenManager
 ) : ViewModel() {
 
@@ -41,7 +41,7 @@ class MainViewModel(
 
     private suspend fun getUserData(token: String) {
         println("MainViewModel: Attempting to fetch user data with token: $token")
-        authRemoteRepository.getMe()
+        getMeUseCase()
             .onStart {
                 _userState.update { UiState.Loading }
             }
@@ -65,7 +65,6 @@ class MainViewModel(
                 }
             }
     }
-
     fun logout() {
         viewModelScope.launch {
             tokenManager.clearAuthData()

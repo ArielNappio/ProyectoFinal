@@ -6,7 +6,8 @@ import androidx.lifecycle.viewModelScope
 import com.example.proyectofinal.auth.data.model.LoginRequestDto
 import com.example.proyectofinal.auth.data.model.LoginResponseDto
 import com.example.proyectofinal.auth.data.tokenmanager.TokenManager
-import com.example.proyectofinal.auth.domain.provider.AuthRemoteProvider
+import com.example.proyectofinal.auth.domain.usecases.GetMeUseCase
+import com.example.proyectofinal.auth.domain.usecases.PostLoginUseCase
 import com.example.proyectofinal.core.network.NetworkResponse
 import com.example.proyectofinal.core.util.UiState
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -17,8 +18,9 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 class LoginViewModel(
-    private val repository: AuthRemoteProvider,
-    private val tokenManager: TokenManager
+    private val tokenManager: TokenManager,
+    private val getMeUseCase: GetMeUseCase,
+    private val postLoginUseCase: PostLoginUseCase
 ) : ViewModel() {
 
     private val _email = MutableStateFlow<String>("sofialopez@biblioteca.com")
@@ -68,7 +70,7 @@ class LoginViewModel(
 
                 println("entro al if de que no esta empty")
                 _isLoading.update { true }
-                repository.postLogin(LoginRequestDto(email.value, password.value)).collect { response ->
+                postLoginUseCase(LoginRequestDto(email.value, password.value)).collect { response ->
                     when (response) {
                         is NetworkResponse.Success -> {
                             _isLoading.update { false }
@@ -77,7 +79,7 @@ class LoginViewModel(
                                 tokenManager.saveToken(response.data.token)
                                 tokenManager.saveUserId(response.data.userId)
 
-                                repository.getMe().collect { userResponse ->
+                                getMeUseCase().collect { userResponse ->
                                     when (userResponse) {
                                         is NetworkResponse.Success -> {
                                             tokenManager.saveUser(userResponse.data)

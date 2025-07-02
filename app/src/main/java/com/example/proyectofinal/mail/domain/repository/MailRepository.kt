@@ -2,6 +2,7 @@ package com.example.proyectofinal.mail.domain.repository
 
 import com.example.proyectofinal.core.network.NetworkResponse
 import com.example.proyectofinal.mail.domain.model.MessageModel
+import com.example.proyectofinal.mail.domain.model.MessageModelDto
 import kotlinx.coroutines.flow.Flow
 
 interface MailRepository {
@@ -15,4 +16,6 @@ interface MailRepository {
     suspend fun getDrafts(): List<MessageModel>
     suspend fun deleteDraftById(idMessage: Int)
     suspend fun getDraftById(idMessage: Int): MessageModel
+    suspend fun getAllConversations(): Flow<NetworkResponse<List<MessageModelDto>>>
+    suspend fun getConversationById(id: String): Flow<NetworkResponse<List<MessageModelDto>>>
 }
