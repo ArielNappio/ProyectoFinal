@@ -5,6 +5,7 @@ import com.example.proyectofinal.auth.data.tokenmanager.TokenManager
 import com.example.proyectofinal.core.network.ApiUrls
 import com.example.proyectofinal.core.network.NetworkResponse
 import com.example.proyectofinal.mail.domain.model.MessageModel
+import com.example.proyectofinal.mail.domain.model.MessageModelDto
 import com.example.proyectofinal.mail.domain.provider.MailProvider
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
@@ -135,6 +136,76 @@ class MailProviderImpl(
             }
 
         } catch (e: Exception) {
+            emit(NetworkResponse.Failure(error = e.toString()))
+        }
+    }
+
+    override fun receiveAllConversations(): Flow<NetworkResponse<List<MessageModelDto>>> = flow{
+        try {
+            emit(NetworkResponse.Loading())
+
+            val url = ApiUrls.MESSAGES_CONVERSATIONS
+            val token = tokenManager.token.firstOrNull()
+
+            if (token.isNullOrEmpty()) {
+                emit(NetworkResponse.Failure("No auth token found"))
+                return@flow
+            }
+
+            val response = ktorClient.get(url) {
+                header("Authorization", "Bearer $token")
+            }
+
+            val bodyText = response.bodyAsText()
+            println("DEBUG JSON RECEIVE ALL CONVERS: $bodyText")
+
+            if (response.status == HttpStatusCode.OK) {
+                val json = Json { ignoreUnknownKeys = true }
+                val messages = json.decodeFromString<List<MessageModelDto>>(bodyText)
+                emit(NetworkResponse.Success(messages))
+            } else {
+                Log.e("RECEIVE ALL CONVERS", "Error ${response.status.value} al obtener mensajes de all conversations")
+                Log.e("RECEIVE ALL CONVERS", "Body del error: $bodyText")
+                emit(NetworkResponse.Failure("Error en get all conversations: ${response.status.value}"))
+            }
+
+        } catch (e: Exception) {
+            Log.e("RECEIVE ALL CONVERS", "Excepción: $e")
+            emit(NetworkResponse.Failure(error = e.toString()))
+        }
+    }
+
+    override fun receiveConversationById(userId: String): Flow<NetworkResponse<List<MessageModelDto>>> = flow{
+        try {
+            emit(NetworkResponse.Loading())
+
+            val url = ApiUrls.MESSAGES_CONVERSATIONS
+            val token = tokenManager.token.firstOrNull()
+
+            if (token.isNullOrEmpty()) {
+                emit(NetworkResponse.Failure("No auth token found"))
+                return@flow
+            }
+
+            val response = ktorClient.get(url) {
+                header("Authorization", "Bearer $token")
+            }
+
+            val bodyText = response.bodyAsText()
+            println("DEBUG JSON RECEIVE CONVERS by ID: $bodyText")
+
+            if (response.status == HttpStatusCode.OK) {
+                val json = Json { ignoreUnknownKeys = true }
+                val messages = json.decodeFromString<List<MessageModelDto>>(bodyText)
+                emit(NetworkResponse.Success(messages))
+            } else {
+                Log.e("RECEIVE CONVERS by ID", "Error ${response.status.value} al obtener mensajes de convers by id")
+                Log.e("RECEIVE CONVERS by ID", "Body del error: $bodyText")
+                emit(NetworkResponse.Failure("Error en RECEIVE CONVERS by ID: ${response.status.value}"))
+            }
+
+        } catch (e: Exception) {
+            Log.e("RECEIVE CONVERS by ID", "Excepción: $e")
             emit(NetworkResponse.Failure(error = e.toString()))
         }
     }

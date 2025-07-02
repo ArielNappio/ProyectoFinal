@@ -4,8 +4,11 @@ import android.util.Log
 import com.example.proyectofinal.core.network.NetworkResponse
 import com.example.proyectofinal.mail.data.local.MessageDao
 import com.example.proyectofinal.mail.domain.model.MessageModel
+import com.example.proyectofinal.mail.domain.model.MessageModelDto
 import com.example.proyectofinal.mail.domain.provider.MailProvider
 import com.example.proyectofinal.mail.domain.repository.MailRepository
+import com.example.proyectofinal.mail.domain.usecase.ReceiveAllConversationsUseCase
+import com.example.proyectofinal.mail.domain.usecase.ReceiveConversationByIdUseCase
 import com.example.proyectofinal.mail.mapper.toDomain
 import com.example.proyectofinal.mail.mapper.toEntity
 import kotlinx.coroutines.Dispatchers
@@ -16,7 +19,9 @@ import kotlinx.coroutines.withContext
 
 class MailRepoImpl(
     private val mailProvider: MailProvider,
-    private val messageDao: MessageDao
+    private val messageDao: MessageDao,
+    private val receiveAllConversationsUseCase: ReceiveAllConversationsUseCase,
+    private val receiveConversationByIdUseCase: ReceiveConversationByIdUseCase
 ) : MailRepository {
 
     override suspend fun sendMessage(message: MessageModel): NetworkResponse<MessageModel> {
@@ -142,5 +147,69 @@ class MailRepoImpl(
 
     override suspend fun getDraftById(idMessage: Int): MessageModel {
         return messageDao.getDraftById(idMessage).toDomain()
+    }
+
+    override suspend fun getAllConversations(): Flow<NetworkResponse<List<MessageModelDto>>> = flow  {
+        emit(NetworkResponse.Loading())
+
+        try {
+            receiveAllConversationsUseCase().collect { response ->
+                when (response) {
+                    is NetworkResponse.Success -> {
+                        val messages = response.data ?: emptyList()
+                        messages.forEach { messageDao.insertMessage(it.toEntity()) }
+                        emit(NetworkResponse.Success(messages))
+                    }
+
+                    is NetworkResponse.Failure -> {
+                        // HACER LO DE LOS MENSAJES LOCALES
+                    }
+
+                    is NetworkResponse.Loading -> {
+                        emit(NetworkResponse.Loading())
+                    }
+                }
+            }
+        } catch (e: Exception) { // HACER LO DE LOS MENSAJES LOCALES
+            // val localMessages = messageDao.getOutboxMessages(userId).map { it.toDomain() }
+//            if (localMessages.isNotEmpty()) {
+//                Log.d("Repo", "Excepción, devolviendo outbox local: ${localMessages.size} mensajes")
+//                emit(NetworkResponse.Success(localMessages))
+//            } else {
+//                emit(NetworkResponse.Failure(e.toString()))
+//            }
+        }
+    }
+
+    override suspend fun getConversationById(id: String): Flow<NetworkResponse<List<MessageModelDto>>> = flow {
+        emit(NetworkResponse.Loading())
+
+        try {
+            receiveConversationByIdUseCase(id).collect { response ->
+                when (response) {
+                    is NetworkResponse.Success -> {
+                        val messages = response.data ?: emptyList()
+                        messages.forEach { messageDao.insertMessage(it.toEntity()) }
+                        emit(NetworkResponse.Success(messages))
+                    }
+
+                    is NetworkResponse.Failure -> {
+                        // HACER LO DE LOS MENSAJES LOCALES
+                    }
+
+                    is NetworkResponse.Loading -> {
+                        emit(NetworkResponse.Loading())
+                    }
+                }
+            }
+        } catch (e: Exception) { // HACER LO DE LOS MENSAJES LOCALES
+            // val localMessages = messageDao.getOutboxMessages(userId).map { it.toDomain() }
+//            if (localMessages.isNotEmpty()) {
+//                Log.d("Repo", "Excepción, devolviendo outbox local: ${localMessages.size} mensajes")
+//                emit(NetworkResponse.Success(localMessages))
+//            } else {
+//                emit(NetworkResponse.Failure(e.toString()))
+//            }
+        }
     }
 }

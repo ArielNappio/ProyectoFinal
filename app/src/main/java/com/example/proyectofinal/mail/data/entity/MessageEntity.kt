@@ -15,5 +15,6 @@ data class MessageEntity(
     val content: String,
     val filePath: String?,
     val isResponse: Boolean,
-    val responseText: String?
+    val responseText: String?,
+    val isRead: Boolean = false
 )
