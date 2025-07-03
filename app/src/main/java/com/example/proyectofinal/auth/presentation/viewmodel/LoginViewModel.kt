@@ -105,7 +105,7 @@ class LoginViewModel(
                         }
                         is NetworkResponse.Failure -> {
                             _isLoading.update { false }
-                            _loginState.update { UiState.Error("Noooo, donde te sentaste\n\n Ocurrió un error desconocido 😕") }
+                            _loginState.update { UiState.Error("Ocurrió un error desconocido 😕") }
                             _showErrorDialog.update { true }
                             println("Falló")
                         }
