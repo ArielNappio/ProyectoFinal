@@ -65,6 +65,7 @@ class MainViewModel(
                 }
             }
     }
+
     fun logout() {
         viewModelScope.launch {
             tokenManager.clearAuthData()
