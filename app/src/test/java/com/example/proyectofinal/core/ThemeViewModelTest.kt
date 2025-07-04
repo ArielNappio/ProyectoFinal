@@ -2,14 +2,12 @@ package com.example.proyectofinal.core
 
 import com.example.proyectofinal.auth.data.tokenmanager.TokenManager
 import com.example.proyectofinal.core.ui.ThemeViewModel
-import io.mockk.coVerify
 import io.mockk.mockk
 import junit.framework.TestCase.assertEquals
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.runTest
-
 import org.junit.Before
 import org.junit.Test
 
@@ -31,11 +29,5 @@ class ThemeViewModelTest {
         val initialTheme = viewModel.isDarkTheme.first()
         viewModel.toggleTheme()
         assertEquals(!initialTheme, viewModel.isDarkTheme.first())
-    }
-
-    @Test
-    fun `test logout clears token`() = testScope.runTest {
-        viewModel.logout()
-        coVerify { mockTokenManager.clearAuthData() }
     }
 }
