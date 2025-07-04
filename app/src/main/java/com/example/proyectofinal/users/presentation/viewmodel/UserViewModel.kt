@@ -1,6 +1,6 @@
 package com.example.proyectofinal.users.presentation.viewmodel
 
-import UpdateUserUseCase
+import com.example.proyectofinal.users.domain.usecase.UpdateUserUseCase
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope

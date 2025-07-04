@@ -1,3 +1,5 @@
+package com.example.proyectofinal.core.presentation.components
+
 import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.infiniteRepeatable

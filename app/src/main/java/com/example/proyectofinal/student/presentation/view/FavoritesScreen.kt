@@ -1,6 +1,6 @@
 package com.example.proyectofinal.student.presentation.view
 
-import LoadingWithImageBar
+import com.example.proyectofinal.core.presentation.components.LoadingWithImageBar
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer

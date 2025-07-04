@@ -1,6 +1,6 @@
 package com.example.proyectofinal.users.data.di
 
-import UpdateUserUseCase
+import com.example.proyectofinal.users.domain.usecase.UpdateUserUseCase
 import com.example.proyectofinal.users.data.provider.UserProviderImpl
 import com.example.proyectofinal.users.domain.provider.UserProvider
 import com.example.proyectofinal.users.domain.usecase.CreateUserUseCase

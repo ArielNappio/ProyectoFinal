@@ -1,6 +1,6 @@
 package com.example.proyectofinal.users
 
-import UpdateUserUseCase
+import com.example.proyectofinal.users.domain.usecase.UpdateUserUseCase
 import android.util.Log
 import com.example.proyectofinal.core.network.NetworkResponse
 import com.example.proyectofinal.users.data.model.User

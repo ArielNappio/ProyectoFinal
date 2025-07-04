@@ -1,7 +1,6 @@
 package com.example.proyectofinal.student.presentation.view
 
-import LoadingWithImageBar
-import android.annotation.SuppressLint
+import com.example.proyectofinal.core.presentation.components.LoadingWithImageBar
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box

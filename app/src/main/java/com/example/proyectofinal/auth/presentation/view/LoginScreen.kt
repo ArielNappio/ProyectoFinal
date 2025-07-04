@@ -1,6 +1,6 @@
 package com.example.proyectofinal.auth.presentation.view
 
-import LoadingWithImageBar
+import com.example.proyectofinal.core.presentation.components.LoadingWithImageBar
 import android.graphics.BitmapFactory
 import android.view.animation.OvershootInterpolator
 import androidx.compose.animation.core.Animatable

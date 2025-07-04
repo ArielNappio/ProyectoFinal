@@ -1,6 +1,6 @@
 package com.example.proyectofinal.student.presentation.view
 
-import LoadingWithImageBar
+import com.example.proyectofinal.core.presentation.components.LoadingWithImageBar
 import android.util.Log
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
