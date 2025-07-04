@@ -65,24 +65,25 @@ class MailProviderImpl(
         }
     }
 
-    override fun receiveMessageByUserId(userId: String): Flow<NetworkResponse<List<MessageModel>>> = flow {
-        try {
-            emit(NetworkResponse.Loading())
+    override fun receiveMessageByUserId(userId: String): Flow<NetworkResponse<List<MessageModel>>> =
+        flow {
+            try {
+                emit(NetworkResponse.Loading())
 
-            val url = ApiUrls.MESSAGES_INBOX_BY_ID.replace("{userId}", userId)
+                val url = ApiUrls.MESSAGES_INBOX_BY_ID.replace("{userId}", userId)
 
-            val response: HttpResponse = ktorClient.get(url)
+                val response: HttpResponse = ktorClient.get(url)
 
-            if (response.status == HttpStatusCode.OK) {
-                val messages = response.body<List<MessageModel>>()
-                emit(NetworkResponse.Success(messages))
-            } else {
-                emit(NetworkResponse.Failure("Error ${response.status.value}"))
+                if (response.status == HttpStatusCode.OK) {
+                    val messages = response.body<List<MessageModel>>()
+                    emit(NetworkResponse.Success(messages))
+                } else {
+                    emit(NetworkResponse.Failure("Error ${response.status.value}"))
+                }
+            } catch (e: Exception) {
+                emit(NetworkResponse.Failure(error = e.toString()))
             }
-        } catch (e: Exception) {
-            emit(NetworkResponse.Failure(error = e.toString()))
         }
-    }
 
     override fun receiveMessageOutbox(): Flow<NetworkResponse<List<MessageModel>>> = flow {
         try {
@@ -108,7 +109,10 @@ class MailProviderImpl(
                 val messages = json.decodeFromString<List<MessageModel>>(bodyText)
                 emit(NetworkResponse.Success(messages))
             } else {
-                Log.e("ProviderOutbox", "Error ${response.status.value} al obtener mensajes de outbox")
+                Log.e(
+                    "ProviderOutbox",
+                    "Error ${response.status.value} al obtener mensajes de outbox"
+                )
                 Log.e("ProviderOutbox", "Body del error: $bodyText")
                 emit(NetworkResponse.Failure("Error en get outbox: ${response.status.value}"))
             }
@@ -140,7 +144,7 @@ class MailProviderImpl(
         }
     }
 
-    override fun receiveAllConversations(): Flow<NetworkResponse<List<MessageModelDto>>> = flow{
+    override fun receiveAllConversations(): Flow<NetworkResponse<List<MessageModelDto>>> = flow {
         try {
             emit(NetworkResponse.Loading())
 
@@ -164,7 +168,10 @@ class MailProviderImpl(
                 val messages = json.decodeFromString<List<MessageModelDto>>(bodyText)
                 emit(NetworkResponse.Success(messages))
             } else {
-                Log.e("RECEIVE ALL CONVERS", "Error ${response.status.value} al obtener mensajes de all conversations")
+                Log.e(
+                    "RECEIVE ALL CONVERS",
+                    "Error ${response.status.value} al obtener mensajes de all conversations"
+                )
                 Log.e("RECEIVE ALL CONVERS", "Body del error: $bodyText")
                 emit(NetworkResponse.Failure("Error en get all conversations: ${response.status.value}"))
             }
@@ -175,39 +182,43 @@ class MailProviderImpl(
         }
     }
 
-    override fun receiveConversationById(userId: String): Flow<NetworkResponse<List<MessageModelDto>>> = flow{
-        try {
-            emit(NetworkResponse.Loading())
+    override fun receiveConversationById(userId: String): Flow<NetworkResponse<List<MessageModelDto>>> =
+        flow {
+            try {
+                emit(NetworkResponse.Loading())
 
-            val url = ApiUrls.MESSAGES_CONVERSATIONS
-            val token = tokenManager.token.firstOrNull()
+                val url = ApiUrls.MESSAGES_CONVERSATIONS
+                val token = tokenManager.token.firstOrNull()
 
-            if (token.isNullOrEmpty()) {
-                emit(NetworkResponse.Failure("No auth token found"))
-                return@flow
+                if (token.isNullOrEmpty()) {
+                    emit(NetworkResponse.Failure("No auth token found"))
+                    return@flow
+                }
+
+                val response = ktorClient.get(url) {
+                    header("Authorization", "Bearer $token")
+                }
+
+                val bodyText = response.bodyAsText()
+                println("DEBUG JSON RECEIVE CONVERS by ID: $bodyText")
+
+                if (response.status == HttpStatusCode.OK) {
+                    val json = Json { ignoreUnknownKeys = true }
+                    val messages = json.decodeFromString<List<MessageModelDto>>(bodyText)
+                    emit(NetworkResponse.Success(messages))
+                } else {
+                    Log.e(
+                        "RECEIVE CONVERS by ID",
+                        "Error ${response.status.value} al obtener mensajes de convers by id"
+                    )
+                    Log.e("RECEIVE CONVERS by ID", "Body del error: $bodyText")
+                    emit(NetworkResponse.Failure("Error en RECEIVE CONVERS by ID: ${response.status.value}"))
+                }
+
+            } catch (e: Exception) {
+                Log.e("RECEIVE CONVERS by ID", "Excepción: $e")
+                emit(NetworkResponse.Failure(error = e.toString()))
             }
-
-            val response = ktorClient.get(url) {
-                header("Authorization", "Bearer $token")
-            }
-
-            val bodyText = response.bodyAsText()
-            println("DEBUG JSON RECEIVE CONVERS by ID: $bodyText")
-
-            if (response.status == HttpStatusCode.OK) {
-                val json = Json { ignoreUnknownKeys = true }
-                val messages = json.decodeFromString<List<MessageModelDto>>(bodyText)
-                emit(NetworkResponse.Success(messages))
-            } else {
-                Log.e("RECEIVE CONVERS by ID", "Error ${response.status.value} al obtener mensajes de convers by id")
-                Log.e("RECEIVE CONVERS by ID", "Body del error: $bodyText")
-                emit(NetworkResponse.Failure("Error en RECEIVE CONVERS by ID: ${response.status.value}"))
-            }
-
-        } catch (e: Exception) {
-            Log.e("RECEIVE CONVERS by ID", "Excepción: $e")
-            emit(NetworkResponse.Failure(error = e.toString()))
         }
-    }
 
 }

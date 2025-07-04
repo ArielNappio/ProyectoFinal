@@ -112,13 +112,6 @@ class ProjectDetailViewModelTest {
             coEvery { orderRepository.getTasks(userId) } returns flowOf(
                 NetworkResponse.Success(emptyList())
             )
-            viewModel = ProjectDetailViewModel(
-                GetTaskGroupByStudentUseCase(orderRepository),
-                tokenManager,
-                updateFavoriteStatusUseCase,
-                repository,
-                lastReadRepository
-            )
 
             viewModel.loadProject(projectId)
             testDispatcher.scheduler.advanceUntilIdle()
