@@ -13,6 +13,7 @@ import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
+import kotlin.test.assertNull
 
 @ExperimentalCoroutinesApi
 class CameraViewModelTest {
@@ -41,14 +42,15 @@ class CameraViewModelTest {
         assertEquals(mockBitmap, state.capturedImage)
     }
 
-    // TODO: Ver por qué falla este test
-//    @Test
-//    fun `onCleared should recycle captured image`() {
-//        val mockBitmap = mockk<Bitmap>()
-//        cameraViewModel.storePhotoInGallery(mockBitmap)
-//
-//        cameraViewModel.onCleared()
-//
-//        coVerify { cameraViewModel.state.value.capturedImage?.recycle() }
-//    }
+    @Test
+    fun `onCleared should recycle captured image`() = testScope.runTest {
+        val mockBitmap = mockk<Bitmap>()
+        cameraViewModel.storePhotoInGallery(mockBitmap)
+        testDispatcher.scheduler.advanceUntilIdle()
+
+        cameraViewModel.onCleared()
+        testDispatcher.scheduler.advanceUntilIdle()
+
+        assertNull(cameraViewModel.state.first().capturedImage)
+    }
 }

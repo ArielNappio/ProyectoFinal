@@ -318,7 +318,6 @@ class TaskStudentViewModel(
     }
 
     fun startSpeech() {
-
         val currentPage = _currentPageIndex.value
         val currentTextHtml = _paragraphs.value
             .filter { it.pageNumber == currentPage + 1 }

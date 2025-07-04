@@ -6,6 +6,8 @@ import com.example.proyectofinal.audio.domain.repository.AudioRepository
 import com.example.proyectofinal.audio.player.AudioPlayerManager
 import com.example.proyectofinal.audio.recorder.AudioRecorderManager
 import com.example.proyectofinal.auth.data.tokenmanager.TokenManager
+import com.example.proyectofinal.orderFeedback.domain.local.FeedbackRepository
+import com.example.proyectofinal.orderFeedback.domain.provider.OrderFeedbackProvider
 import com.example.proyectofinal.orderFeedback.domain.usecase.GetFeedbackUseCase
 import com.example.proyectofinal.orderFeedback.domain.usecase.SaveFeedbackUseCase
 import com.example.proyectofinal.orderFeedback.domain.usecase.SendFeedbackUseCase
@@ -52,6 +54,8 @@ class TaskStudentViewModelTest {
     private val tokenManager: TokenManager = mockk(relaxed = true)
     private val userPreferences: DataStoreManager = mockk(relaxed = true)
     private val lastReadRepository: LastReadRepository = mockk(relaxed = true)
+    private val feedbackRepository: FeedbackRepository = mockk(relaxed = true)
+    private val orderFeedbackProvider: OrderFeedbackProvider = mockk(relaxed = true)
 
     private lateinit var viewModel: TaskStudentViewModel
     private val testDispatcher = StandardTestDispatcher()
@@ -83,9 +87,9 @@ class TaskStudentViewModelTest {
             orderRepository = orderRepository,
             userPreferences = userPreferences,
             lastReadRepository = lastReadRepository,
-            sendFeedbackUseCase = SendFeedbackUseCase(mockk()),
-            saveFeedbackUseCase = SaveFeedbackUseCase(mockk()),
-            getFeedbackUseCase = GetFeedbackUseCase(mockk()),
+            sendFeedbackUseCase = SendFeedbackUseCase(orderFeedbackProvider),
+            saveFeedbackUseCase = SaveFeedbackUseCase(feedbackRepository),
+            getFeedbackUseCase = GetFeedbackUseCase(feedbackRepository),
         )
     }
 

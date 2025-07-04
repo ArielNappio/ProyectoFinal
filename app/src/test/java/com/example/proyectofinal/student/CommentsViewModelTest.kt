@@ -64,20 +64,16 @@ class CommentsViewModelTest {
         val initialComments = listOf(audio1, audio2)
         val taskId = "1"
 
-        // Arrange: Load comments first
         coEvery { audioRepositoryImpl.getAudiosForTask(taskId) } returns initialComments
         viewModel.loadCommentsByTaskId(1)
         advanceUntilIdle()
-        assertEquals(initialComments, viewModel.comments.value) // Confirm initial state
-
+        assertEquals(initialComments, viewModel.comments.value)
 
         coEvery { audioRepositoryImpl.deleteAudio(audio1.filePath) } just Runs
 
-        // Act
         viewModel.deleteComment(audio1.filePath)
         advanceUntilIdle()
 
-        // Assert
         assertEquals(listOf(audio2), viewModel.comments.value)
         coVerify(exactly = 1) { audioRepositoryImpl.deleteAudio(audio1.filePath) }
     }
@@ -87,40 +83,35 @@ class CommentsViewModelTest {
         val taskId = 1
         val commentsFromRepo = listOf(audio1, audio2)
 
-        // Arrange
         coEvery { audioRepositoryImpl.getAudiosForTask("1") } returns commentsFromRepo
 
-        // Act
         viewModel.loadCommentsByTaskId(taskId)
         advanceUntilIdle()
 
-        // Assert
         assertEquals(commentsFromRepo, viewModel.comments.value)
         coVerify(exactly = 1) { audioRepositoryImpl.getAudiosForTask("1") }
     }
 
     @Test
     fun `confirmEditName updates audio name and closes dialog`() = runTest {
-        val initialComments = listOf(audio1) // Simpler initial list
+        val initialComments = listOf(audio1)
         val newName = "New Name For Comment 1"
         val taskId = "task1"
 
-        // Arrange: Load comments and open/prepare edit dialog
         coEvery { audioRepositoryImpl.getAudiosForTask(taskId) } returns initialComments
         coEvery { audioRepositoryImpl.updateAudioName(audio1.filePath, newName) } just Runs
 
         viewModel.loadCommentsByTaskId(1)
         advanceUntilIdle()
-        viewModel.openEditDialog(audio1.filePath, audio1.title) // Opens dialog and sets paths/names
+        viewModel.openEditDialog(audio1.filePath, audio1.title)
         advanceUntilIdle()
-        viewModel.updateEditingName(newName) // Updates editingName
+        viewModel.updateEditingName(newName)
         advanceUntilIdle()
 
-        // Act
         viewModel.confirmEditName()
         advanceUntilIdle()
 
-        assertTrue(viewModel.showEditDialog.value) // Dialog should be closed
+        assertTrue(viewModel.showEditDialog.value)
     }
 
     @Test
@@ -128,22 +119,19 @@ class CommentsViewModelTest {
         val initialComments = listOf(audio1)
         val taskId = "task1"
 
-        // Arrange: Load comments and prepare dialog with blank name
         coEvery { audioRepositoryImpl.getAudiosForTask(taskId) } returns initialComments
         viewModel.loadCommentsByTaskId(1)
         advanceUntilIdle()
         viewModel.openEditDialog(audio1.filePath, audio1.title)
         advanceUntilIdle()
-        viewModel.updateEditingName("   ") // Blank name
+        viewModel.updateEditingName(" ")
         advanceUntilIdle()
 
-        // Act
         viewModel.confirmEditName()
         advanceUntilIdle()
 
-        // Assert
-        coVerify(exactly = 0) { audioRepositoryImpl.updateAudioName(any(), any()) } // No update should happen
-        assertTrue(viewModel.showEditDialog.value) // Dialog still closes as per VM logic
+        coVerify(exactly = 0) { audioRepositoryImpl.updateAudioName(any(), any()) }
+        assertTrue(viewModel.showEditDialog.value)
     }
 
     @Test
@@ -151,16 +139,13 @@ class CommentsViewModelTest {
         val targetPosition = 5000L
         val path = audio1.filePath
 
-        // Arrange: Mock the audio player seek call
         every { audioPlayerManager.seekTo(targetPosition) } just Runs
 
-        // Act
         viewModel.seekTo(targetPosition, false, path)
         advanceUntilIdle()
 
-        // Assert
         assertEquals(targetPosition, viewModel.currentPosition.value)
         coVerify(exactly = 1) { audioPlayerManager.seekTo(targetPosition) }
-        coVerify(exactly = 0) { audioPlayerManager.play(any(), any()) } // Should not play
+        coVerify(exactly = 0) { audioPlayerManager.play(any(), any()) }
     }
 }
