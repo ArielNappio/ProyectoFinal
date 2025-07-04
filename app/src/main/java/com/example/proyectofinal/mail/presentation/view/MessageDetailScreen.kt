@@ -11,17 +11,23 @@ import androidx.compose.material.icons.filled.AttachFile
 import androidx.compose.material3.*
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
+import com.example.proyectofinal.core.network.NetworkResponse
 import com.example.proyectofinal.core.theme.BlueDark
 import com.example.proyectofinal.core.theme.GreenLight
 import com.example.proyectofinal.mail.domain.model.MailboxType
 import com.example.proyectofinal.mail.domain.model.MessageModel
+import com.example.proyectofinal.mail.domain.model.MessageModelDto
+import com.example.proyectofinal.mail.presentation.viewmodel.ConversationViewModel
 import com.example.proyectofinal.userpreferences.presentation.component.AppText
+import org.koin.androidx.compose.koinViewModel
 import java.io.File
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -34,6 +40,13 @@ fun MessageDetailScreen(
     onBack: () -> Unit,
     onReply: ((MessageModel) -> Unit)? = null
 ) {
+    val conversationVm: ConversationViewModel = koinViewModel()
+    val conversationState by conversationVm.conversationState.collectAsState()
+
+    LaunchedEffect(message.id) {
+        conversationVm.loadConversation(message.id.toString())
+    }
+
     Scaffold(
         containerColor = Color(0xFF121212),
         topBar = {
@@ -105,6 +118,19 @@ fun MessageDetailScreen(
                             color = GreenLight
                         )
                     }
+                }
+            }
+            when (conversationState) {
+                is NetworkResponse.Loading -> {
+                    CircularProgressIndicator()
+                }
+                is NetworkResponse.Success -> {
+                    ConversationList(
+                        conversation = (conversationState as NetworkResponse.Success<List<MessageModelDto>>).data ?: emptyList()
+                    )
+                }
+                is NetworkResponse.Failure -> {
+                    Text("No se pudo cargar la conversación", color = Color.Red)
                 }
             }
 
