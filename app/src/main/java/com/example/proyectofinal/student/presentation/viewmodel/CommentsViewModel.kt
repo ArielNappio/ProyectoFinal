@@ -10,6 +10,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+import java.io.File
 
 class CommentsViewModel(
     private val audioRepositoryImpl: AudioRepositoryImpl,
@@ -93,7 +94,7 @@ class CommentsViewModel(
     fun deleteComment(filePath: String) {
         viewModelScope.launch {
             // 1. Eliminar archivo físicamente (si existe)
-            val file = java.io.File(filePath)
+            val file = File(filePath)
             if (file.exists()) {
                 file.delete()
             }
@@ -144,7 +145,10 @@ class CommentsViewModel(
             val current = _comments.value.find { it.filePath == path } ?: return@launch
 
             val isDuplicate = _comments.value.any {
-                it.title.equals(newName, ignoreCase = true) && it.filePath != path && it.associatedTaskId == current.associatedTaskId
+                it.title.equals(
+                    newName,
+                    ignoreCase = true
+                ) && it.filePath != path && it.associatedTaskId == current.associatedTaskId
             }
 
             if (newName.isBlank() || isDuplicate) return@launch
@@ -159,4 +163,3 @@ class CommentsViewModel(
         }
     }
 }
-
