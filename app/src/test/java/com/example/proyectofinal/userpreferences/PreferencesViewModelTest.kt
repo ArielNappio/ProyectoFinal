@@ -45,14 +45,16 @@ class PreferencesViewModelTest {
 
     @Test
     fun `updateFontSize updates the font size in repository`() = runTest {
-        val newSize = 26f
-        coEvery { repository.saveFontSize(newSize) } just Runs
-        coEvery { repository.saveIconSize(32f) } just Runs
+        val newSizesList = listOf(26f, 30f, 34f, 38f, 42f, 46f, 50f)
+        coEvery { repository.saveFontSize(any()) } just Runs
+        coEvery { repository.saveIconSize(any()) } just Runs
 
-        viewModel.updateFontSize(newSize)
+        newSizesList.forEach {
+            viewModel.updateFontSize(it)
+        }
         testDispatcher.scheduler.advanceUntilIdle()
 
-        coVerify { repository.saveFontSize(newSize) }
+        coVerify(exactly = newSizesList.size) { repository.saveFontSize(any<Float>()) }
         coVerify { repository.saveIconSize(32f) }
     }
 
