@@ -43,8 +43,8 @@ import androidx.navigation.NavController
 import coil.compose.rememberAsyncImagePainter
 import com.example.proyectofinal.R
 import com.example.proyectofinal.auth.data.tokenmanager.TokenManager
-import com.example.proyectofinal.core.theme.LocalTheme
-import com.example.proyectofinal.core.ui.ThemeViewModel
+import com.example.proyectofinal.core.presentation.theme.LocalTheme
+import com.example.proyectofinal.core.presentation.viewmodel.ThemeViewModel
 import com.example.proyectofinal.navigation.ScreensRoute
 import com.example.proyectofinal.navigation.presentation.viewmodel.MainViewModel
 import com.example.proyectofinal.userpreferences.presentation.component.AppText

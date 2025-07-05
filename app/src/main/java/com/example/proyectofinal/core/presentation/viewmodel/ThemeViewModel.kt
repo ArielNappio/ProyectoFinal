@@ -1,4 +1,4 @@
-package com.example.proyectofinal.core.ui
+package com.example.proyectofinal.core.presentation.viewmodel
 
 import androidx.lifecycle.ViewModel
 import com.example.proyectofinal.auth.data.tokenmanager.TokenManager

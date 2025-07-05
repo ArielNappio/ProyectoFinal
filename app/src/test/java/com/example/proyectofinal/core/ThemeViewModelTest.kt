@@ -1,7 +1,7 @@
 package com.example.proyectofinal.core
 
 import com.example.proyectofinal.auth.data.tokenmanager.TokenManager
-import com.example.proyectofinal.core.ui.ThemeViewModel
+import com.example.proyectofinal.core.presentation.viewmodel.ThemeViewModel
 import io.mockk.mockk
 import junit.framework.TestCase.assertEquals
 import kotlinx.coroutines.flow.first

@@ -20,8 +20,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.example.proyectofinal.core.network.NetworkResponse
-import com.example.proyectofinal.core.theme.BlueDark
-import com.example.proyectofinal.core.theme.GreenLight
+import com.example.proyectofinal.core.presentation.theme.BlueDark
+import com.example.proyectofinal.core.presentation.theme.GreenLight
 import com.example.proyectofinal.mail.domain.model.MailboxType
 import com.example.proyectofinal.mail.domain.model.MessageModel
 import com.example.proyectofinal.mail.domain.model.MessageModelDto

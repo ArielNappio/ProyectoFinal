@@ -33,8 +33,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
-import com.example.proyectofinal.core.theme.BlackGray
-import com.example.proyectofinal.core.theme.CustomGreen
+import com.example.proyectofinal.core.presentation.theme.BlackGray
+import com.example.proyectofinal.core.presentation.theme.CustomGreen
 import com.example.proyectofinal.mail.domain.model.MessageModel
 import com.example.proyectofinal.mail.presentation.viewmodel.MessageViewModel
 import java.time.LocalDateTime

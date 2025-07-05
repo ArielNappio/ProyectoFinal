@@ -33,7 +33,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.proyectofinal.R
-import com.example.proyectofinal.core.theme.LocalTheme
+import com.example.proyectofinal.core.presentation.theme.LocalTheme
 import com.example.proyectofinal.navigation.ScreensRoute
 import com.example.proyectofinal.userpreferences.domain.model.UserPreferences
 import com.example.proyectofinal.userpreferences.domain.repository.UserPreferencesRepository

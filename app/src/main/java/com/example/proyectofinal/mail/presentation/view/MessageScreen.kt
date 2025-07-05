@@ -59,9 +59,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.proyectofinal.audio.speechrecognizer.SpeechRecognizerManager
 import com.example.proyectofinal.core.network.NetworkResponse
-import com.example.proyectofinal.core.theme.BlueDark
-import com.example.proyectofinal.core.theme.CustomRed
-import com.example.proyectofinal.core.theme.GreenLight
+import com.example.proyectofinal.core.presentation.theme.BlueDark
+import com.example.proyectofinal.core.presentation.theme.CustomRed
+import com.example.proyectofinal.core.presentation.theme.GreenLight
 import com.example.proyectofinal.mail.presentation.component.FormScreen
 import com.example.proyectofinal.mail.presentation.viewmodel.MessageViewModel
 import org.koin.androidx.compose.koinViewModel

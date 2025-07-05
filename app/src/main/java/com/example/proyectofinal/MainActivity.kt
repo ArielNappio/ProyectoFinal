@@ -22,10 +22,10 @@ import androidx.core.content.ContextCompat
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.compose.rememberNavController
 import com.example.proyectofinal.auth.data.tokenmanager.TokenManager
-import com.example.proyectofinal.core.theme.CurrentTheme
-import com.example.proyectofinal.core.theme.LocalTheme
-import com.example.proyectofinal.core.theme.ProyectoFinalTheme
-import com.example.proyectofinal.core.ui.ThemeViewModel
+import com.example.proyectofinal.core.presentation.theme.CurrentTheme
+import com.example.proyectofinal.core.presentation.theme.LocalTheme
+import com.example.proyectofinal.core.presentation.theme.ProyectoFinalTheme
+import com.example.proyectofinal.core.presentation.viewmodel.ThemeViewModel
 import com.example.proyectofinal.navigation.presentation.view.Main
 import com.example.proyectofinal.notifications.scheduleOneTimeWorker
 import kotlinx.coroutines.launch

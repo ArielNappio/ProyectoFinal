@@ -101,10 +101,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.example.proyectofinal.audio.speechrecognizer.SpeechRecognizerManager
-import com.example.proyectofinal.core.theme.ATKINSON_HYPERLEGIBLE_FAMILY_NAME
-import com.example.proyectofinal.core.theme.LocalTheme
-import com.example.proyectofinal.core.theme.OPEN_DYSLEXIC_FAMILY_NAME
-import com.example.proyectofinal.core.ui.ThemeViewModel
+import com.example.proyectofinal.core.presentation.theme.ATKINSON_HYPERLEGIBLE_FAMILY_NAME
+import com.example.proyectofinal.core.presentation.theme.LocalTheme
+import com.example.proyectofinal.core.presentation.theme.OPEN_DYSLEXIC_FAMILY_NAME
+import com.example.proyectofinal.core.presentation.viewmodel.ThemeViewModel
 import com.example.proyectofinal.student.presentation.component.CommentAudioCard
 import com.example.proyectofinal.task_student.presentation.component.AccessibleIconButton
 import com.example.proyectofinal.task_student.presentation.component.DownloadOption

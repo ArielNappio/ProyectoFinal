@@ -3,7 +3,7 @@ package com.example.proyectofinal.core.di
 import com.example.proyectofinal.auth.data.tokenmanager.TokenManager
 import com.example.proyectofinal.auth.presentation.viewmodel.LoginViewModel
 import com.example.proyectofinal.camera.presentation.viewmodel.CameraViewModel
-import com.example.proyectofinal.core.ui.ThemeViewModel
+import com.example.proyectofinal.core.presentation.viewmodel.ThemeViewModel
 import com.example.proyectofinal.navigation.presentation.viewmodel.MainViewModel
 import com.example.proyectofinal.student.presentation.viewmodel.CommentsViewModel
 import com.example.proyectofinal.student.presentation.viewmodel.HomeScreenViewModel

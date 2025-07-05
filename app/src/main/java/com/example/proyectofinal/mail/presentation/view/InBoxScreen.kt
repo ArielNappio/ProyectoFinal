@@ -50,7 +50,7 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.proyectofinal.R
 import com.example.proyectofinal.core.network.NetworkResponse
-import com.example.proyectofinal.core.theme.LocalTheme
+import com.example.proyectofinal.core.presentation.theme.LocalTheme
 import com.example.proyectofinal.mail.domain.model.MailboxType
 import com.example.proyectofinal.mail.domain.model.MessageModel
 import com.example.proyectofinal.mail.presentation.component.MessageItem
