@@ -24,6 +24,7 @@ import io.mockk.mockkStatic
 import junit.framework.TestCase.assertEquals
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.TestScope
@@ -158,5 +159,132 @@ class MessageViewModelTest {
         viewModel.discardDraft(1)
 
         coVerify { deleteDraftUseCase(1) }
+    }
+
+    @Test
+    fun `when removeAttachment is called, formPath and attachments are cleared`() = runTest {
+        // Arrange
+        viewModel.addAttachment("testFilePath")
+        viewModel.updateFormPath("testFormPath")
+
+        viewModel.removeAttachment()
+
+        assertEquals(null, viewModel.formPath.value)
+        assertEquals(emptyList<String>(), viewModel.attachments.value)
+    }
+
+    @Test
+    fun `when addAttachment is called, filePath is added to attachments`() = runTest {
+        val filePath = "testFilePath"
+
+        viewModel.addAttachment(filePath)
+
+        assertEquals(listOf(filePath), viewModel.attachments.value)
+    }
+
+    @Test
+    fun `appendToMessage should append new text to the existing message`() = runTest {
+        val initialMessage = "Hello"
+        val newText = "World"
+        viewModel.updateMessage(initialMessage)
+
+        viewModel.appendToMessage(newText)
+
+        val result = viewModel.message.first()
+        assertEquals("Hello World", result)
+    }
+
+    @Test
+    fun `when loadUserId is called, currentUserId is updated`() = testScope.runTest {
+        coEvery { tokenManager.userId } returns flowOf("test_user_id")
+
+        viewModel.loadUserId()
+        testDispatcher.scheduler.advanceUntilIdle()
+
+        assertEquals("test_user_id", viewModel.currentUserId.value)
+    }
+
+    @Test
+    fun `when getUserIdByEmailSync is called with valid email, correct userId is returned`() = testScope.runTest {
+        val email = "test@example.com"
+        coEvery { userProvider.getUsers() } returns flowOf(NetworkResponse.Success(listOf(librarianUser)))
+
+        val userId = viewModel.getUserIdByEmailSync(email)
+
+        assertEquals("1", userId)
+    }
+
+    @Test
+    fun `when getUserIdByEmailSync is called with invalid email, empty userId is returned`() = testScope.runTest {
+        val email = "invalid@example.com"
+        coEvery { userProvider.getUsers() } returns flowOf(NetworkResponse.Success(listOf(librarianUser)))
+
+        val userId = viewModel.getUserIdByEmailSync(email)
+
+        assertEquals("", userId)
+    }
+
+    @Test
+    fun `when getUserIdByEmail is called with valid email, userToId is updated`() = testScope.runTest {
+        val email = "test@example.com"
+        coEvery { userProvider.getUsers() } returns flowOf(NetworkResponse.Success(listOf(librarianUser)))
+
+        viewModel.getUserIdByEmail(email)
+        testDispatcher.scheduler.advanceUntilIdle()
+
+        assertEquals("1", viewModel.userToId.value)
+    }
+
+    @Test
+    fun `when getUserIdByEmail is called with invalid email, userToId is empty`() = testScope.runTest {
+        val email = "invalid@example.com"
+        coEvery { userProvider.getUsers() } returns flowOf(NetworkResponse.Success(listOf(librarianUser)))
+
+        viewModel.getUserIdByEmail(email)
+        testDispatcher.scheduler.advanceUntilIdle()
+
+        assertEquals("", viewModel.userToId.value)
+    }
+
+    @Test
+    fun `when getEmailByUserIdSync is called with valid userId, correct email is returned`() = testScope.runTest {
+        val userId = "1"
+        coEvery { userProvider.getUsers() } returns flowOf(NetworkResponse.Success(listOf(librarianUser)))
+
+        val email = viewModel.getEmailByUserIdSync(userId)
+
+        assertEquals("test@example.com", email)
+    }
+
+    @Test
+    fun `when getEmailByUserIdSync is called with invalid userId, 'Desconocido' is returned`() = testScope.runTest {
+        val userId = "invalid_id"
+        coEvery { userProvider.getUsers() } returns flowOf(NetworkResponse.Success(listOf(librarianUser)))
+
+        val email = viewModel.getEmailByUserIdSync(userId)
+
+        assertEquals("Desconocido", email)
+    }
+
+    @Test
+    fun `when getEmailByUserId is called with valid userId, 'to' is updated`() = testScope.runTest {
+        val userId = "1"
+        coEvery { userProvider.getUsers() } returns flowOf(NetworkResponse.Success(listOf(librarianUser)))
+
+        viewModel.getEmailByUserId(userId)
+        testDispatcher.scheduler.advanceUntilIdle()
+
+        assertEquals("test@example.com", viewModel.to.value)
+    }
+
+    @Test
+    fun `when getEmailByUserId is called with invalid userId, 'to' is empty`() = testScope.runTest {
+        val userId = "invalid_id"
+        coEvery { userProvider.getUsers() } returns flowOf(NetworkResponse.Success(listOf(librarianUser)))
+
+        viewModel.getEmailByUserId(userId)
+        testDispatcher.scheduler.advanceUntilIdle()
+
+        assertEquals("", viewModel.to.value)
     }
 }
