@@ -5,6 +5,7 @@ import com.example.proyectofinal.auth.data.model.LoginRequestDto
 import com.example.proyectofinal.auth.data.model.LoginResponseDto
 import com.example.proyectofinal.auth.data.model.UserResponseDto
 import com.example.proyectofinal.auth.data.tokenmanager.TokenManager
+import com.example.proyectofinal.auth.domain.provider.AuthRemoteProvider
 import com.example.proyectofinal.auth.domain.usecases.GetMeUseCase
 import com.example.proyectofinal.auth.domain.usecases.PostLoginUseCase
 import com.example.proyectofinal.auth.presentation.viewmodel.LoginViewModel
@@ -48,18 +49,21 @@ class LoginViewModelTest {
     private lateinit var tokenManager: TokenManager
     private lateinit var getMeUseCase: GetMeUseCase
     private lateinit var postLoginUseCase: PostLoginUseCase
+    private lateinit var authRemoteProvider: AuthRemoteProvider
     private lateinit var viewModel: LoginViewModel
 
     private val testEmail = "test@example.com"
     private val testPassword = "password123"
     private val loginResponse = LoginResponseDto("dummy_token", "expiration", "user_id_123")
-    private val userResponse = UserResponseDto("user_id_123", "Test User", "test@example.com", listOf(""))
+    private val userResponse =
+        UserResponseDto("user_id_123", "Test User", "test@example.com", listOf(""))
 
     @Before
     fun setup() {
+        authRemoteProvider = mockk(relaxed = true)
         tokenManager = mockk(relaxed = true)
-        getMeUseCase = mockk(relaxed = true)
-        postLoginUseCase = mockk(relaxed = true)
+        getMeUseCase = GetMeUseCase(authRemoteProvider)
+        postLoginUseCase = PostLoginUseCase(authRemoteProvider)
 
         Dispatchers.setMain(testDispatcher)
 
@@ -129,7 +133,8 @@ class LoginViewModelTest {
         viewModel.onPasswordChange(testPassword)
 
         val loginStates = mutableListOf<UiState<LoginResponseDto>>()
-        val loginJob = launch(testDispatcher) { viewModel.loginState.collect { loginStates.add(it) } }
+        val loginJob =
+            launch(testDispatcher) { viewModel.loginState.collect { loginStates.add(it) } }
 
         advanceUntilIdle()
         assertEquals(UiState.Loading, loginStates.first())
@@ -154,22 +159,35 @@ class LoginViewModelTest {
         viewModel.onEmailFocusChange(false)
         viewModel.onPasswordFocusChange(false)
 
-        coEvery { postLoginUseCase.invoke(LoginRequestDto(testEmail, testPassword)) } returns flowOf(
+        coEvery {
+            authRemoteProvider.postLogin(
+                LoginRequestDto(
+                    testEmail,
+                    testPassword
+                )
+            )
+        } returns flowOf(
             NetworkResponse.Success(loginResponse)
         )
 
-        coEvery { getMeUseCase.invoke() } returns flowOf(
+        coEvery { authRemoteProvider.getMe() } returns flowOf(
             NetworkResponse.Success(userResponse)
         )
 
         val isLoadingStates = mutableListOf<Boolean>()
-        val isLoadingJob = launch(testDispatcher) { viewModel.isLoading.collect { isLoadingStates.add(it) } }
+        val isLoadingJob =
+            launch(testDispatcher) { viewModel.isLoading.collect { isLoadingStates.add(it) } }
 
         val loginStates = mutableListOf<UiState<LoginResponseDto>>()
-        val loginJob = launch(testDispatcher) { viewModel.loginState.collect { loginStates.add(it) } }
+        val loginJob =
+            launch(testDispatcher) { viewModel.loginState.collect { loginStates.add(it) } }
 
         val navigateToPreferencesStates = mutableListOf<Boolean>()
-        val navigateToPreferencesJob = launch(testDispatcher) { viewModel.navigateToPreferences.collect { navigateToPreferencesStates.add(it) } }
+        val navigateToPreferencesJob = launch(testDispatcher) {
+            viewModel.navigateToPreferences.collect {
+                navigateToPreferencesStates.add(it)
+            }
+        }
 
         advanceUntilIdle()
         assertFalse(isLoadingStates.first())
@@ -206,18 +224,24 @@ class LoginViewModelTest {
         viewModel.onPasswordChange(testPassword)
 
         val errorMessage = "Bad Credentials"
-        coEvery { postLoginUseCase.invoke(any()) } returns flowOf(
+        coEvery { authRemoteProvider.postLogin(any()) } returns flowOf(
             NetworkResponse.Failure(errorMessage)
         )
 
         val isLoadingStates = mutableListOf<Boolean>()
-        val isLoadingJob = launch(testDispatcher) { viewModel.isLoading.collect { isLoadingStates.add(it) } }
+        val isLoadingJob =
+            launch(testDispatcher) { viewModel.isLoading.collect { isLoadingStates.add(it) } }
 
         val loginStates = mutableListOf<UiState<LoginResponseDto>>()
-        val loginJob = launch(testDispatcher) { viewModel.loginState.collect { loginStates.add(it) } }
+        val loginJob =
+            launch(testDispatcher) { viewModel.loginState.collect { loginStates.add(it) } }
 
         val showErrorDialogStates = mutableListOf<Boolean>()
-        val showErrorDialogJob = launch(testDispatcher) { viewModel.showErrorDialog.collect { showErrorDialogStates.add(it) } }
+        val showErrorDialogJob = launch(testDispatcher) {
+            viewModel.showErrorDialog.collect {
+                showErrorDialogStates.add(it)
+            }
+        }
 
         advanceUntilIdle()
         assertEquals(false, isLoadingStates.first())
@@ -250,19 +274,24 @@ class LoginViewModelTest {
         viewModel.onEmailChange(testEmail)
         viewModel.onPasswordChange(testPassword)
 
-        coEvery { postLoginUseCase.invoke(any()) } returns flowOf(
+        coEvery { authRemoteProvider.postLogin(any()) } returns flowOf(
             NetworkResponse.Success(loginResponse)
         )
         val getMeErrorMessage = "Failed to fetch user data"
-        coEvery { getMeUseCase.invoke() } returns flowOf(
+        coEvery { authRemoteProvider.getMe() } returns flowOf(
             NetworkResponse.Failure(getMeErrorMessage)
         )
 
         val isLoadingStates = mutableListOf<Boolean>()
-        val isLoadingJob = launch(testDispatcher) { viewModel.isLoading.collect { isLoadingStates.add(it) } }
+        val isLoadingJob =
+            launch(testDispatcher) { viewModel.isLoading.collect { isLoadingStates.add(it) } }
 
         val navigateToPreferencesStates = mutableListOf<Boolean>()
-        val navigateToPreferencesJob = launch(testDispatcher) { viewModel.navigateToPreferences.collect { navigateToPreferencesStates.add(it) } }
+        val navigateToPreferencesJob = launch(testDispatcher) {
+            viewModel.navigateToPreferences.collect {
+                navigateToPreferencesStates.add(it)
+            }
+        }
 
         advanceUntilIdle()
         assertEquals(false, isLoadingStates.first())

@@ -65,9 +65,7 @@ class LoginViewModel(
         viewModelScope.launch {
             println("Intentando loguear con ${email.value} y ${password.value}")
 
-            if(email.value.isNotEmpty() && password.value.isNotEmpty())
-            {
-
+            if (email.value.isNotEmpty() && password.value.isNotEmpty()) {
                 println("entro al if de que no esta empty")
                 _isLoading.update { true }
                 postLoginUseCase(LoginRequestDto(email.value, password.value)).collect { response ->
@@ -99,10 +97,12 @@ class LoginViewModel(
                                 _loginState.update { UiState.Success(response.data) }
                             }
                         }
+
                         is NetworkResponse.Loading -> {
                             _isLoading.update { true }
                             println("Cargando...")
                         }
+
                         is NetworkResponse.Failure -> {
                             _isLoading.update { false }
                             _loginState.update { UiState.Error("Ocurrió un error desconocido 😕") }
@@ -111,8 +111,7 @@ class LoginViewModel(
                         }
                     }
                 }
-            }
-            else {
+            } else {
                 _loginState.update { UiState.Error("Email o contraseña vacíos") }
                 print("ta vacio")
             }
