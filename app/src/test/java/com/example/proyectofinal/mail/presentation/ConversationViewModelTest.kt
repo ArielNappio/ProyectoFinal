@@ -1,4 +1,4 @@
-package com.example.proyectofinal.mail
+package com.example.proyectofinal.mail.presentation
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.example.proyectofinal.core.network.NetworkResponse
@@ -6,14 +6,21 @@ import com.example.proyectofinal.mail.domain.model.MessageModelDto
 import com.example.proyectofinal.mail.domain.provider.MailProvider
 import com.example.proyectofinal.mail.domain.usecase.ReceiveConversationByIdUseCase
 import com.example.proyectofinal.mail.presentation.viewmodel.ConversationViewModel
-import io.mockk.*
+import io.mockk.coEvery
+import io.mockk.every
+import io.mockk.mockk
+import io.mockk.verify
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.test.*
+import kotlinx.coroutines.test.StandardTestDispatcher
+import kotlinx.coroutines.test.advanceUntilIdle
+import kotlinx.coroutines.test.resetMain
+import kotlinx.coroutines.test.runTest
+import kotlinx.coroutines.test.setMain
 import org.junit.After
-import org.junit.Assert.assertEquals
+import org.junit.Assert
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -60,14 +67,20 @@ class ConversationViewModelTest {
                 isRead = true
             )
         )
-        every { mailProvider.receiveConversationById(any()) } returns flow { emit(NetworkResponse.Success(mockMessages)) }
+        every { mailProvider.receiveConversationById(any()) } returns flow {
+            emit(
+                NetworkResponse.Success(
+                    mockMessages
+                )
+            )
+        }
         val conversationId = "123"
 
         viewModel.loadConversation(conversationId)
         advanceUntilIdle()
 
         assert(viewModel.conversationState.first() is NetworkResponse.Success)
-        assertEquals(mockMessages, viewModel.conversationState.first().data)
+        Assert.assertEquals(mockMessages, viewModel.conversationState.first().data)
         verify { mailProvider.receiveConversationById(conversationId) }
     }
 
@@ -76,13 +89,19 @@ class ConversationViewModelTest {
         val conversationId = "123"
         val errorMessage = "Error occurred"
 
-        every { mailProvider.receiveConversationById(any()) } returns flow { emit(NetworkResponse.Failure(errorMessage)) }
+        every { mailProvider.receiveConversationById(any()) } returns flow {
+            emit(
+                NetworkResponse.Failure(
+                    errorMessage
+                )
+            )
+        }
 
         viewModel.loadConversation(conversationId)
         advanceUntilIdle()
 
         assert(viewModel.conversationState.first() is NetworkResponse.Failure)
-        assertEquals(viewModel.conversationState.first().error, errorMessage)
+        Assert.assertEquals(viewModel.conversationState.first().error, errorMessage)
         verify { mailProvider.receiveConversationById(conversationId) }
     }
 

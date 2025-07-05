@@ -1,4 +1,4 @@
-package com.example.proyectofinal.mail
+package com.example.proyectofinal.mail.presentation
 
 import android.util.Log
 import app.cash.turbine.test
