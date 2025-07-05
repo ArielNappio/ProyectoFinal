@@ -225,6 +225,26 @@ class ProjectDetailViewModelTest {
         }
 
     @Test
+    fun `loadProject should update projectState with loading when network call in process`() =
+        testScope.runTest {
+            coEvery { orderRepository.getTasks(userId) } returns flowOf(
+                NetworkResponse.Loading()
+            )
+
+            viewModel.projectState.test {
+                assert(awaitItem() is NetworkResponse.Loading)
+
+                viewModel.loadProject(projectId)
+                testDispatcher.scheduler.advanceUntilIdle()
+
+                val loadingState = awaitItem()
+                assertTrue(loadingState is NetworkResponse.Loading)
+
+                cancelAndConsumeRemainingEvents()
+            }
+        }
+
+    @Test
     fun `toggleFavorite should update projectState with updated favorite status`() =
         testScope.runTest {
             val updatedOrderDeliveredMock = orderDeliveredMock[0].copy(isFavorite = true)
