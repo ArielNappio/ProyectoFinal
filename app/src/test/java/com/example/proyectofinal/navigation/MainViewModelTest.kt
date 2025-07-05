@@ -178,6 +178,42 @@ class MainViewModelTest {
     }
 
     @Test
+    fun `refreshSession with valid token keeps loading and emits Loading`() = runTest {
+        val testToken = "valid_token_123"
+
+        coEvery { tokenManager.token } returns flowOf(testToken)
+        coEvery { getMeUseCase.invoke() } returns flowOf(NetworkResponse.Loading())
+
+        val mainScreenUiStates = mutableListOf<MainScreenUiState>()
+        val mainJob = launch(testDispatcher) {
+            viewModel.mainScreenUiState.collect { mainScreenUiStates.add(it) }
+        }
+
+        val userStates = mutableListOf<UiState<UserResponseDto>>()
+        val userJob = launch(testDispatcher) {
+            viewModel.userState.collect { userStates.add(it) }
+        }
+
+        advanceUntilIdle()
+        assertEquals(MainScreenUiState.Loading, mainScreenUiStates.first())
+        assertEquals(UiState.Loading, userStates.first())
+
+        viewModel.refreshSession()
+        advanceUntilIdle()
+
+        assertEquals(1, mainScreenUiStates.size)
+        assertEquals(MainScreenUiState.Loading, mainScreenUiStates[0])
+
+        assertEquals(1, userStates.size)
+        assertEquals(UiState.Loading, userStates[0])
+
+        coVerify(exactly = 1) { getMeUseCase.invoke() }
+
+        mainJob.cancel()
+        userJob.cancel()
+    }
+
+    @Test
     fun `refreshSession with valid token and use case throws exception emits Unauthenticated`() = runTest {
         val testToken = "valid_token_123"
         val exceptionMessage = "Simulated crash"

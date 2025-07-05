@@ -55,10 +55,12 @@ class MainViewModel(
                         _userState.update { UiState.Success(response.data) as UiState<UserResponseDto> }
                         _mainScreenUiState.update { MainScreenUiState.Authenticated }
                     }
+
                     is NetworkResponse.Failure -> {
                         _userState.update { UiState.Error(response.error.toString()) }
                         _mainScreenUiState.update { MainScreenUiState.Unauthenticated }
                     }
+
                     is NetworkResponse.Loading -> {
                         _userState.update { UiState.Loading }
                     }
