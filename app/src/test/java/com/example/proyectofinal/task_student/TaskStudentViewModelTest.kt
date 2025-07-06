@@ -290,6 +290,39 @@ class TaskStudentViewModelTest {
         }
 
     @Test
+    fun `when loadProject is called with a valid taskId and provider call fails, nothing happens`() =
+        testScope.runTest {
+            val taskId = 1
+            val userId = "example_user_id"
+
+            val mockResponse = NetworkResponse.Failure<List<OrderDelivered>>("network error")
+
+            coEvery { tokenManager.userId } returns flowOf(userId)
+            coEvery { getOrders(userId) } returns flowOf(mockResponse)
+
+            viewModel.loadProject(taskId)
+            testDispatcher.scheduler.advanceUntilIdle()
+
+            assertTrue(viewModel.projectState.value is NetworkResponse.Loading)
+        }
+
+    @Test
+    fun `when loadProject is called with a valid taskId and user id is null, state is updated`() =
+        testScope.runTest {
+            val taskId = 1
+            coEvery { tokenManager.userId } returns flowOf(null)
+
+            viewModel.loadProject(taskId)
+            testDispatcher.scheduler.advanceUntilIdle()
+
+            assertTrue(viewModel.projectState.value is NetworkResponse.Failure)
+            assertEquals(
+                "Usuario no autenticado",
+                (viewModel.projectState.value as NetworkResponse.Failure).error
+            )
+        }
+
+    @Test
     fun `when saveTaskId is called, currentTaskId is updated`() = runTest {
         val taskId = 123
 
@@ -523,6 +556,18 @@ class TaskStudentViewModelTest {
     }
 
     @Test
+    fun `when setSpeechRate is called with valid rate and isSpeaking is true, speechRate is updated`() = runTest {
+        every { ttsManager.speak(any()) } just Runs
+        viewModel.startSpeech()
+        val speechRate = 1.5f
+
+        viewModel.setSpeechRate(speechRate)
+
+        assertEquals(speechRate, viewModel.speechRate.value)
+        verify { ttsManager.setSpeechRate(speechRate) }
+    }
+
+    @Test
     fun `when startSpeech is called, ttsManager speak is invoked with correct text`() = runTest {
         val taskId = 1
         val userId = "example_user_id"
@@ -581,5 +626,129 @@ class TaskStudentViewModelTest {
 
             coVerify(exactly = 1) { lastReadRepository.saveLastReadPage(orderId, page) }
         }
+
+    @Test
+    fun `when toggleSpeechSettingsMenu is called, _showSpeechSettingsMenu value is toggled`() = runTest {
+        val initialValue = viewModel.showSpeechSettingsMenu.value
+
+        viewModel.toggleSpeechSettingsMenu()
+
+        assertEquals(!initialValue, viewModel.showSpeechSettingsMenu.value)
+    }
+
+    @Test
+    fun `when closeSpeechSettingsMenu is called, _showSpeechSettingsMenu is set to false`() = runTest {
+        viewModel.toggleSpeechSettingsMenu()
+        assertTrue(viewModel.showSpeechSettingsMenu.value)
+
+        viewModel.closeSpeechSettingsMenu()
+
+        assertFalse(viewModel.showSpeechSettingsMenu.value)
+    }
+
+    @Test
+    fun `when playSpeech is called, ttsManager resume is invoked and state is updated`() = runTest {
+        every { ttsManager.resume() } just Runs
+
+        viewModel.playSpeech()
+
+        verify { ttsManager.resume() }
+        assertTrue(viewModel.isSpeaking.value)
+        assertFalse(viewModel.isPaused.value)
+    }
+
+    @Test
+    fun `when pauseSpeech is called, ttsManager pause is invoked and state is updated`() = runTest {
+        every { ttsManager.pause() } just Runs
+
+        viewModel.pauseSpeech()
+
+        verify { ttsManager.pause() }
+        assertFalse(viewModel.isSpeaking.value)
+        assertTrue(viewModel.isPaused.value)
+    }
+
+    @Test
+    fun `when openEditDialog is called, editingPath and editingName are updated and showEditDialog is set to true`() = runTest {
+        val filePath = "example/path/to/file"
+        val currentName = "Example Name"
+
+        viewModel.openEditDialog(filePath, currentName)
+
+        assertEquals(filePath, viewModel.editingPath.value)
+        assertEquals(currentName, viewModel.editingName.value)
+        assertTrue(viewModel.showEditDialog.value)
+    }
+
+    @Test
+    fun `when updateEditingName is called, editingName is updated`() = runTest {
+        val newName = "Updated Name"
+
+        viewModel.updateEditingName(newName)
+
+        assertEquals(newName, viewModel.editingName.value)
+    }
+
+    @Test
+    fun `when closeEditDialog is called, editingPath, editingName are cleared and showEditDialog is set to false`() = runTest {
+        viewModel.openEditDialog("example/path", "Example Name")
+
+        viewModel.closeEditDialog()
+
+        assertEquals("", viewModel.editingPath.value)
+        assertEquals("", viewModel.editingName.value)
+        assertFalse(viewModel.showEditDialog.value)
+    }
+
+    @Test
+    fun `when confirmEditName is called with valid new name, it updates the audio name`() = testScope.runTest {
+        val taskId = 1
+        val mockComments = listOf(
+            RecordedAudio(
+                id = 1,
+                filePath = "example/path/to/file",
+                timestamp = 1L,
+                associatedTaskId = "1",
+                title = "Comment 1",
+                page = 1,
+                date = "2025-01-01",
+                duration = 1L
+            ),
+            RecordedAudio(
+                id = 2,
+                filePath = "filePath2",
+                timestamp = 1L,
+                associatedTaskId = "1",
+                title = "Comment 2",
+                page = 2,
+                date = "2025-01-01",
+                duration = 2L
+            )
+        )
+        coEvery { audioRepository.getAudiosForTask(taskId.toString()) } returns mockComments
+
+        viewModel.loadCommentsByTaskId(taskId)
+        testDispatcher.scheduler.advanceUntilIdle()
+
+        val filePath = "example/path/to/file"
+        val currentName = "Current Name"
+        val newName = "New Name"
+
+        val recordedAudio = RecordedAudio(1, filePath = filePath, title = "Comment 1", timestamp = 10000L, duration =  1L, associatedTaskId = "1", date = "2025-10-01")
+
+        viewModel.openEditDialog(filePath, currentName)
+        viewModel.updateEditingName(newName)
+        testDispatcher.scheduler.advanceUntilIdle()
+
+        coEvery { audioRepository.getAudiosForTask("1") } returns listOf(recordedAudio)
+        coEvery { audioRepository.updateAudioName(filePath, newName) } just Runs
+
+        viewModel.confirmEditName()
+        testDispatcher.scheduler.advanceUntilIdle()
+
+        coVerify { audioRepository.updateAudioName(filePath, newName) }
+        assertEquals(newName, viewModel.comments.value.first { it.filePath == filePath }.title)
+        assertFalse(viewModel.showEditDialog.value)
+    }
 
 }
