@@ -17,6 +17,7 @@ import com.example.proyectofinal.mail.domain.usecase.ReceiveMessageUseCase
 import com.example.proyectofinal.mail.domain.usecase.ReceiveOutboxMessageUseCase
 import com.example.proyectofinal.mail.domain.usecase.SaveDraftUseCase
 import com.example.proyectofinal.mail.domain.usecase.SendMessageUseCase
+import com.example.proyectofinal.mail.presentation.viewmodel.ConversationViewModel
 import com.example.proyectofinal.mail.presentation.viewmodel.InboxViewModel
 import com.example.proyectofinal.mail.presentation.viewmodel.MessageViewModel
 import org.koin.android.ext.koin.androidContext
@@ -52,4 +53,6 @@ val mailModule = module {
     factory { ReceiveConversationByIdUseCase(get()) }
     viewModel { InboxViewModel(get(), get(), get(), get(), get(), get()) }
     viewModel { MessageViewModel(get(), get(), get(), get(), get(), get()) }
+    viewModel { ConversationViewModel(get()) }
+
 }
