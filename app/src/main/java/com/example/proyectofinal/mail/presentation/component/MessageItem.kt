@@ -13,11 +13,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Reply
 import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.Done
 import androidx.compose.material.icons.filled.Edit
-import androidx.compose.material.icons.filled.Info
-import androidx.compose.material.icons.filled.Visibility
-import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Icon
@@ -130,25 +126,25 @@ fun MessageItem(
                         }
 
                         MailboxType.OUTBOX -> {
-                            listOf("Leído", "No leído", "Entregado").forEach { status ->
-                                IconButton(
-                                    onClick = { onMarkStatus?.invoke(message, status) },
-                                    modifier = Modifier.semantics {
-                                        contentDescription = "Marcar como $status"
-                                    }
-                                ) {
-                                    Icon(
-                                        imageVector = when (status) {
-                                            "Leído" -> Icons.Default.Visibility
-                                            "No leído" -> Icons.Default.VisibilityOff
-                                            "Entregado" -> Icons.Default.Done
-                                            else -> Icons.Default.Info
-                                        },
-                                        contentDescription = null,
-                                        tint = Color.White
-                                    )
-                                }
-                            }
+//                            listOf("Leído", "No leído", "Entregado").forEach { status ->
+//                                IconButton(
+//                                    onClick = { onMarkStatus?.invoke(message, status) },
+//                                    modifier = Modifier.semantics {
+//                                        contentDescription = "Marcar como $status"
+//                                    }
+//                                ) {
+//                                    Icon(
+//                                        imageVector = when (status) {
+//                                            "Leído" -> Icons.Default.Visibility
+//                                            "No leído" -> Icons.Default.VisibilityOff
+//                                            "Entregado" -> Icons.Default.Done
+//                                            else -> Icons.Default.Info
+//                                        },
+//                                        contentDescription = null,
+//                                        tint = Color.White
+//                                    )
+//                                }
+//                            }
                         }
 
                         MailboxType.DRAFT -> {
