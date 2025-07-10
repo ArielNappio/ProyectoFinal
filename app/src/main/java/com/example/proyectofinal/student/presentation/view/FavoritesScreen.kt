@@ -43,7 +43,7 @@ fun FavoritesScreen(
     ) { innerPadding ->
         Column(
             modifier = Modifier
-                .padding(16.dp)
+                .padding(innerPadding)
                 .fillMaxSize()
 
         ) {

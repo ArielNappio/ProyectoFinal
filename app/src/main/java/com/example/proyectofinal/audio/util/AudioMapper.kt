@@ -16,15 +16,3 @@ fun RecordedAudioEntity.toDomain(): RecordedAudio {
     )
 }
 
-fun RecordedAudio.toEntity(): RecordedAudioEntity {
-    return RecordedAudioEntity(
-        id = id,
-        filePath = filePath,
-        timestamp = timestamp,
-        associatedTaskId = associatedTaskId,
-        title = title,
-        page = page,
-        date = date,
-        duration = duration
-    )
-}

@@ -5,7 +5,6 @@ import android.graphics.Bitmap
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.proyectofinal.core.network.ApiUrls
-import com.example.proyectofinal.core.network.NetworkResponse
 import com.example.proyectofinal.text_editor.data.repository.PdfProviderImpl
 import com.example.proyectofinal.text_editor.domain.PdfBitmapConverter
 import kotlinx.coroutines.CoroutineDispatcher

@@ -29,7 +29,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.navigation.compose.rememberNavController
 import com.example.proyectofinal.users.data.model.User
 import com.example.proyectofinal.users.presentation.component.UserCard
 import androidx.compose.material.icons.Icons
@@ -39,7 +38,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.navigation.NavController
-import com.example.proyectofinal.navigation.ScreensRoute
 import com.example.proyectofinal.users.presentation.viewmodel.UserViewModel
 import org.koin.androidx.compose.koinViewModel
 

@@ -1,6 +1,5 @@
 package com.example.proyectofinal.mail.domain.usecase
 
-import com.example.proyectofinal.mail.domain.provider.MailProvider
 import com.example.proyectofinal.mail.domain.repository.MailRepository
 
 //class ReceiveOutboxMessageUseCase (private val mailRemoteProvider: MailProvider) {
