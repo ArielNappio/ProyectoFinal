@@ -117,7 +117,7 @@ fun ProjectDetailScreen(
                             },
                             onToggleFavorite = { projectId, isFavorite ->
                                 viewModel.toggleFavorite(
-                                    project.data.id.toString(),
+                                    project.data.id,
                                     !project.data.isFavorite
                                 )
                             },
@@ -168,7 +168,7 @@ private fun ProjectDetailContent(
             ProjectCard(
                 project = project,
                 onClick = {},
-                onToggleFavorite = { onToggleFavorite(project.id.toString(), project.isFavorite) },
+                onToggleFavorite = { onToggleFavorite(project.id, project.isFavorite) },
                 iconSize = iconSize
             )
         }
