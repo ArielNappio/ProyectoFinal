@@ -16,7 +16,6 @@ import io.ktor.client.request.header
 import io.ktor.client.request.post
 import io.ktor.client.request.put
 import io.ktor.client.request.setBody
-import io.ktor.client.statement.HttpResponse
 import io.ktor.client.statement.bodyAsText
 import io.ktor.http.ContentType
 import io.ktor.http.HttpStatusCode
@@ -71,7 +70,19 @@ class MailProviderImpl(
 
             val url = ApiUrls.MESSAGES_INBOX_BY_ID.replace("{userId}", userId)
 
-            val response: HttpResponse = ktorClient.get(url)
+            val token = tokenManager.token.firstOrNull()
+
+            if (token.isNullOrEmpty()) {
+                emit(NetworkResponse.Failure("No auth token found"))
+                return@flow
+            }
+
+            val response = ktorClient.get(url) {
+                header("Authorization", "Bearer $token")
+            }
+
+            val bodyText = response.bodyAsText()
+            println("DEBUG JSON: $bodyText")
 
             if (response.status == HttpStatusCode.OK) {
                 val messages = response.body<List<MessageModel>>()
