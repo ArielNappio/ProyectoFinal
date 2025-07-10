@@ -3,7 +3,7 @@ package com.example.proyectofinal.order.presentation.viewmodel
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.proyectofinal.order.data.model.Order
+import com.example.proyectofinal.order.domain.model.Order
 import com.example.proyectofinal.order.domain.usecase.CreateOrderUseCase
 import com.example.proyectofinal.order.domain.usecase.DeleteOrderUseCase
 import com.example.proyectofinal.order.domain.usecase.GetOrderByIdUseCase

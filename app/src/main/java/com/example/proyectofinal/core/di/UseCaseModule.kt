@@ -17,5 +17,4 @@ val useCaseModule = module {
     factory { CreateOrderUseCase(get()) }
     factory { UpdateOrderUseCase(get()) }
     factory { DeleteOrderUseCase(get()) }
-
 }

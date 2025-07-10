@@ -9,44 +9,41 @@ import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.compositionLocalOf
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 
-data class CurrentTheme(
-    val isDark: Boolean = false,
-    private val isCustomFontFamilySelected: Boolean = false // TODO: Change to enum with different font families
-) {
-    val font = atkinsonHyperlegibleFamily.takeIf { isCustomFontFamilySelected }
-}
+data class CurrentTheme(val isDark: Boolean = false)
+
 val LocalTheme = compositionLocalOf { CurrentTheme() }
 
 private val DarkColorScheme = darkColorScheme(
     primary = Purple80,
     secondary = PurpleGrey80,
-    tertiary = Pink80
+    tertiary = Pink80,
+    background = BackgroundColorNegro,
+    surface = BackgroundColorNegro,
+    onBackground = Color.White,
+    onSurface = Color.White,
 )
 
 private val LightColorScheme = lightColorScheme(
     primary = Purple40,
     secondary = PurpleGrey40,
-    tertiary = Pink40
+    tertiary = Pink40,
 
-    /* Other default colors to override
-    background = Color(0xFFFFFBFE),
+    background = Color.White,
     surface = Color(0xFFFFFBFE),
-    onPrimary = Color.White,
-    onSecondary = Color.White,
-    onTertiary = Color.White,
-    onBackground = Color(0xFF1C1B1F),
-    onSurface = Color(0xFF1C1B1F),
-    */
+    onPrimary = Color.Black,
+    onSecondary = Color.Black,
+    onBackground = Color.Black,
+    onSurface = Color.Black,
 )
 
 @Composable
 fun ProyectoFinalTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
     // Dynamic color is available on Android 12+
-    customTypographySelected: Boolean = false,
-    dynamicColor: Boolean = true,
+    dynamicColor: Boolean = false,
     content: @Composable () -> Unit
 ) {
     val colorScheme = when {
@@ -61,7 +58,7 @@ fun ProyectoFinalTheme(
 
     MaterialTheme(
         colorScheme = colorScheme,
-        typography = getTypography(customTypographySelected),
+        typography = getTypography(),
         content = content
     )
 }

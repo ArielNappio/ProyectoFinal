@@ -12,12 +12,16 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -29,6 +33,7 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.proyectofinal.student.presentation.component.CommentAudioCard
 import com.example.proyectofinal.student.presentation.viewmodel.CommentsViewModel
+import com.example.proyectofinal.student.util.formatHumanReadableDate
 import org.koin.androidx.compose.koinViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -38,12 +43,17 @@ fun CommentsScreen(
     modifier: Modifier = Modifier,
     taskId: Int
 ) {
-    val viewModel = koinViewModel< CommentsViewModel>()
+    val viewModel = koinViewModel<CommentsViewModel>()
 
     val comments by viewModel.comments.collectAsState()
+    val currentlyPlayingPath by viewModel.currentlyPlayingPath.collectAsState()
+    val isPlaying by viewModel.isPlaying.collectAsState()
+    val currentPosition by viewModel.currentPosition.collectAsState()
+    val showEditDialog by viewModel.showEditDialog.collectAsState()
+    val editingName by viewModel.editingName.collectAsState()
 
-    LaunchedEffect(Unit) {
-        viewModel.getCommentsByTaskId(taskId)
+    LaunchedEffect(taskId){
+        viewModel.loadCommentsByTaskId(taskId)
     }
 
     Column(modifier = modifier.fillMaxSize()) {
@@ -55,37 +65,98 @@ fun CommentsScreen(
         Spacer(modifier = Modifier.height(12.dp))
 
         if (comments.isEmpty()) {
-            Text(
-                "No hay comentarios aún.",
-                modifier = Modifier.padding(16.dp)
-            )
+            Column(
+                modifier = Modifier
+                    .fillMaxSize(),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Text(
+                    "No hay comentarios",
+                    modifier = Modifier.padding(16.dp)
+                )
+                Text(
+                    text = "😢",
+                    fontSize = 48.sp
+                )
+            }
         } else {
-            Column(modifier = Modifier.padding(horizontal = 16.dp)) {
-                comments.forEach { comment ->
+            LazyColumn(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(horizontal = 16.dp),
+                verticalArrangement = Arrangement.spacedBy(16.dp)
+            ) {
+                items(comments.size) { index ->
+                    val comment = comments[index]
                     CommentAudioCard(
                         comment = comment,
-                        onPlayClick = { /* solo UI, nada de media player */ }
+                        isPlaying = isPlaying && comment.filePath == currentlyPlayingPath,
+                        currentPosition = if (currentlyPlayingPath == comment.filePath) currentPosition else 0L,
+                        onPlayClick = {
+                            println("Reproduciendo ${comment.filePath}")
+                            viewModel.playAudio(comment.filePath)
+                        },
+                        onPauseClick = { viewModel.playAudio(comment.filePath) },
+                        onSeek = { position, playAfterSeek, path ->
+                            viewModel.seekTo(position, playAfterSeek, path)
+                        },
+                        onDeleteClick = {
+                            viewModel.deleteComment(comment.filePath)
+                        },
+                        onEditClick = { filePath, newTitle ->
+                            viewModel.openEditDialog(comment.filePath, comment.title)
+                        }
                     )
+
                     Spacer(modifier = Modifier.height(12.dp))
 
                     // Info extra abajo de cada card
                     Row(
                         horizontalArrangement = Arrangement.SpaceBetween,
                         modifier = Modifier.fillMaxWidth()
+
                     ) {
                         Text(
-                            text = "📄 Página: ${comment.page}",
+                            text = "📄 Página: ${comment.page + 1}",
                             style = MaterialTheme.typography.bodyMedium
                         )
                         Text(
-                            text = "📅 Fecha: ${comment.date}",
+                            text = "📅 Fecha: ${formatHumanReadableDate(comment.date)}",
                             style = MaterialTheme.typography.bodyMedium
                         )
                     }
-
-                    Spacer(modifier = Modifier.height(16.dp))
                 }
             }
+
+        }
+
+
+        if (showEditDialog) {
+            AlertDialog(
+                onDismissRequest = { viewModel.closeEditDialog() },
+                confirmButton = {
+                    TextButton(
+                        onClick = { viewModel.confirmEditName() },
+                        enabled = editingName.isNotBlank()
+                    ) {
+                        Text("Guardar")
+                    }
+                },
+                dismissButton = {
+                    TextButton(onClick = { viewModel.closeEditDialog() }) {
+                        Text("Cancelar")
+                    }
+                },
+                title = { Text("Editar nombre") },
+                text = {
+                    OutlinedTextField(
+                        value = editingName,
+                        onValueChange = { viewModel.updateEditingName(it) },
+                        singleLine = true,
+                        label = { Text("Nuevo nombre") }
+                    )
+                }
+            )
         }
     }
 }

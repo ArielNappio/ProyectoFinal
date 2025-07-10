@@ -1,5 +1,9 @@
 package com.example.proyectofinal.student.presentation.view
 
+import android.content.Intent
+import android.net.Uri
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -12,47 +16,79 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.DropdownMenu
-import androidx.compose.material3.DropdownMenuItem
-import androidx.compose.material3.Icon
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Switch
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
-import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
+import androidx.core.net.toUri
+import androidx.navigation.NavController
+import coil.compose.rememberAsyncImagePainter
 import com.example.proyectofinal.R
+import com.example.proyectofinal.auth.data.tokenmanager.TokenManager
 import com.example.proyectofinal.core.theme.LocalTheme
 import com.example.proyectofinal.core.ui.ThemeViewModel
+import com.example.proyectofinal.navigation.ScreensRoute
+import com.example.proyectofinal.navigation.presentation.viewmodel.MainViewModel
+import com.example.proyectofinal.userpreferences.presentation.component.AppText
+import com.example.proyectofinal.userpreferences.presentation.viewmodel.PreferencesViewModel
 import org.koin.androidx.compose.koinViewModel
+import org.koin.compose.koinInject
+
 
 @Composable
-fun StudentProfileScreen(modifier: Modifier = Modifier) {
+fun StudentProfileScreen(
+    modifier: Modifier = Modifier,
+    navController: NavController,
+) {
     val themeViewModel = koinViewModel<ThemeViewModel>()
-    var expanded by remember { mutableStateOf(false) }
-    val isCustomFontFamilySelected by themeViewModel.fontFamilySelected.collectAsState()
+    val mainViewModel = koinViewModel<MainViewModel>()
+    val preferencesViewModel = koinViewModel<PreferencesViewModel>()
+    val tokenManager: TokenManager = koinInject()
+    val user = tokenManager.user.collectAsState(initial = null).value
+    val context = LocalContext.current
+
+    val imageUri = remember { mutableStateOf<Uri?>(null) }
+
+    LaunchedEffect(user?.email) {
+        user?.email?.let { email ->
+            preferencesViewModel.getProfileImageUri(email) { uriString ->
+                uriString?.let { imageUri.value = it.toUri() }
+            }
+        }
+    }
+
+    val launcher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.OpenDocument()
+    ) { uri: Uri? ->
+        uri?.let {
+            context.contentResolver.takePersistableUriPermission(
+                it,
+                Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION
+            )
+            imageUri.value = it
+            user?.email?.let { email ->
+                preferencesViewModel.updateProfileImageUri(email, it.toString())
+            }
+        }
+    }
 
     Column(
         modifier = modifier
@@ -62,28 +98,31 @@ fun StudentProfileScreen(modifier: Modifier = Modifier) {
         Row(
             modifier = Modifier
                 .fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceEvenly,
+            horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
             // Profile Image
             Image(
-                painter = painterResource(id = R.drawable.student_placeholder_profile_photo),
+                painter = rememberAsyncImagePainter(
+                    model = imageUri.value ?: R.drawable.student_placeholder_profile_photo
+                ),
                 contentDescription = null,
                 modifier = Modifier
                     .size(120.dp)
                     .clip(CircleShape)
                     .background(Color.DarkGray)
+                    .clickable {
+                        launcher.launch(arrayOf("image/*"))
+                    },
+                contentScale = ContentScale.Crop
             )
 
-            Spacer(modifier = Modifier.height(16.dp))
-
+            Spacer(modifier = Modifier.width(24.dp))
             // Placeholder for user info
             Column {
-                Text("Información de usuario", fontSize = 20.sp, fontWeight = FontWeight.Bold)
+                AppText(user?.email.toString(), isTitle = true, fontWeight = FontWeight.Bold)
                 Spacer(modifier = Modifier.height(4.dp))
-                Text("Nombre y Apellido", fontSize = 16.sp, fontWeight = FontWeight.Bold)
-                Spacer(modifier = Modifier.height(4.dp))
-                Text("Carrera: Abogacia", fontSize = 16.sp, fontWeight = FontWeight.Bold)
+                AppText(user?.fullName.toString())
             }
         }
 
@@ -96,9 +135,8 @@ fun StudentProfileScreen(modifier: Modifier = Modifier) {
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Text(
+            AppText(
                 text = "Modo Oscuro",
-                fontSize = 20.sp,
                 fontWeight = FontWeight.Bold,
                 modifier = Modifier.semantics { contentDescription = "Toggle de modo oscuro" }
             )
@@ -108,99 +146,43 @@ fun StudentProfileScreen(modifier: Modifier = Modifier) {
             )
         }
 
-        Spacer(modifier = Modifier.height(32.dp))
-
-        Row(
+        Button(
+            onClick = { navController.navigate(ScreensRoute.Preferences.route) },
             modifier = Modifier
-                .fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
+                .wrapContentSize()
+                .fillMaxWidth()
+                .padding(vertical = 4.dp),
+            colors = ButtonDefaults.buttonColors(
+                containerColor = Color(0xFF3A66FF),
+                contentColor = Color.White
+            ),
+            shape = RoundedCornerShape(24.dp)
         ) {
-            OutlinedTextField(
-                value = if (isCustomFontFamilySelected) "Atkinson Hyperlegible" else "System Default",
-                onValueChange = {},
-                readOnly = true,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .clickable { expanded = true },
-                label = {
-                    Text(
-                        text = "Tipografia:",
-                        fontFamily = LocalTheme.current.font ?: FontFamily.SansSerif,
-                        fontSize = 20.sp,
-                        fontWeight = FontWeight.Bold,
-                        modifier = Modifier.semantics { contentDescription = "Selector de tipografía" }
-                    )
-                },
-                trailingIcon = {
-                    Icon(
-                        imageVector = Icons.Default.ArrowDropDown,
-                        contentDescription = "Abrir selector",
-                        modifier = Modifier
-                            .rotate(if (expanded) 180f else 0f)
-                    )
-                }
-            )
-            DropdownMenu(
-                expanded = expanded,
-                onDismissRequest = { expanded = false }
-            ) {
-                listOf("System Default", "Atkinson Hyperlegible").forEach { option ->
-                    DropdownMenuItem(
-                        onClick = {
-                            expanded = !expanded
-                            themeViewModel.setFontFamilySelected(option == "Atkinson Hyperlegible")
-                        },
-                        text = { Text(option) }
-                    )
-                }
-            }
+            AppText(text = "Configuración de fuente")
         }
 
         Spacer(modifier = Modifier.weight(1f))
 
-        // Blue buttons
-        val buttonLabels = listOf("Aviso legal", "Sección Tutorial?")
-        buttonLabels.forEach { label ->
-            Button(
-                onClick = {},
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(vertical = 4.dp)
-                    .height(48.dp),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = Color(0xFF3A66FF),
-                    contentColor = Color.White
-                ),
-                shape = RoundedCornerShape(24.dp)
-            ) {
-                Text(text = label)
-            }
-        }
-
-        Spacer(modifier = Modifier.height(24.dp))
-
-        // Logout button (Red)
         Button(
-            onClick = {},
+            onClick = {
+                println("Click en cerrar sesión")
+                mainViewModel.logout()
+                navController.navigate(ScreensRoute.Login.route) {
+                    popUpTo(ScreensRoute.Login.route) { inclusive = true }
+                                                             }
+                      },
             modifier = Modifier
-                .fillMaxWidth()
-                .height(48.dp),
+                .wrapContentSize()
+                .fillMaxWidth(),
             colors = ButtonDefaults.buttonColors(
                 containerColor = Color(0xFFE53935),
                 contentColor = Color.White
             ),
             shape = RoundedCornerShape(24.dp)
         ) {
-            Text("Cerrar sesión")
+            AppText("Cerrar sesión")
         }
 
         Spacer(modifier = Modifier.height(16.dp))
     }
-}
-
-@Preview
-@Composable
-fun PreviewStudentProfileScreen() {
-    StudentProfileScreen(koinViewModel())
 }

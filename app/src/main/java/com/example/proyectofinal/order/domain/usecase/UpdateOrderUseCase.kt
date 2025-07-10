@@ -1,9 +1,8 @@
 package com.example.proyectofinal.order.domain.usecase
 
-import com.example.proyectofinal.order.data.model.Order
-import com.example.proyectofinal.auth.data.remoteData.repository.AuthRemoteRepository
-import com.example.proyectofinal.order.data.repository.OrderRepository
+import com.example.proyectofinal.order.domain.model.Order
+import com.example.proyectofinal.order.domain.provider.OrderProvider
 
-class UpdateOrderUseCase(private val orderRepository: OrderRepository) {
-    operator fun invoke(order: Order) = orderRepository.updateOrder(order)
+class UpdateOrderUseCase(private val orderProvider: OrderProvider) {
+    operator fun invoke(order: Order) = orderProvider.updateOrder(order)
 }

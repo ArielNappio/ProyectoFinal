@@ -4,6 +4,7 @@ plugins {
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.jetbrainsKotlinSerialization)
     id("com.google.gms.google-services")
+    alias(libs.plugins.ksp)
 }
 
 android {
@@ -39,6 +40,10 @@ android {
     buildFeatures {
         compose = true
     }
+
+    ksp {
+        arg("room.schemaLocation", "$projectDir/schemas")
+    }
 }
 
 dependencies {
@@ -65,6 +70,8 @@ dependencies {
     implementation(libs.ktor.client.content.negotiation)
     implementation(libs.ktor.client.logging)
 
+    implementation(libs.kotlinx.serialization.json)
+
     // CameraX
     implementation(libs.androidx.camera.camera2)
     implementation(libs.androidx.camera.lifecycle)
@@ -81,6 +88,20 @@ dependencies {
     implementation(libs.androidx.navigation.runtime.ktx)
     implementation(libs.androidx.navigation.runtime.android)
 
+    //room
+    implementation(libs.androidx.room.runtime)
+    implementation(libs.androidx.room.common.jvm)
+    implementation(libs.androidx.ui.test.junit4.android)
+    implementation(libs.ads.mobile.sdk)
+    annotationProcessor(libs.androidx.room.compiler)
+    implementation(libs.androidx.room.ktx)
+    ksp(libs.androidx.room.compiler)
+    implementation("com.google.code.gson:gson:2.10.1")
+
+    // Coil
+    implementation ("io.coil-kt:coil-compose:2.7.0")
+
+
     //mockito
     testImplementation(libs.mockk)
     testImplementation(libs.kotlinx.coroutines.test)
@@ -93,9 +114,8 @@ dependencies {
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
 
-
-
     implementation(platform("com.google.firebase:firebase-bom:33.12.0"))
 
     implementation("com.google.firebase:firebase-analytics")
+    testImplementation(kotlin("test"))
 }

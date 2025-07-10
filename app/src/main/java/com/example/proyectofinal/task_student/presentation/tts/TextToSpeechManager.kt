@@ -3,13 +3,13 @@ package com.example.proyectofinal.task_student.presentation.tts
 import android.content.Context
 import android.os.Bundle
 import android.speech.tts.TextToSpeech
-import java.util.Locale
 import android.speech.tts.UtteranceProgressListener
 import android.util.Log
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import java.io.File
+import java.util.Locale
 
 
 class TextToSpeechManager(private val context: Context) : TextToSpeech.OnInitListener {
@@ -90,6 +90,8 @@ class TextToSpeechManager(private val context: Context) : TextToSpeech.OnInitLis
         }
     }
 
+
+
     fun shutdown() {
         tts?.stop()
         isPaused = false
@@ -128,5 +130,24 @@ class TextToSpeechManager(private val context: Context) : TextToSpeech.OnInitLis
 
         tts?.synthesizeToFile(text, params, file, "tts_export")
     }
+
+    // config velocidad
+
+    fun setSpeechRate(rate: Float) {
+        tts?.setSpeechRate(rate)
+    }
+
+    // config tono
+    fun setPitch(pitch: Float) {
+        tts?.setPitch(pitch)
+    }
+
+    // config tono y velocidad
+
+    fun configure(rate: Float = 1.0f, pitch: Float = 1.0f) {
+        tts?.setSpeechRate(rate)
+        tts?.setPitch(pitch)
+    }
+
 
 }
