@@ -48,7 +48,6 @@ fun SearchScreen(navController: NavController) {
     val context = LocalContext.current
     val orderState by viewModel.orderManagementState.collectAsState()
     val searchText by viewModel.searchText.collectAsState()
-    val iconSize by viewModel.iconSize.collectAsState()
 
     val speechRecognizerManager = remember {
         SpeechRecognizerManager(

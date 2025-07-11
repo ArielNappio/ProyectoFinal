@@ -1,7 +1,7 @@
 package com.example.proyectofinal.student.presentation.component
 
+import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Mic
@@ -10,10 +10,17 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.example.proyectofinal.userpreferences.presentation.component.AppText
+import com.example.proyectofinal.userpreferences.presentation.viewmodel.PreferencesViewModel
+import com.example.proyectofinal.userpreferences.util.getFontFamilyFromString
+import org.koin.androidx.compose.koinViewModel
 
 @Composable
 fun SearchBar(
@@ -22,6 +29,12 @@ fun SearchBar(
     onVoiceClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val viewModel: PreferencesViewModel = koinViewModel()
+    val prefs by viewModel.preferences.collectAsState()
+
+    val fontSize = (prefs.fontSize - 4).coerceAtLeast(12f)
+    val fontFamily = getFontFamilyFromString(prefs.fontFamily)
+
     TextField(
         value = searchText,
         onValueChange = onTextChange,
@@ -61,9 +74,14 @@ fun SearchBar(
 //            focusedPlaceholderColor = Color.White.copy(alpha = 0.5f),
 //            unfocusedPlaceholderColor = Color.White.copy(alpha = 0.5f)
 //        ),
+        textStyle = TextStyle(
+            fontSize = fontSize.sp,
+            fontFamily = fontFamily,
+            lineHeight = (fontSize * 1.2).sp
+        ),
         shape = RoundedCornerShape(50),
         modifier = modifier
             .fillMaxWidth()
-            .height(56.dp)
+            .defaultMinSize(minHeight = 56.dp)
     )
 }
