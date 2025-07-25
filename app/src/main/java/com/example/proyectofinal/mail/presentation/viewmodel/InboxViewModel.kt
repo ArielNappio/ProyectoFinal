@@ -13,6 +13,7 @@ import com.example.proyectofinal.mail.domain.usecase.DeleteMessageByIdUseCase
 import com.example.proyectofinal.mail.domain.usecase.GetDraftMessagesUseCase
 import com.example.proyectofinal.mail.domain.usecase.ReceiveMessageUseCase
 import com.example.proyectofinal.mail.domain.usecase.ReceiveOutboxMessageUseCase
+import com.example.proyectofinal.mail.util.DateUtilsMail
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -106,13 +107,11 @@ class InboxViewModel(
                         Log.d("InboxViewModel", "Response completa inbox:\n${response.data}")
 
                         val inbox = allMessages
-                            .filter { it.sender == userEmail }
+                            .filter { it.sender != userEmail }
                             .sortedByDescending { parseDate(it.date) }
 
                         val inboxFormatted = inbox.map { message ->
-                            val parsedDate = parseDate(message.date)
-                            val formattedDate = formatDateTimeForDisplay(parsedDate)
-                            message.copy(date = formattedDate)
+                            message.copy(date = DateUtilsMail.formatHumanReadableDate(message.date))
                         }
 
                         _inboxMessages.value = inboxFormatted
@@ -144,9 +143,7 @@ class InboxViewModel(
                             .sortedByDescending { parseDate(it.date) }
 
                         val outboxFormatted = outbox.map { message ->
-                            val parsedDate = parseDate(message.date)
-                            val formattedDate = formatDateTimeForDisplay(parsedDate)
-                            message.copy(date = formattedDate)
+                            message.copy(date = DateUtilsMail.formatHumanReadableDate(message.date))
                         }
 
                         _outboxMessages.value = outboxFormatted
@@ -191,12 +188,6 @@ class InboxViewModel(
         return LocalDateTime.MIN
     }
 
-    // Esta función devuelve un string con el formato "EEE dd MMM yyyy HH:mm" (ejemplo: "Sun 22 Jun 2025 23:09")
-    private fun formatDateTimeForDisplay(dateTime: LocalDateTime): String {
-        val formatter = DateTimeFormatter.ofPattern("EEE dd MMM yyyy HH:mm", Locale.ENGLISH)
-        return dateTime.format(formatter)
-    }
-
     fun getMessageById(id: Int): MessageModel? {
         val message = inboxMessages.value.find { it.id == id }
             ?: outboxMessages.value.find { it.id == id }
@@ -212,11 +203,13 @@ class InboxViewModel(
 
         viewModelScope.launch(Dispatchers.IO) {
             val drafts: List<MessageModel> = getDraftMessagesUseCase()
-            _draftMessages.value = drafts
             if (drafts.isEmpty()) {
                 println("Sin borradores")
             } else {
                 println("Borradores cargados: ${drafts.size}")
+                _draftMessages.value = drafts.map { message ->
+                    message.copy(date = DateUtilsMail.formatHumanReadableDate(message.date))
+                }
             }
         }
 

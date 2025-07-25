@@ -228,8 +228,8 @@ fun InboxScreenTopBar(
 
             AppText(
                 text = when (mailboxType) {
-                    MailboxType.INBOX -> "Bandeja de Entrada"
-                    MailboxType.OUTBOX -> "Bandeja de Salida"
+                    MailboxType.INBOX -> "Recibidos"
+                    MailboxType.OUTBOX -> "Enviados"
                     MailboxType.DRAFT -> "Borradores"
                 },
                 fontWeight = FontWeight.Bold,
@@ -265,7 +265,7 @@ fun InboxScreenTopBar(
                         }
                     )
                     DropdownMenuItem(
-                        text = { Text("Bandeja de Entrada", fontSize = 18.sp) },
+                        text = { Text("Recibidos", fontSize = 18.sp) },
                         onClick = {
                             menuExpanded.value = false
                             navController.navigate("mail/inbox")
@@ -273,13 +273,13 @@ fun InboxScreenTopBar(
                         leadingIcon = {
                             Icon(
                                 Icons.Filled.Inbox,
-                                contentDescription = "Bandeja de Entrada",
+                                contentDescription = "Recibidos",
                                 modifier = Modifier.size(24.dp)
                             )
                         }
                     )
                     DropdownMenuItem(
-                        text = { Text("Bandeja de Salida", fontSize = 18.sp) },
+                        text = { Text("Enviados", fontSize = 18.sp) },
                         onClick = {
                             menuExpanded.value = false
                             navController.navigate("mail/outbox")
@@ -287,7 +287,7 @@ fun InboxScreenTopBar(
                         leadingIcon = {
                             Icon(
                                 Icons.AutoMirrored.Filled.Send,
-                                contentDescription = "Bandeja de Salida",
+                                contentDescription = "Enviados",
                                 modifier = Modifier.size(24.dp)
                             )
                         }

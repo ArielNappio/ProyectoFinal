@@ -1,11 +1,9 @@
 package com.example.proyectofinal.text_editor.presentation.component
 
 import android.graphics.Bitmap
-import androidx.compose.foundation.layout.aspectRatio
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.drawWithContent
+
 //import coil.compose.AsyncImage
 
 @Composable
